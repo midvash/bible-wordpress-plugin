@@ -117,7 +117,7 @@ function bbm_enqueue_assets()
         true
     );
 
-    // Translations for tooltip
+    // Translations for tooltip (frontend strings — passed to JS, not loaded from .mo)
     $translations = array(
         'pt-br' => array(
             'read_more' => 'Ler mais',
@@ -130,6 +130,30 @@ function bbm_enqueue_assets()
         'en' => array(
             'read_more' => 'Read more',
             'verse_unavailable' => 'Verse currently unavailable',
+        ),
+        'fr' => array(
+            'read_more' => 'Lire plus',
+            'verse_unavailable' => 'Verset actuellement indisponible',
+        ),
+        'de' => array(
+            'read_more' => 'Mehr lesen',
+            'verse_unavailable' => 'Vers derzeit nicht verfügbar',
+        ),
+        'it' => array(
+            'read_more' => 'Leggi di più',
+            'verse_unavailable' => 'Versetto attualmente non disponibile',
+        ),
+        'ru' => array(
+            'read_more' => 'Читать далее',
+            'verse_unavailable' => 'Стих временно недоступен',
+        ),
+        'ko' => array(
+            'read_more' => '더 읽기',
+            'verse_unavailable' => '구절을 현재 사용할 수 없습니다',
+        ),
+        'zh' => array(
+            'read_more' => '阅读更多',
+            'verse_unavailable' => '经文暂时无法显示',
         ),
     );
     

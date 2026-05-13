@@ -302,3 +302,7 @@ msgstr "Bibbia online"
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Leggi %s su Midvash"
+
+#: includes/class-bbm-admin.php:46 includes/class-bbm-admin.php:47 includes/class-bbm-admin.php:770
+msgid "Bible by Midvash"
+msgstr "Bibbia by Midvash"

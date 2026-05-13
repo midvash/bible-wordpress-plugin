@@ -43,8 +43,8 @@ class BBM_Admin
     public function add_admin_menu()
     {
         add_options_page(
-            'Bible by Midvash',
-            'Bible by Midvash',
+            __('Bible by Midvash', 'bible-by-midvash'),
+            __('Bible by Midvash', 'bible-by-midvash'),
             'manage_options',
             'bbm',
             array($this, 'options_page')
@@ -767,7 +767,7 @@ class BBM_Admin
                     <img src="<?php echo esc_url($icon_url); ?>" alt="Midvash">
                 </div>
                 <div class="bbm-hero__content">
-                    <h1 class="bbm-hero__title">Bible by Midvash</h1>
+                    <h1 class="bbm-hero__title"><?php esc_html_e('Bible by Midvash', 'bible-by-midvash'); ?></h1>
                     <p class="bbm-hero__subtitle">
                         <?php esc_html_e('Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips.', 'bible-by-midvash'); ?>
                     </p>

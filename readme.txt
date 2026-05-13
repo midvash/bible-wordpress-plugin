@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, reference, biblical, tooltip, multilingual
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -106,6 +106,9 @@ Go to Settings > Midvash and use the color picker.
 
 == Changelog ==
 
+= 0.2.1 =
+* The plugin brand name "Bible by Midvash" is now translated in the admin menu and settings page header — appears as "Bíblia by Midvash" (Portuguese), "Biblia by Midvash" (Spanish), "Bibel by Midvash" (German), "Bibbia by Midvash" (Italian), "Библия by Midvash" (Russian), "성경 by Midvash" (Korean), "圣经 by Midvash" (Chinese), keeping "Midvash" as the brand.
+
 = 0.2.0 =
 * Added full support for 6 new content locales: French, German, Italian, Russian, Korean, and Chinese (Simplified). All 9 locales (pt-br, en, es, fr, de, it, ru, ko, zh) now have working book detection, localized URLs, and matching Bible versions.
 * Book data is now generated from the Midvash API via `scripts/sync-books.ts`, eliminating ~500 lines of hardcoded data.
@@ -124,6 +127,9 @@ Go to Settings > Midvash and use the color picker.
 * Distributed via https://wordpress.midvash.com.
 
 == Upgrade Notice ==
+
+= 0.2.1 =
+Translates the plugin brand name into the 8 non-English locales (Bíblia, Biblia, Bibel, Bibbia, Библия, 성경, 圣经…) for a fully localized admin experience.
 
 = 0.2.0 =
 Adds full content support for French, German, Italian, Russian, Korean and Chinese.

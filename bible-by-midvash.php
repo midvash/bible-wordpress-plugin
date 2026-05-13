@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://wordpress.midvash.com
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.3.0
+ * Version: 0.4.0
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('BBM_VERSION', '0.3.0');
+define('BBM_VERSION', '0.4.0');
 define('BBM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BBM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('BBM_API_BASE_URL', 'https://api.midvash.com');
@@ -28,6 +28,7 @@ require_once BBM_PLUGIN_DIR . 'includes/class-bbm-books.php';
 require_once BBM_PLUGIN_DIR . 'includes/class-bbm-api.php';
 require_once BBM_PLUGIN_DIR . 'includes/class-bbm-parser.php';
 require_once BBM_PLUGIN_DIR . 'includes/class-bbm-admin.php';
+require_once BBM_PLUGIN_DIR . 'includes/class-bbm-widget.php';
 
 // Plugin Update Checker — auto-update sem depender do wordpress.org.
 // Consulta wordpress.midvash.com/update-info.json a cada ~12h e mostra
@@ -58,6 +59,16 @@ function bbm_init()
     }
 }
 add_action('plugins_loaded', 'bbm_init');
+
+/**
+ * Register the VOTD widget and shortcode
+ */
+function bbm_register_widget()
+{
+    register_widget('BBM_Widget');
+}
+add_action('widgets_init', 'bbm_register_widget');
+add_shortcode('bbm_votd', 'bbm_votd_shortcode');
 
 /**
  * Register scripts and styles

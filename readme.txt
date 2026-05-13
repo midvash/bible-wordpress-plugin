@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, reference, biblical, tooltip, multilingual
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,6 +20,8 @@ Midvash is a plugin that detects Bible references within your WordPress post con
 
 * Automatic detection of Bible references
 * **Tooltip with verse text** (via API)
+* **Verse of the Day** widget and `[bbm_votd]` shortcode
+* **Schema.org Quotation** structured data on every reference link
 * **Multi-language support** (9 languages: Portuguese, English, Spanish, French, German, Italian, Russian, Korean, Chinese)
 * Support for ranges: John 3:16-18
 * 35+ available Bible versions
@@ -106,6 +108,9 @@ Go to Settings > Midvash and use the color picker.
 
 == Changelog ==
 
+= 0.4.0 =
+* Added **Verse of the Day** widget and `[bbm_votd]` shortcode powered by the Midvash API. Place the widget in any sidebar or use `[bbm_votd]` anywhere in your content. Supports all 9 locales, per-widget language and version overrides, and caches the daily verse for 24 hours.
+
 = 0.3.0 =
 * Added Schema.org `Quotation` microdata to all auto-detected Bible reference links. Search engines can now parse every verse reference as structured data, improving rich-result eligibility for sites using the plugin.
 
@@ -130,6 +135,9 @@ Go to Settings > Midvash and use the color picker.
 * Distributed via https://wordpress.midvash.com.
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Adds the Verse of the Day widget and `[bbm_votd]` shortcode — place daily verses in sidebars or posts with a single line.
 
 = 0.3.0 =
 Adds Schema.org Quotation microdata to every Bible reference link — no configuration needed, improves SEO structured data automatically.

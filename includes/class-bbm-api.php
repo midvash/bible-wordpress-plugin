@@ -453,6 +453,51 @@ class BBM_API
     }
 
     /**
+     * Fetches the verse of the day from the API
+     *
+     * @param string $locale  Content locale (pt-br, en, es…)
+     * @param string $version Bible version slug (nvt, kjv…)
+     * @return array|null Verse data or null on error
+     */
+    public function get_votd($locale = null, $version = null)
+    {
+        $locale  = $locale  ?: $this->locale;
+        $locale  = BBM_Books::normalize_locale($locale);
+        $version = $version ?: BBM_Books::get_default_version($locale);
+
+        $cache_key = 'bbm_votd_' . $locale . '_' . $version . '_' . gmdate('Y-m-d');
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        $result = $this->make_request('/votd', array(
+            'language' => $locale,
+            'version'  => $version,
+        ));
+
+        if ($result && isset($result['text'])) {
+            // Retry with locale default version if the chosen version returned an error
+            if (isset($result['error'])) {
+                $fallback = BBM_Books::get_default_version($locale);
+                if ($fallback !== $version) {
+                    $result = $this->make_request('/votd', array(
+                        'language' => $locale,
+                        'version'  => $fallback,
+                    ));
+                }
+            }
+        }
+
+        if ($result && isset($result['text']) && !isset($result['error'])) {
+            set_transient($cache_key, $result, DAY_IN_SECONDS);
+            return $result;
+        }
+
+        return null;
+    }
+
+    /**
      * Fetches available Bible books
      */
     public function get_books()

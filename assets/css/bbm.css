@@ -399,6 +399,83 @@ body.theme-dark .bbm-tooltip__loader,
 }
 
 /* ===========================
+   Verse of the Day Widget
+   =========================== */
+
+.bbm-votd {
+    padding: 16px;
+    border-left: 4px solid #B17027;
+    background: rgba(177, 112, 39, 0.05);
+    border-radius: 0 8px 8px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.7;
+}
+
+.bbm-votd__text {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: inherit;
+    font-style: italic;
+}
+
+.bbm-votd__reference {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    font-style: normal;
+    color: #B17027;
+    margin-bottom: 8px;
+}
+
+.bbm-votd__link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.bbm-votd__link:hover {
+    text-decoration: underline;
+}
+
+.bbm-votd__powered {
+    margin: 0;
+    font-size: 11px;
+    color: #999;
+}
+
+.bbm-votd__powered a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.bbm-votd__powered a:hover {
+    text-decoration: underline;
+}
+
+.bbm-votd__title {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.bbm-votd--error .bbm-votd__text {
+    font-style: normal;
+    color: #999;
+    font-size: 13px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .bbm-votd {
+        background: rgba(177, 112, 39, 0.08);
+    }
+    .bbm-votd__reference {
+        color: #F0CE8A;
+    }
+    .bbm-votd__powered {
+        color: #666;
+    }
+}
+
+/* ===========================
    Print Styles
    =========================== */
 

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('BBM_VERSION', '0.0.5');
+define('BBM_VERSION', '0.0.6');
 define('BBM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BBM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('BBM_API_BASE_URL', 'https://api.midvash.com');

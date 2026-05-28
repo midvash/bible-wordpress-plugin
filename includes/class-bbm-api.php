@@ -30,14 +30,14 @@ class BBM_API
     private $locale;
 
     /**
-     * Timestamp of the last request (for burst limit)
+     * Object cache group used as in-request fast path before transients.
+     *
+     * On sites with a persistent object cache (Redis, Memcached, MemCachier…),
+     * lookups stay in-memory; on vanilla installs transients hit the options
+     * table — still fine, just slower. Group names ending in "-bbm" keep
+     * keys isolated from other plugins.
      */
-    private static $last_request_time = 0;
-
-    /**
-     * Minimum delay between requests in microseconds (100ms)
-     */
-    private $min_request_delay = 100000;
+    const CACHE_GROUP = 'bbm';
 
     /**
      * Constructor
@@ -54,71 +54,6 @@ class BBM_API
         ));
         $this->locale = isset($this->options['locale']) ? $this->options['locale'] : 'pt-br';
         $this->locale = BBM_Books::normalize_locale($this->locale);
-    }
-
-    /**
-     * Parses a reference string and extracts book, chapter, verse
-     * 
-     * @param string $reference Reference like "João 3:16" or "Jo 3:16"
-     * @return array|null Parsed data or null if invalid
-     */
-    private function parse_reference($reference)
-    {
-        $reference = trim($reference);
-
-        // Match pattern: BookName Chapter:Verse(-VerseEnd)?
-        if (!preg_match('/^(.+?)\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $matches)) {
-            return null;
-        }
-
-        $book_input = mb_strtolower(trim($matches[1]));
-        $chapter = intval($matches[2]);
-        $verse = isset($matches[3]) && $matches[3] !== '' ? intval($matches[3]) : null;
-        $verse_end = isset($matches[4]) && $matches[4] !== '' ? intval($matches[4]) : null;
-
-        // Find book using centralized lookup
-        $lookup_table = BBM_Books::get_lookup_table();
-
-        if (!isset($lookup_table[$book_input])) {
-            // Try without accents
-            $book_input_no_accent = $this->remove_accents($book_input);
-            if (!isset($lookup_table[$book_input_no_accent])) {
-                return null;
-            }
-            $book_id = $lookup_table[$book_input_no_accent];
-        } else {
-            $book_id = $lookup_table[$book_input];
-        }
-
-        $book = BBM_Books::get_book_by_id($book_id);
-        if (!$book) {
-            return null;
-        }
-
-        return array(
-            'book_id' => $book_id,
-            'book' => $book,
-            'chapter' => $chapter,
-            'verse' => $verse,
-            'verse_end' => $verse_end,
-        );
-    }
-
-    /**
-     * Remove accents from string
-     */
-    private function remove_accents($string)
-    {
-        $accents = array(
-            'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
-            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
-            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-            'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o',
-            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-            'ñ' => 'n', 'ç' => 'c',
-        );
-
-        return strtr(mb_strtolower($string), $accents);
     }
 
     /**
@@ -174,37 +109,23 @@ class BBM_API
     }
 
     /**
-     * Waits for minimum delay between requests (avoids burst limit)
-     */
-    private function wait_if_needed()
-    {
-        $now = microtime(true) * 1000000;
-        $elapsed = $now - self::$last_request_time;
-
-        if (self::$last_request_time > 0 && $elapsed < $this->min_request_delay) {
-            usleep((int) ($this->min_request_delay - $elapsed));
-        }
-
-        self::$last_request_time = microtime(true) * 1000000;
-    }
-
-    /**
-     * Checks rate limit in response headers
-     * 
-     * @param array $response Response from wp_remote_get
+     * Inspects rate-limit headers but never blocks the request.
+     *
+     * The previous implementation `sleep(2)`-ed when the remaining budget was
+     * under 5 — fine for cron, brutal for a synchronous AJAX tooltip handler
+     * because it lengthens the user-visible round-trip for the *next* visitor
+     * (current request still pays the wait). We surface the remaining budget
+     * to error_log only when debugging, and let the upstream 429 (with our
+     * own backoff in make_request) handle real throttling.
      */
     private function check_rate_limit($response)
     {
+        if (!defined('WP_DEBUG') || !WP_DEBUG) {
+            return;
+        }
         $remaining = wp_remote_retrieve_header($response, 'X-RateLimit-Remaining');
-
-        if ($remaining !== '') {
-            $remaining_int = intval($remaining);
-
-            if ($remaining_int < 10) {
-                if ($remaining_int < 5) {
-                    sleep(2);
-                }
-            }
+        if ($remaining !== '' && (int) $remaining < 5) {
+            error_log('[bbm] upstream API rate-limit window almost exhausted (remaining=' . (int) $remaining . ')');
         }
     }
 
@@ -226,8 +147,8 @@ class BBM_API
             return null;
         }
 
-        // Parse reference
-        $parsed = $this->parse_reference($reference);
+        // Parse reference (centralized in BBM_Books)
+        $parsed = BBM_Books::parse_reference($reference);
         if (!$parsed) {
             return null;
         }
@@ -270,22 +191,23 @@ class BBM_API
     }
 
     /**
-     * Makes API request with retry and exponential backoff
-     * 
-     * @param string $path API endpoint path
-     * @param array $args Query parameters
-     * @param int $attempt Current attempt number
-     * @return array|null
+     * Makes a GET request to the Midvash API.
+     *
+     * Retry policy is deliberately *minimal* (1 retry, 1s backoff): this code
+     * runs synchronously inside AJAX handlers and `the_content` filters, where
+     * long sleep() chains snowball into PHP-FPM timeouts and bad UX. For 429s
+     * we honour `X-RateLimit-Reset` but cap the wait at 2s, then give up.
+     *
+     * @param string $path    API endpoint path (with leading slash).
+     * @param array  $args    Query parameters.
+     * @param int    $attempt Internal — recursion guard.
+     * @return array|null Decoded JSON body or null on failure.
      */
     private function make_request($path, $args = array(), $attempt = 1)
     {
-        $max_retries = 3;
-        $timeout = isset($this->options['timeout']) ? intval($this->options['timeout']) : 10;
-        if ($timeout < 5) {
-            $timeout = 10;
-        }
-
-        $this->wait_if_needed();
+        $max_retries = 2;
+        $timeout     = isset($this->options['timeout']) ? intval($this->options['timeout']) : 5;
+        $timeout     = max(1, min(30, $timeout)); // matches admin field constraint
 
         $url = $this->api_url . $path;
         if (!empty($args)) {
@@ -293,18 +215,19 @@ class BBM_API
         }
 
         $response = wp_remote_get($url, array(
-            'timeout' => $timeout,
-            'sslverify' => true,
+            'timeout'             => $timeout,
+            'sslverify'           => true,
+            'reject_unsafe_urls'  => true, // hard-blocks local/private redirects (SSRF defence)
+            'limit_response_size' => 256 * 1024, // 256 KB — verses are small JSON
             'headers' => array(
-                'Accept' => 'application/json',
+                'Accept'     => 'application/json',
                 'User-Agent' => 'Midvash-WP-Plugin/' . BBM_VERSION,
             ),
         ));
 
-        // Connection error
         if (is_wp_error($response)) {
             if ($attempt < $max_retries) {
-                sleep(pow(2, $attempt - 1));
+                sleep(1);
                 return $this->make_request($path, $args, $attempt + 1);
             }
             return null;
@@ -313,33 +236,31 @@ class BBM_API
         $status_code = wp_remote_retrieve_response_code($response);
         $this->check_rate_limit($response);
 
-        // Rate limit exceeded
         if ($status_code === 429) {
             if ($attempt < $max_retries) {
                 $reset_at = wp_remote_retrieve_header($response, 'X-RateLimit-Reset');
+                $wait     = 1;
                 if ($reset_at) {
-                    $reset_timestamp = strtotime($reset_at);
-                    $wait_seconds = max(1, min(60, $reset_timestamp - time()));
-                    sleep($wait_seconds);
-                } else {
-                    sleep(pow(2, $attempt));
+                    $reset_ts = strtotime($reset_at);
+                    if ($reset_ts) {
+                        $wait = max(1, min(2, $reset_ts - time())); // cap at 2s
+                    }
                 }
+                sleep($wait);
                 return $this->make_request($path, $args, $attempt + 1);
             }
             return null;
         }
 
-        // Server error
         if ($status_code >= 500 && $attempt < $max_retries) {
-            sleep(pow(2, $attempt - 1));
+            sleep(1);
             return $this->make_request($path, $args, $attempt + 1);
         }
 
-        // Success
         if ($status_code === 200) {
             $body = wp_remote_retrieve_body($response);
             $data = json_decode($body, true);
-            if ($data) {
+            if (is_array($data)) {
                 return $data;
             }
         }
@@ -364,22 +285,36 @@ class BBM_API
     }
 
     /**
-     * Fetches from cache
+     * Read-through cache: object cache (in-memory) → transient (persistent).
+     *
+     * On WPCom / managed hosts with a persistent object cache (Redis…), reads
+     * stay in-memory between requests — significantly faster than the options
+     * table round-trip that transients fall back to.
      */
     private function get_from_cache($reference, $version)
     {
         $key = $this->get_cache_key($reference, $version);
-        return get_transient($key);
+        $hit = wp_cache_get($key, self::CACHE_GROUP);
+        if ($hit !== false) {
+            return $hit;
+        }
+        $stored = get_transient($key);
+        if ($stored !== false) {
+            wp_cache_set($key, $stored, self::CACHE_GROUP, HOUR_IN_SECONDS);
+            return $stored;
+        }
+        return false;
     }
 
     /**
-     * Saves to cache
+     * Write-through cache: persist via transient, mirror in object cache.
      */
     private function save_to_cache($reference, $version, $data)
     {
         $key = $this->get_cache_key($reference, $version);
         $ttl = isset($this->options['cache_ttl']) ? intval($this->options['cache_ttl']) : 2592000;
         set_transient($key, $data, $ttl);
+        wp_cache_set($key, $data, self::CACHE_GROUP, min($ttl, HOUR_IN_SECONDS));
     }
 
     /**
@@ -497,36 +432,8 @@ class BBM_API
         return null;
     }
 
-    /**
-     * Fetches available Bible books
-     */
-    public function get_books()
-    {
-        $cache_key = 'bbm_books';
-        $cached = get_transient($cache_key);
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        $result = $this->make_request('/books');
-
-        if ($result) {
-            set_transient($cache_key, $result, 30 * DAY_IN_SECONDS);
-            return $result;
-        }
-
-        return null;
-    }
-
-    /**
-     * Clears all plugin cache
-     */
-    public function clear_cache()
-    {
-        global $wpdb;
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_bbm_%'");
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_bbm_%'");
-    }
+    // Note: an HTTP-backed get_books() and a direct-SQL clear_cache() lived
+    // here in earlier versions but had zero callers (the parser uses the
+    // static BBM_Books data, and cache wiping moved to uninstall.php). They
+    // were removed to keep the API surface minimal.
 }

@@ -22,19 +22,41 @@ class BBM_Admin
     }
 
     /**
-     * Enqueue admin CSS only on the plugin's settings page
+     * Enqueue admin CSS/JS only on the plugin's settings page
      */
     public function enqueue_admin_assets($hook)
     {
         if ($hook !== 'settings_page_bbm') {
             return;
         }
+
         wp_enqueue_style(
             'bbm-admin-style',
             BBM_PLUGIN_URL . 'assets/css/bbm-admin.css',
             array(),
             BBM_VERSION
         );
+
+        wp_enqueue_script(
+            'bbm-admin',
+            BBM_PLUGIN_URL . 'assets/js/bbm-admin.js',
+            array(),
+            BBM_VERSION,
+            true
+        );
+
+        wp_localize_script('bbm-admin', 'bbmAdmin', array(
+            'ajaxUrl'  => admin_url('admin-ajax.php'),
+            'nonce'    => wp_create_nonce('bbm_nonce'),
+            // Kept in sync with BBM_Books::DEFAULT_VERSIONS — passed to JS so
+            // the version select snaps to the preferred default per locale.
+            'defaults' => BBM_Books::DEFAULT_VERSIONS,
+            'i18n'     => array(
+                'loading' => __('Loading…', 'bible-by-midvash'),
+                'empty'   => __('No versions available', 'bible-by-midvash'),
+                'error'   => __('Error loading versions', 'bible-by-midvash'),
+            ),
+        ));
     }
 
     /**
@@ -237,142 +259,135 @@ class BBM_Admin
     }
 
     /**
+     * Whitelist of admin tabs. Used by both navigation and the per-tab
+     * checkbox reset logic in sanitize_options().
+     */
+    const TABS = array('general', 'cache');
+
+    /**
+     * Reads the active tab from `$_GET['tab']`, sanitized and validated.
+     * Defaults to 'general'.
+     */
+    private function get_active_tab()
+    {
+        // Reading $_GET only to identify which tab is being saved — there's no
+        // form action attached to this value, so no nonce is needed beyond the
+        // settings_fields() nonce that wraps the form.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $raw = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'general';
+        return in_array($raw, self::TABS, true) ? $raw : 'general';
+    }
+
+    /**
+     * True when the current POST is the Settings API submit for our option page.
+     * Settings API already verified the nonce via `option_page_capability_*` /
+     * `check_admin_referer` by the time `register_setting`’s sanitize callback
+     * runs, so reading $_POST here is safe; we still sanitize+unslash for WPCS.
+     */
+    private function is_our_options_post()
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if (empty($_POST['option_page'])) {
+            return false;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        return sanitize_key(wp_unslash($_POST['option_page'])) === 'bbm';
+    }
+
+    /**
+     * Reads a checkbox value from $input. If the key is missing AND we're
+     * submitting from the right tab (checkboxes don't POST when unchecked),
+     * returns false. Otherwise leaves the existing value untouched.
+     *
+     * @param array       $input       Raw $_POST input.
+     * @param string      $key         Option key.
+     * @param string      $tab         Tab where this checkbox lives.
+     * @param array       $sanitized   Working sanitized array (passed by ref).
+     */
+    private function read_checkbox($input, $key, $tab, &$sanitized)
+    {
+        if (isset($input[$key])) {
+            $sanitized[$key] = (bool) $input[$key];
+            return;
+        }
+        if ($this->is_our_options_post() && $this->get_active_tab() === $tab) {
+            $sanitized[$key] = false;
+        }
+    }
+
+    /**
      * Sanitizes options
      */
     public function sanitize_options($input)
     {
-        $existing = get_option('bbm_options', array());
+        $existing  = get_option('bbm_options', array());
         $sanitized = is_array($existing) ? $existing : array();
 
-        // General settings
-        if (isset($input['use_custom_color'])) {
-            $sanitized['use_custom_color'] = (bool) $input['use_custom_color'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['use_custom_color'] = false;
-            }
+        if (!is_array($input)) {
+            return $sanitized;
         }
 
+        // ----- General tab checkboxes -----
+        $this->read_checkbox($input, 'use_custom_color', 'general', $sanitized);
+        $this->read_checkbox($input, 'underline_link',   'general', $sanitized);
+        $this->read_checkbox($input, 'new_tab',          'general', $sanitized);
+        $this->read_checkbox($input, 'show_version',     'general', $sanitized);
+        $this->read_checkbox($input, 'link_biblia',      'general', $sanitized);
+        $this->read_checkbox($input, 'link_versions',    'general', $sanitized);
+        $this->read_checkbox($input, 'link_books',       'general', $sanitized);
+        $this->read_checkbox($input, 'link_terms',       'general', $sanitized);
+        $this->read_checkbox($input, 'link_characters',  'general', $sanitized);
+
+        // ----- Cache tab checkboxes -----
+        $this->read_checkbox($input, 'cache_enabled', 'cache', $sanitized);
+
+        // ----- Colors -----
         if (isset($input['link_color'])) {
             $sanitized['link_color'] = sanitize_hex_color($input['link_color']);
         }
-
-        if (isset($input['underline_link'])) {
-            $sanitized['underline_link'] = (bool) $input['underline_link'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['underline_link'] = false;
-            }
-        }
-
         if (isset($input['underline_color'])) {
             $sanitized['underline_color'] = sanitize_hex_color($input['underline_color']);
         }
 
+        // ----- Locale -----
         if (isset($input['locale'])) {
-            $valid_locales = array('pt-br', 'en', 'es', 'fr', 'de', 'it', 'ru', 'ko', 'zh');
-            $new_locale = sanitize_text_field($input['locale']);
-            $new_locale = in_array($new_locale, $valid_locales) ? $new_locale : 'pt-br';
-            $new_locale = BBM_Books::normalize_locale($new_locale);
-            
-            $old_locale = isset($sanitized['locale']) ? $sanitized['locale'] : 'pt-br';
-            $sanitized['locale'] = $new_locale;
-            
-            // If locale changed, update version to default for that locale (unless versao is explicitly set)
+            $valid_locales = BBM_Books::LOCALES;
+            $new_locale    = sanitize_text_field($input['locale']);
+            $new_locale    = in_array($new_locale, $valid_locales, true) ? $new_locale : 'pt-br';
+            $new_locale    = BBM_Books::normalize_locale($new_locale);
+
+            $old_locale            = isset($sanitized['locale']) ? $sanitized['locale'] : 'pt-br';
+            $sanitized['locale']   = $new_locale;
+
+            // If locale changed, snap version to that locale's default (unless caller picked one).
             if ($new_locale !== $old_locale && !isset($input['versao'])) {
-                $default_version = BBM_Books::get_default_version($new_locale);
-                $sanitized['versao'] = $default_version;
+                $sanitized['versao'] = BBM_Books::get_default_version($new_locale);
             }
         }
 
+        // ----- Version -----
         if (isset($input['versao'])) {
             $sanitized['versao'] = sanitize_text_field($input['versao']);
         }
 
+        // ----- Underline style (constrained list) -----
         if (isset($input['underline_style'])) {
-            $sanitized['underline_style'] = sanitize_text_field($input['underline_style']);
-        }
-        $sanitized['css_class'] = 'bbm-link'; // Constant for now
-
-        if (isset($input['new_tab'])) {
-            $sanitized['new_tab'] = (bool) $input['new_tab'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            // If we are on the general tab and checkbox is missing, it means it's unchecked
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['new_tab'] = false;
-            }
+            $style = sanitize_text_field($input['underline_style']);
+            $allowed = array('solid', 'double', 'dotted', 'dashed', 'wavy');
+            $sanitized['underline_style'] = in_array($style, $allowed, true) ? $style : 'solid';
         }
 
-        if (isset($input['show_version'])) {
-            $sanitized['show_version'] = (bool) $input['show_version'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['show_version'] = false;
-            }
-        }
+        // CSS class is fixed for now (kept here so consumers can rely on it).
+        $sanitized['css_class'] = 'bbm-link';
 
-        // Cache settings
-        if (isset($input['cache_enabled'])) {
-            $sanitized['cache_enabled'] = (bool) $input['cache_enabled'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'cache') {
-                $sanitized['cache_enabled'] = false;
-            }
-        }
-
+        // ----- Cache numbers -----
         if (isset($input['cache_ttl'])) {
-            $sanitized['cache_ttl'] = absint($input['cache_ttl']);
+            // Clamp to [60 s, 1 year] to avoid degenerate values.
+            $sanitized['cache_ttl'] = max(60, min(YEAR_IN_SECONDS, absint($input['cache_ttl'])));
         }
         if (isset($input['timeout'])) {
-            $sanitized['timeout'] = absint($input['timeout']);
-        }
-
-        // Auto-linking options
-        if (isset($input['link_biblia'])) {
-            $sanitized['link_biblia'] = (bool) $input['link_biblia'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['link_biblia'] = false;
-            }
-        }
-
-        if (isset($input['link_versions'])) {
-            $sanitized['link_versions'] = (bool) $input['link_versions'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['link_versions'] = false;
-            }
-        }
-
-
-
-        if (isset($input['link_books'])) {
-            $sanitized['link_books'] = (bool) $input['link_books'];
-        } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-            $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-            if ($tab === 'general') {
-                $sanitized['link_books'] = false;
-            }
-        }
-
-        // Additional link options
-        $link_fields = array('link_biblia', 'link_versions', 'link_terms', 'link_characters');
-        foreach ($link_fields as $field) {
-            if (isset($input[$field])) {
-                $sanitized[$field] = (bool) $input[$field];
-            } elseif (isset($_POST['option_page']) && $_POST['option_page'] === 'bbm') {
-                $tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
-                if ($tab === 'general') {
-                    $sanitized[$field] = false;
-                }
-            }
+            // Clamp to [1, 30] seconds; matches the admin field's `min`/`max`.
+            $sanitized['timeout'] = max(1, min(30, absint($input['timeout'])));
         }
 
         return $sanitized;
@@ -755,7 +770,7 @@ class BBM_Admin
      */
     public function options_page()
     {
-        $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
+        $active_tab = $this->get_active_tab();
         // Cache-buster com BBM_VERSION pra que o browser não sirva ícone antigo
         // após upgrade (img tag não tem o equivalente de wp_enqueue_style/_script).
         $icon_url = BBM_PLUGIN_URL . 'assets/images/icon-bbm.svg?v=' . BBM_VERSION;
@@ -788,11 +803,11 @@ class BBM_Admin
 
             <h2 class="nav-tab-wrapper">
                 <a href="?page=bbm&tab=general"
-                    class="nav-tab <?php echo esc_attr($active_tab == 'general' ? 'nav-tab-active' : ''); ?>">
+                    class="nav-tab <?php echo esc_attr($active_tab === 'general' ? 'nav-tab-active' : ''); ?>">
                     <?php esc_html_e('General', 'bible-by-midvash'); ?>
                 </a>
                 <a href="?page=bbm&tab=cache"
-                    class="nav-tab <?php echo esc_attr($active_tab == 'cache' ? 'nav-tab-active' : ''); ?>">
+                    class="nav-tab <?php echo esc_attr($active_tab === 'cache' ? 'nav-tab-active' : ''); ?>">
                     <?php esc_html_e('Cache & Performance', 'bible-by-midvash'); ?>
                 </a>
             </h2>
@@ -802,7 +817,7 @@ class BBM_Admin
                     <?php
                     settings_fields('bbm');
 
-                    if ($active_tab == 'general') {
+                    if ($active_tab === 'general') {
                         do_settings_sections('bbm_general');
                     } else {
                         do_settings_sections('bbm_cache');
@@ -812,100 +827,7 @@ class BBM_Admin
                     ?>
                 </form>
             </div>
-            <?php if ($active_tab == 'general'): ?>
-            <script>
-            (function() {
-                const localeSelect = document.getElementById('bbm_locale');
-                const versaoSelect = document.getElementById('bbm_versao');
-                
-                if (!localeSelect || !versaoSelect) return;
-                
-                // Default versions by locale (kept in sync with BBM_Books::DEFAULT_VERSIONS)
-                const defaultVersions = {
-                    'pt-br': 'nvt',
-                    'en': 'nlt',
-                    'es': 'ntv',
-                    'fr': 'lsg',
-                    'de': 'luth1912',
-                    'it': 'nri',
-                    'ru': 'synodal',
-                    'ko': 'kor',
-                    'zh': 'cuv'
-                };
-                
-                function updateVersions(locale) {
-                    // Show loading state
-                    versaoSelect.disabled = true;
-                    const currentValue = versaoSelect.value;
-                    versaoSelect.innerHTML = '<option value=""><?php echo esc_js(__('Loading...', 'bible-by-midvash')); ?></option>';
-                    
-                    // Fetch versions from API via AJAX
-                    const formData = new FormData();
-                    formData.append('action', 'bbm_get_versions');
-                    formData.append('nonce', '<?php echo wp_create_nonce('bbm_nonce'); ?>');
-                    formData.append('locale', locale);
-                    
-                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        versaoSelect.innerHTML = '';
-                        
-                        if (data.success && data.data && data.data.length > 0) {
-                            // Add versions from API
-                            data.data.forEach(function(v) {
-                                const option = document.createElement('option');
-                                const slug = (v.slug || v.code || '').toLowerCase();
-                                const name = v.name || '';
-                                const shortName = v.shortName || v.code || '';
-                                const displayName = name ? (name + ' (' + shortName + ')') : shortName;
-                                
-                                option.value = slug;
-                                option.textContent = displayName;
-                                versaoSelect.appendChild(option);
-                            });
-                            
-                            // Set default version for locale
-                            const defaultVersion = defaultVersions[locale] || 'nvt';
-                            const defaultOption = versaoSelect.querySelector('option[value="' + defaultVersion + '"]');
-                            if (defaultOption) {
-                                versaoSelect.value = defaultVersion;
-                            } else if (data.data.length > 0) {
-                                // Use first available version if default not found
-                                versaoSelect.value = (data.data[0].slug || data.data[0].code || '').toLowerCase();
-                            }
-                        } else {
-                            // Fallback: show error message
-                            const option = document.createElement('option');
-                            option.value = '';
-                            option.textContent = '<?php echo esc_js(__('No versions available', 'bible-by-midvash')); ?>';
-                            versaoSelect.appendChild(option);
-                        }
-                        
-                        versaoSelect.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching versions:', error);
-                        versaoSelect.innerHTML = '<option value=""><?php echo esc_js(__('Error loading versions', 'bible-by-midvash')); ?></option>';
-                        versaoSelect.disabled = false;
-                    });
-                }
-                
-                // Load versions on page load for current locale (only if select is empty)
-                if (localeSelect.value && versaoSelect.options.length <= 1) {
-                    updateVersions(localeSelect.value);
-                }
-                
-                localeSelect.addEventListener('change', function() {
-                    updateVersions(this.value);
-                });
-            })();
-            </script>
-            <?php endif; ?>
-
-            <?php if ($active_tab == 'general'): ?>
+            <?php if ($active_tab === 'general'): ?>
                 <div class="bbm-help">
                     <h2><?php esc_html_e('How to use', 'bible-by-midvash'); ?></h2>
                     <p><?php esc_html_e('The plugin automatically detects Bible references in your posts. When hovering over a reference, a tooltip displays the verse text fetched from the Midvash API.', 'bible-by-midvash'); ?></p>

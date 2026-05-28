@@ -87,19 +87,17 @@ class BBM_Books
      */
     public static function get_book_by_name($name)
     {
-        $normalized = mb_strtolower(trim($name));
-        $books = self::get_books();
+        $normalized = self::lower(trim($name));
+        $books      = self::get_books();
 
         foreach ($books as $book) {
-            // Check names
             foreach (self::LOCALES as $locale) {
-                if (isset($book['names'][$locale]) && mb_strtolower($book['names'][$locale]) === $normalized) {
+                if (isset($book['names'][$locale]) && self::lower($book['names'][$locale]) === $normalized) {
                     return $book;
                 }
             }
-            // Check abbreviations
             foreach (self::LOCALES as $locale) {
-                if (isset($book['abbrev'][$locale]) && mb_strtolower($book['abbrev'][$locale]) === $normalized) {
+                if (isset($book['abbrev'][$locale]) && self::lower($book['abbrev'][$locale]) === $normalized) {
                     return $book;
                 }
             }
@@ -178,16 +176,28 @@ class BBM_Books
     }
 
     /**
-     * Build pattern for regex matching (all names and abbreviations)
+     * Build pattern for regex matching (all names and abbreviations).
+     *
+     * Memoized per-locale: the pattern is built once per request, then served
+     * from a static cache. With 66 books × 9 locales × 2 fields, the original
+     * implementation rebuilt a ~1.2k-element string on every `the_content`
+     * filter call — wasteful for pages that render multiple post bodies
+     * (related posts, sticky posts, archives in custom themes…).
      */
     public static function get_matching_pattern($locale = null)
     {
-        $books = self::get_books();
-        $patterns = array();
+        static $cache = array();
+
+        $key = $locale ? self::normalize_locale($locale) : '__all__';
+        if (isset($cache[$key])) {
+            return $cache[$key];
+        }
+
+        $books            = self::get_books();
+        $patterns         = array();
+        $locales_to_check = $locale ? array(self::normalize_locale($locale)) : self::LOCALES;
 
         foreach ($books as $book) {
-            $locales_to_check = $locale ? array(self::normalize_locale($locale)) : self::LOCALES;
-
             foreach ($locales_to_check as $loc) {
                 if (isset($book['names'][$loc])) {
                     $patterns[] = preg_quote($book['names'][$loc], '/');
@@ -203,7 +213,104 @@ class BBM_Books
             return strlen($b) - strlen($a);
         });
 
-        return implode('|', array_unique($patterns));
+        $cache[$key] = implode('|', array_unique($patterns));
+        return $cache[$key];
+    }
+
+    /**
+     * Lowercase a string, preferring the multibyte function when available.
+     * Some shared hosts ship PHP without `mbstring` enabled; we fall back to
+     * `strtolower()` which still works for the ASCII portion of book names.
+     */
+    public static function lower($string)
+    {
+        if (function_exists('mb_strtolower')) {
+            return mb_strtolower($string);
+        }
+        return strtolower($string);
+    }
+
+    /**
+     * Removes Latin accents from a string for tolerant book matching.
+     * Used as a second lookup pass when the verbatim lower-cased input misses
+     * (e.g. "Joao 3:16" → "joao" → match against "joão").
+     */
+    public static function strip_accents($string)
+    {
+        static $map = array(
+            'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ñ' => 'n', 'ç' => 'c',
+            'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
+            'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
+            'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
+            'Ó' => 'O', 'Ò' => 'O', 'Õ' => 'O', 'Ô' => 'O', 'Ö' => 'O',
+            'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
+            'Ñ' => 'N', 'Ç' => 'C',
+        );
+        return strtr($string, $map);
+    }
+
+    /**
+     * Centralized reference parser used by BBM_Parser, BBM_API and BBM_Block.
+     *
+     * Accepts shapes like:
+     *   "John 3"            → entire chapter
+     *   "John 3:16"         → single verse
+     *   "John 3.16"         → alternative separator
+     *   "John 3:16-18"      → verse range
+     *
+     * Returns null when the book name cannot be resolved against any locale
+     * (with and without accents), or when the chapter number exceeds the
+     * book's total chapters.
+     *
+     * @param string $reference Raw reference text.
+     * @return array|null {book_id, book, chapter, verse, verse_end}
+     */
+    public static function parse_reference($reference)
+    {
+        $reference = trim($reference);
+        if ($reference === '') {
+            return null;
+        }
+        if (!preg_match('/^(.+?)\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m)) {
+            return null;
+        }
+
+        $book_input = self::lower(trim($m[1]));
+        $chapter    = intval($m[2]);
+        $verse      = (isset($m[3]) && $m[3] !== '') ? intval($m[3]) : null;
+        $verse_end  = (isset($m[4]) && $m[4] !== '') ? intval($m[4]) : null;
+
+        $lookup = self::get_lookup_table();
+        if (isset($lookup[$book_input])) {
+            $book_id = $lookup[$book_input];
+        } else {
+            $book_no_accent = self::strip_accents($book_input);
+            if (!isset($lookup[$book_no_accent])) {
+                return null;
+            }
+            $book_id = $lookup[$book_no_accent];
+        }
+
+        $book = self::get_book_by_id($book_id);
+        if (!$book) {
+            return null;
+        }
+        if ($chapter < 1 || $chapter > $book['chapters']) {
+            return null;
+        }
+
+        return array(
+            'book_id'   => $book_id,
+            'book'      => $book,
+            'chapter'   => $chapter,
+            'verse'     => $verse,
+            'verse_end' => $verse_end,
+        );
     }
 
     /**
@@ -752,32 +859,37 @@ class BBM_Books
     }
 
     /**
-     * Build lookup table for fast name/abbreviation to book mapping
-     * Returns array of pattern => book_id
+     * Build lookup table for fast name/abbreviation/slug → book_id mapping.
+     * Memoized per-locale for the same reason as get_matching_pattern().
      */
     public static function get_lookup_table($locale = null)
     {
-        $books = self::get_books();
-        $lookup = array();
+        static $cache = array();
+
+        $key = $locale ? self::normalize_locale($locale) : '__all__';
+        if (isset($cache[$key])) {
+            return $cache[$key];
+        }
+
+        $books            = self::get_books();
+        $lookup           = array();
         $locales_to_check = $locale ? array(self::normalize_locale($locale)) : self::LOCALES;
 
         foreach ($books as $book) {
             foreach ($locales_to_check as $loc) {
-                // Add name (lowercase)
                 if (isset($book['names'][$loc])) {
-                    $lookup[mb_strtolower($book['names'][$loc])] = $book['id'];
+                    $lookup[self::lower($book['names'][$loc])] = $book['id'];
                 }
-                // Add abbreviation (lowercase)
                 if (isset($book['abbrev'][$loc])) {
-                    $lookup[mb_strtolower($book['abbrev'][$loc])] = $book['id'];
+                    $lookup[self::lower($book['abbrev'][$loc])] = $book['id'];
                 }
-                // Add slug
                 if (isset($book['slugs'][$loc])) {
                     $lookup[$book['slugs'][$loc]] = $book['id'];
                 }
             }
         }
 
+        $cache[$key] = $lookup;
         return $lookup;
     }
 }

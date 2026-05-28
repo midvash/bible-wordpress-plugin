@@ -52,10 +52,13 @@
         tooltipElement.className = 'bbm-tooltip bbm-tooltip--below';
         tooltipElement.setAttribute('role', 'tooltip');
         tooltipElement.setAttribute('aria-hidden', 'true');
-        const iconHtml = config.icon_url ? `<img src="${escapeHtml(config.icon_url)}" alt="Midvash" class="bbm-tooltip__logo" />` : '';
+
+        // Static SVG markup is fine via innerHTML (no untrusted input), but
+        // the icon URL comes from PHP config — build it as an actual <img>
+        // node so aggressive theme sanitizers (e.g. AMP-mode plugins) can't
+        // strip the attribute.
         tooltipElement.innerHTML = `
             <div class="bbm-tooltip__header">
-                ${iconHtml}
                 <span class="bbm-tooltip__reference"></span>
                 <a class="bbm-tooltip__version-link" target="_blank" rel="noopener noreferrer">
                     <span class="bbm-tooltip__version"></span>
@@ -75,6 +78,15 @@
                 </a>
             </div>
         `;
+
+        if (config.icon_url) {
+            const header = tooltipElement.querySelector('.bbm-tooltip__header');
+            const img    = document.createElement('img');
+            img.src       = config.icon_url;
+            img.alt       = 'Midvash';
+            img.className = 'bbm-tooltip__logo';
+            header.insertBefore(img, header.firstChild);
+        }
 
         document.body.appendChild(tooltipElement);
 
@@ -319,7 +331,9 @@
             }
         })
         .catch(function(error) {
-            console.error('Midvash Tooltip Error:', error);
+            if (window.bbm_config && window.bbm_config.debug && typeof console !== 'undefined') {
+                console.error('Midvash Tooltip Error:', error);
+            }
             if (activeLink && activeLink.getAttribute('data-midvash-ref') === reference) {
                 showError(config.fallback_message);
             }

@@ -24,11 +24,6 @@ class BBM_Parser
     private $locale;
 
     /**
-     * Lookup table for matching book names/abbreviations to IDs
-     */
-    private $lookup_table;
-
-    /**
      * Books referenced in the current post
      */
     private $referenced_books = array();
@@ -58,9 +53,6 @@ class BBM_Parser
 
         $this->locale = isset($this->options['locale']) ? $this->options['locale'] : 'pt-br';
         $this->locale = BBM_Books::normalize_locale($this->locale);
-
-        // Build lookup table for current locale (plus allow other locales for flexibility)
-        $this->lookup_table = BBM_Books::get_lookup_table();
 
         // Add filter to content
         add_filter('the_content', array($this, 'parse_content'), 20);
@@ -127,63 +119,46 @@ class BBM_Parser
      */
     public function replace_reference($matches)
     {
-        $original = $matches[0];
-        $book_input = mb_strtolower(trim($matches[1]));
-        $chapter = $matches[2];
-        $verse = isset($matches[3]) && $matches[3] !== '' ? $matches[3] : null;
-        $verse_end = isset($matches[4]) && $matches[4] !== '' ? $matches[4] : null;
+        $original   = $matches[0];
+        $chapter    = isset($matches[2]) ? intval($matches[2]) : 0;
+        $verse_raw  = isset($matches[3]) && $matches[3] !== '' ? intval($matches[3]) : null;
+        $verse_end  = isset($matches[4]) && $matches[4] !== '' ? intval($matches[4]) : null;
 
-        // Find book using lookup table
-        if (!isset($this->lookup_table[$book_input])) {
-            // Try without accents
-            $book_input_no_accent = $this->remove_accents($book_input);
-            if (!isset($this->lookup_table[$book_input_no_accent])) {
-                return $original;
-            }
-            $book_id = $this->lookup_table[$book_input_no_accent];
-        } else {
-            $book_id = $this->lookup_table[$book_input];
-        }
-
-        // Get book data
-        $book = BBM_Books::get_book_by_id($book_id);
-        if (!$book) {
+        // Reconstruct a normalized reference string for the centralized parser
+        // (we already have the parts from the matching regex, but parse_reference
+        // re-runs lookup with accent fallback, chapter clamping, etc.).
+        $parsed = BBM_Books::parse_reference($original);
+        if (!$parsed) {
             return $original;
         }
 
+        $book_id = $parsed['book_id'];
+        $book    = $parsed['book'];
+
         // Track this book as referenced
-        if (!in_array($book_id, $this->referenced_books)) {
+        if (!in_array($book_id, $this->referenced_books, true)) {
             $this->referenced_books[] = $book_id;
         }
 
-        // Validate chapter
-        $chapter_num = intval($chapter);
-        if ($chapter_num < 1 || $chapter_num > $book['chapters']) {
-            return $original;
-        }
-
         // Get settings
-        $versao = isset($this->options['versao']) ? strtolower($this->options['versao']) : 'nvt';
+        $versao    = isset($this->options['versao']) ? strtolower($this->options['versao']) : 'nvt';
         $css_class = isset($this->options['css_class']) ? $this->options['css_class'] : 'bbm-link';
-        $new_tab = isset($this->options['new_tab']) ? $this->options['new_tab'] : true;
+        $new_tab   = isset($this->options['new_tab']) ? $this->options['new_tab'] : true;
 
         // Get slug for the current locale
         $book_slug = BBM_Books::get_book_slug($book_id, $this->locale);
 
         // Build URL with locale prefix
         // Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}/{verse}
-        $url = BBM_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $chapter;
+        $url = BBM_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
-        if ($verse) {
-            if ($verse_end && $verse_end !== $verse) {
-                $url .= '/' . $verse . '-' . $verse_end;
+        if ($parsed['verse']) {
+            if ($parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse']) {
+                $url .= '/' . $parsed['verse'] . '-' . $parsed['verse_end'];
             } else {
-                $url .= '/' . $verse;
+                $url .= '/' . $parsed['verse'];
             }
         }
-
-        // Build reference string for API (uses original text)
-        $api_ref = $original;
 
         // Link attributes
         $target = $new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
@@ -192,7 +167,7 @@ class BBM_Parser
             '<a href="%s" class="%s" data-midvash-ref="%s" data-midvash-book="%d"%s title="%s" itemscope itemtype="https://schema.org/Quotation"><span itemprop="name">%s</span></a>',
             esc_url($url),
             esc_attr($css_class),
-            esc_attr($api_ref),
+            esc_attr($original),
             intval($book_id),
             $target,
             esc_attr(sprintf(
@@ -202,29 +177,6 @@ class BBM_Parser
             )),
             esc_html($original)
         );
-    }
-
-    /**
-     * Remove accents from string for flexible matching
-     */
-    private function remove_accents($string)
-    {
-        $accents = array(
-            'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
-            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
-            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-            'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o',
-            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-            'ñ' => 'n', 'ç' => 'c',
-            'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
-            'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
-            'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
-            'Ó' => 'O', 'Ò' => 'O', 'Õ' => 'O', 'Ô' => 'O', 'Ö' => 'O',
-            'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
-            'Ñ' => 'N', 'Ç' => 'C',
-        );
-
-        return strtr($string, $accents);
     }
 
     /**

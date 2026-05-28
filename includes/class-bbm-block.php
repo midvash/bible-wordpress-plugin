@@ -120,6 +120,10 @@ class BBM_Block
     /**
      * Builds the Midvash URL for a given reference + locale + version.
      *
+     * Delegates parsing to BBM_Books::parse_reference() so book-name lookup,
+     * accent tolerance and chapter validation stay consistent across the
+     * parser, the API client and this block.
+     *
      * @param string $reference Raw reference text (e.g. "John 3:16").
      * @param string $locale    Normalized locale code.
      * @param string $version   Version slug.
@@ -127,25 +131,18 @@ class BBM_Block
      */
     private function build_url($reference, $locale, $version)
     {
-        if (!preg_match('/^(.+?)\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m)) {
+        $parsed = BBM_Books::parse_reference($reference);
+        if (!$parsed) {
             return '';
         }
 
-        $book_input = mb_strtolower(trim($m[1]));
-        $lookup     = BBM_Books::get_lookup_table();
+        $book_slug = BBM_Books::get_book_slug($parsed['book_id'], $locale);
+        $url       = BBM_SITE_URL . '/' . $locale . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
 
-        if (!isset($lookup[$book_input])) {
-            return '';
-        }
-
-        $book_id   = $lookup[$book_input];
-        $book_slug = BBM_Books::get_book_slug($book_id, $locale);
-        $url       = BBM_SITE_URL . '/' . $locale . '/' . $version . '/' . $book_slug . '/' . $m[2];
-
-        if (!empty($m[3])) {
-            $url .= '/' . $m[3];
-            if (!empty($m[4])) {
-                $url .= '-' . $m[4];
+        if ($parsed['verse']) {
+            $url .= '/' . $parsed['verse'];
+            if ($parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse']) {
+                $url .= '-' . $parsed['verse_end'];
             }
         }
 

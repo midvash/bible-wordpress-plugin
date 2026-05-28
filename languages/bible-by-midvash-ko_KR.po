@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bible by Midvash\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 10:21-0300\n"
+"Report-Msgid-Bugs-To: https://github.com/midvash/bible-by-midvash/issues\n"
+"POT-Creation-Date: 2026-05-28 08:19-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Korean\n"
@@ -12,296 +12,365 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: bible-by-midvash.php:195
+#: bible-by-midvash.php:176
+msgid "Verse currently unavailable"
+msgstr "구절을 현재 사용할 수 없습니다"
+
+#: bible-by-midvash.php:177
+msgid "Read more"
+msgstr "더 읽기"
+
+#: bible-by-midvash.php:230
+msgid "Too many requests"
+msgstr "요청이 너무 많습니다"
+
+#: bible-by-midvash.php:237
+msgid "Reference not provided"
+msgstr "구절이 제공되지 않았습니다"
+
+#: bible-by-midvash.php:246
+msgid "Verse not found"
+msgstr "구절을 찾을 수 없습니다"
+
+#: bible-by-midvash.php:262
+msgid "Forbidden"
+msgstr "접근 거부"
+
+#: bible-by-midvash.php:275
 msgid "Failed to fetch versions"
 msgstr "버전을 가져오지 못했습니다"
 
-#: includes/class-bbm-admin.php:64
+#: includes/class-bbm-admin.php:55
+msgid "Loading…"
+msgstr "불러오는 중…"
+
+#: includes/class-bbm-admin.php:56
+msgid "No versions available"
+msgstr "사용 가능한 번역본이 없습니다"
+
+#: includes/class-bbm-admin.php:57
+msgid "Error loading versions"
+msgstr "번역본을 불러오는 중 오류가 발생했습니다"
+
+#: includes/class-bbm-admin.php:68 includes/class-bbm-admin.php:69
+#: includes/class-bbm-admin.php:785
+msgid "Bible by Midvash"
+msgstr "성경 by Midvash"
+
+#: includes/class-bbm-admin.php:86
 msgid "General Settings"
 msgstr "일반 설정"
 
-#: includes/class-bbm-admin.php:72
+#: includes/class-bbm-admin.php:94
 msgid "Cache and Performance"
 msgstr "캐시 및 성능"
 
-#: includes/class-bbm-admin.php:80
+#: includes/class-bbm-admin.php:102
 msgid "Language"
 msgstr "언어"
 
-#: includes/class-bbm-admin.php:89
+#: includes/class-bbm-admin.php:111
 msgid "Bible Version"
 msgstr "성경 번역본"
 
-#: includes/class-bbm-admin.php:98
+#: includes/class-bbm-admin.php:120
 msgid "Link Color"
 msgstr "링크 색상"
 
-#: includes/class-bbm-admin.php:107
+#: includes/class-bbm-admin.php:129
 msgid "Enable custom color"
 msgstr "사용자 지정 색상 사용"
 
-#: includes/class-bbm-admin.php:116
+#: includes/class-bbm-admin.php:138
 msgid "Underline links"
 msgstr "링크 밑줄"
 
-#: includes/class-bbm-admin.php:125
+#: includes/class-bbm-admin.php:147
 msgid "Underline Color"
 msgstr "밑줄 색상"
 
-#: includes/class-bbm-admin.php:134
+#: includes/class-bbm-admin.php:156
 msgid "Underline Style"
 msgstr "밑줄 스타일"
 
-#: includes/class-bbm-admin.php:143
+#: includes/class-bbm-admin.php:165
 msgid "Open in new tab"
 msgstr "새 탭에서 열기"
 
-#: includes/class-bbm-admin.php:152
+#: includes/class-bbm-admin.php:174
 msgid "Show version in tooltip"
 msgstr "툴팁에 번역본 표시"
 
-#: includes/class-bbm-admin.php:161
+#: includes/class-bbm-admin.php:183
 msgid "Enable cache"
 msgstr "캐시 사용"
 
-#: includes/class-bbm-admin.php:170
+#: includes/class-bbm-admin.php:192
 msgid "Cache duration (seconds)"
 msgstr "캐시 유지 시간(초)"
 
-#: includes/class-bbm-admin.php:179
+#: includes/class-bbm-admin.php:201
 msgid "API Timeout (seconds)"
 msgstr "API 타임아웃(초)"
 
-#: includes/class-bbm-admin.php:188
+#: includes/class-bbm-admin.php:210
 msgid "Auto-linking Settings"
 msgstr "자동 링크 설정"
 
-#: includes/class-bbm-admin.php:196 includes/class-bbm-admin.php:651
+#: includes/class-bbm-admin.php:218 includes/class-bbm-admin.php:696
 msgid "Link the word \"Bíblia\""
 msgstr "\"Bíblia\" 단어 링크하기"
 
-#: includes/class-bbm-admin.php:205
+#: includes/class-bbm-admin.php:227
 msgid "Link Bible version names"
 msgstr "성경 번역본 이름 링크"
 
-#: includes/class-bbm-admin.php:214
+#: includes/class-bbm-admin.php:236
 msgid "Link Bible book names"
 msgstr "성경 책 이름 링크"
 
-#: includes/class-bbm-admin.php:223 includes/class-bbm-admin.php:701
+#: includes/class-bbm-admin.php:245 includes/class-bbm-admin.php:746
 msgid "Link dictionary terms"
 msgstr "사전 용어 링크"
 
-#: includes/class-bbm-admin.php:232 includes/class-bbm-admin.php:717
+#: includes/class-bbm-admin.php:254 includes/class-bbm-admin.php:762
 msgid "Link biblical characters"
 msgstr "성경 인물 링크"
 
-#: includes/class-bbm-admin.php:386
+#: includes/class-bbm-admin.php:401
 msgid "Configure how Bible references will be displayed."
 msgstr "성경 구절 표시 방식을 구성합니다."
 
-#: includes/class-bbm-admin.php:394
+#: includes/class-bbm-admin.php:409
 msgid "Configure cache settings to improve tooltip performance."
 msgstr "툴팁 성능 향상을 위해 캐시 설정을 구성합니다."
 
-#: includes/class-bbm-admin.php:431
+#: includes/class-bbm-admin.php:476
 msgid ""
 "Select the language for links and book names. This determines the URL "
 "structure on Midvash."
 msgstr ""
-"링크와 책 이름에 사용할 언어를 선택하세요. 이 설정은 Midvash의 URL "
-"구조를 결정합니다."
+"링크와 책 이름에 사용할 언어를 선택하세요. 이 설정은 Midvash의 URL 구조를 결"
+"정합니다."
 
-#: includes/class-bbm-admin.php:472
+#: includes/class-bbm-admin.php:517
 msgid ""
 "Select the Bible version for links and tooltips. Versions are fetched "
 "dynamically from Midvash."
 msgstr ""
-"링크와 툴팁에 사용할 성경 번역본을 선택하세요. 번역본은 Midvash에서 "
-"동적으로 불러옵니다."
+"링크와 툴팁에 사용할 성경 번역본을 선택하세요. 번역본은 Midvash에서 동적으로 "
+"불러옵니다."
 
-#: includes/class-bbm-admin.php:487
+#: includes/class-bbm-admin.php:532
 msgid "Enable custom color for links"
 msgstr "링크에 사용자 지정 색상 사용"
 
-#: includes/class-bbm-admin.php:502
+#: includes/class-bbm-admin.php:547
 msgid "Main color of the generated links."
 msgstr "생성된 링크의 주 색상입니다."
 
-#: includes/class-bbm-admin.php:516
+#: includes/class-bbm-admin.php:561
 msgid "Enable underline for links"
 msgstr "링크에 밑줄 사용"
 
-#: includes/class-bbm-admin.php:531
+#: includes/class-bbm-admin.php:576
 msgid "Color of the link underline."
 msgstr "링크 밑줄의 색상입니다."
 
-#: includes/class-bbm-admin.php:543
+#: includes/class-bbm-admin.php:588
 msgid "Solid"
 msgstr "실선"
 
-#: includes/class-bbm-admin.php:544
+#: includes/class-bbm-admin.php:589
 msgid "Double"
 msgstr "이중선"
 
-#: includes/class-bbm-admin.php:545
+#: includes/class-bbm-admin.php:590
 msgid "Dotted"
 msgstr "점선"
 
-#: includes/class-bbm-admin.php:546
+#: includes/class-bbm-admin.php:591
 msgid "Dashed"
 msgstr "파선"
 
-#: includes/class-bbm-admin.php:547
+#: includes/class-bbm-admin.php:592
 msgid "Wavy"
 msgstr "물결선"
 
-#: includes/class-bbm-admin.php:556
+#: includes/class-bbm-admin.php:601
 msgid "Style of the link underline."
 msgstr "링크 밑줄의 스타일입니다."
 
-#: includes/class-bbm-admin.php:570
+#: includes/class-bbm-admin.php:615
 msgid "Open links in a new browser tab"
 msgstr "브라우저의 새 탭에서 링크 열기"
 
-#: includes/class-bbm-admin.php:585
+#: includes/class-bbm-admin.php:630
 msgid "Display Bible version in tooltip"
 msgstr "툴팁에 성경 번역본 표시"
 
-#: includes/class-bbm-admin.php:600
+#: includes/class-bbm-admin.php:645
 msgid "Store verses in cache to improve performance"
 msgstr "성능 향상을 위해 구절을 캐시에 저장"
 
-#: includes/class-bbm-admin.php:615
+#: includes/class-bbm-admin.php:660
 msgid "Time in seconds (default: 2592000 = 30 days)."
 msgstr "초 단위 시간(기본값: 2592000 = 30일)."
 
-#: includes/class-bbm-admin.php:629
+#: includes/class-bbm-admin.php:674
 msgid "Maximum wait time for the API."
 msgstr "API의 최대 대기 시간입니다."
 
-#: includes/class-bbm-admin.php:638
+#: includes/class-bbm-admin.php:683
 msgid "Configure auto-linking for various elements in your content."
 msgstr "콘텐츠의 다양한 요소에 대한 자동 링크를 구성합니다."
 
-#: includes/class-bbm-admin.php:653
+#: includes/class-bbm-admin.php:698
 msgid "Auto-link the word \"Bíblia\" to Midvash"
 msgstr "\"Bíblia\" 단어를 Midvash로 자동 링크"
 
-#: includes/class-bbm-admin.php:667
+#: includes/class-bbm-admin.php:712
 msgid "Link version names"
 msgstr "번역본 이름 링크"
 
-#: includes/class-bbm-admin.php:669
+#: includes/class-bbm-admin.php:714
 msgid "Auto-link Bible version names mentioned in text"
 msgstr "본문에 언급된 성경 번역본 이름을 자동으로 링크"
 
-#: includes/class-bbm-admin.php:685
+#: includes/class-bbm-admin.php:730
 msgid "Link book names"
 msgstr "책 이름 링크"
 
-#: includes/class-bbm-admin.php:687
+#: includes/class-bbm-admin.php:732
 msgid "Auto-link Bible book names mentioned in text"
 msgstr "본문에 언급된 성경 책 이름을 자동으로 링크"
 
-#: includes/class-bbm-admin.php:703
+#: includes/class-bbm-admin.php:748
 msgid "Auto-link dictionary terms mentioned in text"
 msgstr "본문에 언급된 사전 용어를 자동으로 링크"
 
-#: includes/class-bbm-admin.php:719
+#: includes/class-bbm-admin.php:764
 msgid "Auto-link biblical characters mentioned in text"
 msgstr "본문에 언급된 성경 인물을 자동으로 링크"
 
-#: includes/class-bbm-admin.php:742
+#: includes/class-bbm-admin.php:787
 msgid ""
 "Auto-detect Bible references in your posts and turn them into beautiful "
 "links with verse tooltips."
 msgstr ""
-"게시물의 성경 구절을 자동으로 감지하고 구절 툴팁이 포함된 멋진 링크로 "
-"변환합니다."
+"게시물의 성경 구절을 자동으로 감지하고 구절 툴팁이 포함된 멋진 링크로 변환합"
+"니다."
 
-#: includes/class-bbm-admin.php:746
+#: includes/class-bbm-admin.php:791
 msgid "Powered by Midvash API"
 msgstr "Midvash API 제공"
 
-#: includes/class-bbm-admin.php:751
+#: includes/class-bbm-admin.php:796
 msgid "Plugin site"
 msgstr "플러그인 사이트"
 
-#: includes/class-bbm-admin.php:754
+#: includes/class-bbm-admin.php:799
 msgid "Open Midvash"
 msgstr "Midvash 열기"
 
-#: includes/class-bbm-admin.php:762
+#: includes/class-bbm-admin.php:807
 msgid "General"
 msgstr "일반"
 
-#: includes/class-bbm-admin.php:766
+#: includes/class-bbm-admin.php:811
 msgid "Cache & Performance"
 msgstr "캐시 및 성능"
 
-#: includes/class-bbm-admin.php:781
+#: includes/class-bbm-admin.php:826
 msgid "Save Settings"
 msgstr "설정 저장"
 
-#: includes/class-bbm-admin.php:804
-msgid "Loading..."
-msgstr "불러오는 중..."
-
-#: includes/class-bbm-admin.php:847
-msgid "No versions available"
-msgstr "사용 가능한 번역본이 없습니다"
-
-#: includes/class-bbm-admin.php:855
-msgid "Error loading versions"
-msgstr "번역본을 불러오는 중 오류가 발생했습니다"
-
-#: includes/class-bbm-admin.php:874
+#: includes/class-bbm-admin.php:832
 msgid "How to use"
 msgstr "사용 방법"
 
-#: includes/class-bbm-admin.php:875
+#: includes/class-bbm-admin.php:833
 msgid ""
 "The plugin automatically detects Bible references in your posts. When "
 "hovering over a reference, a tooltip displays the verse text fetched from "
 "the Midvash API."
 msgstr ""
-"이 플러그인은 게시물 안의 성경 구절을 자동으로 감지합니다. 구절 위에 "
-"마우스를 올리면 Midvash API에서 가져온 구절 본문이 툴팁으로 표시됩니다."
+"이 플러그인은 게시물 안의 성경 구절을 자동으로 감지합니다. 구절 위에 마우스"
+"를 올리면 Midvash API에서 가져온 구절 본문이 툴팁으로 표시됩니다."
 
-#: includes/class-bbm-admin.php:876
+#: includes/class-bbm-admin.php:834
 msgid "Supported formats"
 msgstr "지원되는 형식"
 
-#: includes/class-bbm-admin.php:878
+#: includes/class-bbm-admin.php:836
 msgid "Single verse"
 msgstr "단일 구절"
 
-#: includes/class-bbm-admin.php:879
+#: includes/class-bbm-admin.php:837
 msgid "Alternative separator"
 msgstr "대체 구분 기호"
 
-#: includes/class-bbm-admin.php:880
+#: includes/class-bbm-admin.php:838
 msgid "Verse range"
 msgstr "구절 범위"
 
-#: includes/class-bbm-admin.php:881
+#: includes/class-bbm-admin.php:839
 msgid "Abbreviation"
 msgstr "약어"
 
-#: includes/class-bbm-admin.php:882
+#: includes/class-bbm-admin.php:840
 msgid "Entire chapter"
 msgstr "장 전체"
 
-#: includes/class-bbm-parser.php:116
+#: includes/class-bbm-widget.php:21
+msgid "Verse of the Day — Midvash"
+msgstr "오늘의 말씀 — Midvash"
+
+#: includes/class-bbm-widget.php:23
+msgid "Displays the daily Bible verse powered by the Midvash API."
+msgstr "Midvash API를 통해 오늘의 성경 구절을 표시합니다."
+
+#: includes/class-bbm-widget.php:61
+msgid "Verse of the Day"
+msgstr "오늘의 말씀"
+
+#: includes/class-bbm-widget.php:68
+msgid "Title:"
+msgstr "제목:"
+
+#: includes/class-bbm-widget.php:74
+msgid "Language (leave empty to use plugin setting):"
+msgstr "언어(비워두면 플러그인 설정 사용):"
+
+#: includes/class-bbm-widget.php:77
+msgid "— Use plugin setting —"
+msgstr "— 플러그인 설정 사용 —"
+
+#: includes/class-bbm-widget.php:97
+msgid "Version (leave empty for locale default):"
+msgstr "버전(비워두면 언어 기본값 사용):"
+
+#: includes/class-bbm-widget.php:101
+msgid "e.g. nvt, kjv, lsg"
+msgstr "예: kor"
+
+#: includes/class-bbm-widget.php:106
+msgid "Show reference (e.g. João 3:16)"
+msgstr "참조 표시(예: 요한복음 3:16)"
+
+#: includes/class-bbm-widget.php:112
+msgid "Link verse to Midvash"
+msgstr "구절을 Midvash에 연결"
+
+#: includes/class-bbm-widget.php:164 includes/class-bbm-block.php:88
+msgid "Verse currently unavailable."
+msgstr "구절을 현재 사용할 수 없습니다."
+
+#: includes/class-bbm-parser.php:108
 msgid "Online Bible"
 msgstr "온라인 성경"
 
-#: includes/class-bbm-parser.php:200
+#: includes/class-bbm-parser.php:175
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Midvash에서 %s 읽기"
-
-#: includes/class-bbm-admin.php:46 includes/class-bbm-admin.php:47 includes/class-bbm-admin.php:770
-msgid "Bible by Midvash"
-msgstr "성경 by Midvash"

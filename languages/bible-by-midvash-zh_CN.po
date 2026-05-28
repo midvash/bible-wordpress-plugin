@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bible by Midvash\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 10:21-0300\n"
+"Report-Msgid-Bugs-To: https://github.com/midvash/bible-by-midvash/issues\n"
+"POT-Creation-Date: 2026-05-28 08:19-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Chinese (Simplified)\n"
@@ -12,293 +12,359 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: bible-by-midvash.php:195
+#: bible-by-midvash.php:176
+msgid "Verse currently unavailable"
+msgstr "经文暂时无法显示"
+
+#: bible-by-midvash.php:177
+msgid "Read more"
+msgstr "阅读更多"
+
+#: bible-by-midvash.php:230
+msgid "Too many requests"
+msgstr "请求过多"
+
+#: bible-by-midvash.php:237
+msgid "Reference not provided"
+msgstr "未提供经文引用"
+
+#: bible-by-midvash.php:246
+msgid "Verse not found"
+msgstr "未找到经文"
+
+#: bible-by-midvash.php:262
+msgid "Forbidden"
+msgstr "禁止访问"
+
+#: bible-by-midvash.php:275
 msgid "Failed to fetch versions"
 msgstr "无法获取译本"
 
-#: includes/class-bbm-admin.php:64
-msgid "General Settings"
-msgstr "常规设置"
+#: includes/class-bbm-admin.php:55
+msgid "Loading…"
+msgstr "加载中…"
 
-#: includes/class-bbm-admin.php:72
-msgid "Cache and Performance"
-msgstr "缓存与性能"
-
-#: includes/class-bbm-admin.php:80
-msgid "Language"
-msgstr "语言"
-
-#: includes/class-bbm-admin.php:89
-msgid "Bible Version"
-msgstr "圣经译本"
-
-#: includes/class-bbm-admin.php:98
-msgid "Link Color"
-msgstr "链接颜色"
-
-#: includes/class-bbm-admin.php:107
-msgid "Enable custom color"
-msgstr "启用自定义颜色"
-
-#: includes/class-bbm-admin.php:116
-msgid "Underline links"
-msgstr "为链接添加下划线"
-
-#: includes/class-bbm-admin.php:125
-msgid "Underline Color"
-msgstr "下划线颜色"
-
-#: includes/class-bbm-admin.php:134
-msgid "Underline Style"
-msgstr "下划线样式"
-
-#: includes/class-bbm-admin.php:143
-msgid "Open in new tab"
-msgstr "在新标签页中打开"
-
-#: includes/class-bbm-admin.php:152
-msgid "Show version in tooltip"
-msgstr "在提示框中显示译本"
-
-#: includes/class-bbm-admin.php:161
-msgid "Enable cache"
-msgstr "启用缓存"
-
-#: includes/class-bbm-admin.php:170
-msgid "Cache duration (seconds)"
-msgstr "缓存时长（秒）"
-
-#: includes/class-bbm-admin.php:179
-msgid "API Timeout (seconds)"
-msgstr "API 超时（秒）"
-
-#: includes/class-bbm-admin.php:188
-msgid "Auto-linking Settings"
-msgstr "自动链接设置"
-
-#: includes/class-bbm-admin.php:196 includes/class-bbm-admin.php:651
-msgid "Link the word \"Bíblia\""
-msgstr "链接“Bíblia”一词"
-
-#: includes/class-bbm-admin.php:205
-msgid "Link Bible version names"
-msgstr "链接圣经译本名称"
-
-#: includes/class-bbm-admin.php:214
-msgid "Link Bible book names"
-msgstr "链接圣经书卷名称"
-
-#: includes/class-bbm-admin.php:223 includes/class-bbm-admin.php:701
-msgid "Link dictionary terms"
-msgstr "链接词典词条"
-
-#: includes/class-bbm-admin.php:232 includes/class-bbm-admin.php:717
-msgid "Link biblical characters"
-msgstr "链接圣经人物"
-
-#: includes/class-bbm-admin.php:386
-msgid "Configure how Bible references will be displayed."
-msgstr "配置圣经经文引用的显示方式。"
-
-#: includes/class-bbm-admin.php:394
-msgid "Configure cache settings to improve tooltip performance."
-msgstr "配置缓存设置以提升提示框性能。"
-
-#: includes/class-bbm-admin.php:431
-msgid ""
-"Select the language for links and book names. This determines the URL "
-"structure on Midvash."
-msgstr ""
-"选择链接和书卷名称所用的语言。这将决定 Midvash 上的 URL 结构。"
-
-#: includes/class-bbm-admin.php:472
-msgid ""
-"Select the Bible version for links and tooltips. Versions are fetched "
-"dynamically from Midvash."
-msgstr ""
-"选择链接和提示框使用的圣经译本。译本将从 Midvash 动态获取。"
-
-#: includes/class-bbm-admin.php:487
-msgid "Enable custom color for links"
-msgstr "为链接启用自定义颜色"
-
-#: includes/class-bbm-admin.php:502
-msgid "Main color of the generated links."
-msgstr "生成链接的主要颜色。"
-
-#: includes/class-bbm-admin.php:516
-msgid "Enable underline for links"
-msgstr "为链接启用下划线"
-
-#: includes/class-bbm-admin.php:531
-msgid "Color of the link underline."
-msgstr "链接下划线的颜色。"
-
-#: includes/class-bbm-admin.php:543
-msgid "Solid"
-msgstr "实线"
-
-#: includes/class-bbm-admin.php:544
-msgid "Double"
-msgstr "双线"
-
-#: includes/class-bbm-admin.php:545
-msgid "Dotted"
-msgstr "点线"
-
-#: includes/class-bbm-admin.php:546
-msgid "Dashed"
-msgstr "虚线"
-
-#: includes/class-bbm-admin.php:547
-msgid "Wavy"
-msgstr "波浪线"
-
-#: includes/class-bbm-admin.php:556
-msgid "Style of the link underline."
-msgstr "链接下划线的样式。"
-
-#: includes/class-bbm-admin.php:570
-msgid "Open links in a new browser tab"
-msgstr "在浏览器新标签页中打开链接"
-
-#: includes/class-bbm-admin.php:585
-msgid "Display Bible version in tooltip"
-msgstr "在提示框中显示圣经译本"
-
-#: includes/class-bbm-admin.php:600
-msgid "Store verses in cache to improve performance"
-msgstr "将经文存入缓存以提升性能"
-
-#: includes/class-bbm-admin.php:615
-msgid "Time in seconds (default: 2592000 = 30 days)."
-msgstr "时间（秒，默认值：2592000 = 30 天）。"
-
-#: includes/class-bbm-admin.php:629
-msgid "Maximum wait time for the API."
-msgstr "API 的最长等待时间。"
-
-#: includes/class-bbm-admin.php:638
-msgid "Configure auto-linking for various elements in your content."
-msgstr "为内容中的各种元素配置自动链接。"
-
-#: includes/class-bbm-admin.php:653
-msgid "Auto-link the word \"Bíblia\" to Midvash"
-msgstr "自动将“Bíblia”一词链接到 Midvash"
-
-#: includes/class-bbm-admin.php:667
-msgid "Link version names"
-msgstr "链接译本名称"
-
-#: includes/class-bbm-admin.php:669
-msgid "Auto-link Bible version names mentioned in text"
-msgstr "自动为文本中提到的圣经译本名称添加链接"
-
-#: includes/class-bbm-admin.php:685
-msgid "Link book names"
-msgstr "链接书卷名称"
-
-#: includes/class-bbm-admin.php:687
-msgid "Auto-link Bible book names mentioned in text"
-msgstr "自动为文本中提到的圣经书卷名称添加链接"
-
-#: includes/class-bbm-admin.php:703
-msgid "Auto-link dictionary terms mentioned in text"
-msgstr "自动为文本中提到的词典词条添加链接"
-
-#: includes/class-bbm-admin.php:719
-msgid "Auto-link biblical characters mentioned in text"
-msgstr "自动为文本中提到的圣经人物添加链接"
-
-#: includes/class-bbm-admin.php:742
-msgid ""
-"Auto-detect Bible references in your posts and turn them into beautiful "
-"links with verse tooltips."
-msgstr ""
-"自动检测文章中的圣经经文引用，并将其转换为带有经文提示框的精美链接。"
-
-#: includes/class-bbm-admin.php:746
-msgid "Powered by Midvash API"
-msgstr "由 Midvash API 提供支持"
-
-#: includes/class-bbm-admin.php:751
-msgid "Plugin site"
-msgstr "插件网站"
-
-#: includes/class-bbm-admin.php:754
-msgid "Open Midvash"
-msgstr "打开 Midvash"
-
-#: includes/class-bbm-admin.php:762
-msgid "General"
-msgstr "常规"
-
-#: includes/class-bbm-admin.php:766
-msgid "Cache & Performance"
-msgstr "缓存与性能"
-
-#: includes/class-bbm-admin.php:781
-msgid "Save Settings"
-msgstr "保存设置"
-
-#: includes/class-bbm-admin.php:804
-msgid "Loading..."
-msgstr "加载中..."
-
-#: includes/class-bbm-admin.php:847
+#: includes/class-bbm-admin.php:56
 msgid "No versions available"
 msgstr "没有可用的译本"
 
-#: includes/class-bbm-admin.php:855
+#: includes/class-bbm-admin.php:57
 msgid "Error loading versions"
 msgstr "加载译本时出错"
 
-#: includes/class-bbm-admin.php:874
+#: includes/class-bbm-admin.php:68 includes/class-bbm-admin.php:69
+#: includes/class-bbm-admin.php:785
+msgid "Bible by Midvash"
+msgstr "圣经 by Midvash"
+
+#: includes/class-bbm-admin.php:86
+msgid "General Settings"
+msgstr "常规设置"
+
+#: includes/class-bbm-admin.php:94
+msgid "Cache and Performance"
+msgstr "缓存与性能"
+
+#: includes/class-bbm-admin.php:102
+msgid "Language"
+msgstr "语言"
+
+#: includes/class-bbm-admin.php:111
+msgid "Bible Version"
+msgstr "圣经译本"
+
+#: includes/class-bbm-admin.php:120
+msgid "Link Color"
+msgstr "链接颜色"
+
+#: includes/class-bbm-admin.php:129
+msgid "Enable custom color"
+msgstr "启用自定义颜色"
+
+#: includes/class-bbm-admin.php:138
+msgid "Underline links"
+msgstr "为链接添加下划线"
+
+#: includes/class-bbm-admin.php:147
+msgid "Underline Color"
+msgstr "下划线颜色"
+
+#: includes/class-bbm-admin.php:156
+msgid "Underline Style"
+msgstr "下划线样式"
+
+#: includes/class-bbm-admin.php:165
+msgid "Open in new tab"
+msgstr "在新标签页中打开"
+
+#: includes/class-bbm-admin.php:174
+msgid "Show version in tooltip"
+msgstr "在提示框中显示译本"
+
+#: includes/class-bbm-admin.php:183
+msgid "Enable cache"
+msgstr "启用缓存"
+
+#: includes/class-bbm-admin.php:192
+msgid "Cache duration (seconds)"
+msgstr "缓存时长（秒）"
+
+#: includes/class-bbm-admin.php:201
+msgid "API Timeout (seconds)"
+msgstr "API 超时（秒）"
+
+#: includes/class-bbm-admin.php:210
+msgid "Auto-linking Settings"
+msgstr "自动链接设置"
+
+#: includes/class-bbm-admin.php:218 includes/class-bbm-admin.php:696
+msgid "Link the word \"Bíblia\""
+msgstr "链接“Bíblia”一词"
+
+#: includes/class-bbm-admin.php:227
+msgid "Link Bible version names"
+msgstr "链接圣经译本名称"
+
+#: includes/class-bbm-admin.php:236
+msgid "Link Bible book names"
+msgstr "链接圣经书卷名称"
+
+#: includes/class-bbm-admin.php:245 includes/class-bbm-admin.php:746
+msgid "Link dictionary terms"
+msgstr "链接词典词条"
+
+#: includes/class-bbm-admin.php:254 includes/class-bbm-admin.php:762
+msgid "Link biblical characters"
+msgstr "链接圣经人物"
+
+#: includes/class-bbm-admin.php:401
+msgid "Configure how Bible references will be displayed."
+msgstr "配置圣经经文引用的显示方式。"
+
+#: includes/class-bbm-admin.php:409
+msgid "Configure cache settings to improve tooltip performance."
+msgstr "配置缓存设置以提升提示框性能。"
+
+#: includes/class-bbm-admin.php:476
+msgid ""
+"Select the language for links and book names. This determines the URL "
+"structure on Midvash."
+msgstr "选择链接和书卷名称所用的语言。这将决定 Midvash 上的 URL 结构。"
+
+#: includes/class-bbm-admin.php:517
+msgid ""
+"Select the Bible version for links and tooltips. Versions are fetched "
+"dynamically from Midvash."
+msgstr "选择链接和提示框使用的圣经译本。译本将从 Midvash 动态获取。"
+
+#: includes/class-bbm-admin.php:532
+msgid "Enable custom color for links"
+msgstr "为链接启用自定义颜色"
+
+#: includes/class-bbm-admin.php:547
+msgid "Main color of the generated links."
+msgstr "生成链接的主要颜色。"
+
+#: includes/class-bbm-admin.php:561
+msgid "Enable underline for links"
+msgstr "为链接启用下划线"
+
+#: includes/class-bbm-admin.php:576
+msgid "Color of the link underline."
+msgstr "链接下划线的颜色。"
+
+#: includes/class-bbm-admin.php:588
+msgid "Solid"
+msgstr "实线"
+
+#: includes/class-bbm-admin.php:589
+msgid "Double"
+msgstr "双线"
+
+#: includes/class-bbm-admin.php:590
+msgid "Dotted"
+msgstr "点线"
+
+#: includes/class-bbm-admin.php:591
+msgid "Dashed"
+msgstr "虚线"
+
+#: includes/class-bbm-admin.php:592
+msgid "Wavy"
+msgstr "波浪线"
+
+#: includes/class-bbm-admin.php:601
+msgid "Style of the link underline."
+msgstr "链接下划线的样式。"
+
+#: includes/class-bbm-admin.php:615
+msgid "Open links in a new browser tab"
+msgstr "在浏览器新标签页中打开链接"
+
+#: includes/class-bbm-admin.php:630
+msgid "Display Bible version in tooltip"
+msgstr "在提示框中显示圣经译本"
+
+#: includes/class-bbm-admin.php:645
+msgid "Store verses in cache to improve performance"
+msgstr "将经文存入缓存以提升性能"
+
+#: includes/class-bbm-admin.php:660
+msgid "Time in seconds (default: 2592000 = 30 days)."
+msgstr "时间（秒，默认值：2592000 = 30 天）。"
+
+#: includes/class-bbm-admin.php:674
+msgid "Maximum wait time for the API."
+msgstr "API 的最长等待时间。"
+
+#: includes/class-bbm-admin.php:683
+msgid "Configure auto-linking for various elements in your content."
+msgstr "为内容中的各种元素配置自动链接。"
+
+#: includes/class-bbm-admin.php:698
+msgid "Auto-link the word \"Bíblia\" to Midvash"
+msgstr "自动将“Bíblia”一词链接到 Midvash"
+
+#: includes/class-bbm-admin.php:712
+msgid "Link version names"
+msgstr "链接译本名称"
+
+#: includes/class-bbm-admin.php:714
+msgid "Auto-link Bible version names mentioned in text"
+msgstr "自动为文本中提到的圣经译本名称添加链接"
+
+#: includes/class-bbm-admin.php:730
+msgid "Link book names"
+msgstr "链接书卷名称"
+
+#: includes/class-bbm-admin.php:732
+msgid "Auto-link Bible book names mentioned in text"
+msgstr "自动为文本中提到的圣经书卷名称添加链接"
+
+#: includes/class-bbm-admin.php:748
+msgid "Auto-link dictionary terms mentioned in text"
+msgstr "自动为文本中提到的词典词条添加链接"
+
+#: includes/class-bbm-admin.php:764
+msgid "Auto-link biblical characters mentioned in text"
+msgstr "自动为文本中提到的圣经人物添加链接"
+
+#: includes/class-bbm-admin.php:787
+msgid ""
+"Auto-detect Bible references in your posts and turn them into beautiful "
+"links with verse tooltips."
+msgstr "自动检测文章中的圣经经文引用，并将其转换为带有经文提示框的精美链接。"
+
+#: includes/class-bbm-admin.php:791
+msgid "Powered by Midvash API"
+msgstr "由 Midvash API 提供支持"
+
+#: includes/class-bbm-admin.php:796
+msgid "Plugin site"
+msgstr "插件网站"
+
+#: includes/class-bbm-admin.php:799
+msgid "Open Midvash"
+msgstr "打开 Midvash"
+
+#: includes/class-bbm-admin.php:807
+msgid "General"
+msgstr "常规"
+
+#: includes/class-bbm-admin.php:811
+msgid "Cache & Performance"
+msgstr "缓存与性能"
+
+#: includes/class-bbm-admin.php:826
+msgid "Save Settings"
+msgstr "保存设置"
+
+#: includes/class-bbm-admin.php:832
 msgid "How to use"
 msgstr "使用方法"
 
-#: includes/class-bbm-admin.php:875
+#: includes/class-bbm-admin.php:833
 msgid ""
 "The plugin automatically detects Bible references in your posts. When "
 "hovering over a reference, a tooltip displays the verse text fetched from "
 "the Midvash API."
 msgstr ""
-"该插件会自动识别文章中的圣经经文引用。当鼠标悬停在引用上时，提示框会显示"
-"从 Midvash API 获取的经文内容。"
+"该插件会自动识别文章中的圣经经文引用。当鼠标悬停在引用上时，提示框会显示从 "
+"Midvash API 获取的经文内容。"
 
-#: includes/class-bbm-admin.php:876
+#: includes/class-bbm-admin.php:834
 msgid "Supported formats"
 msgstr "支持的格式"
 
-#: includes/class-bbm-admin.php:878
+#: includes/class-bbm-admin.php:836
 msgid "Single verse"
 msgstr "单节经文"
 
-#: includes/class-bbm-admin.php:879
+#: includes/class-bbm-admin.php:837
 msgid "Alternative separator"
 msgstr "替代分隔符"
 
-#: includes/class-bbm-admin.php:880
+#: includes/class-bbm-admin.php:838
 msgid "Verse range"
 msgstr "经文范围"
 
-#: includes/class-bbm-admin.php:881
+#: includes/class-bbm-admin.php:839
 msgid "Abbreviation"
 msgstr "缩写"
 
-#: includes/class-bbm-admin.php:882
+#: includes/class-bbm-admin.php:840
 msgid "Entire chapter"
 msgstr "整章"
 
-#: includes/class-bbm-parser.php:116
+#: includes/class-bbm-widget.php:21
+msgid "Verse of the Day — Midvash"
+msgstr "每日经文 — Midvash"
+
+#: includes/class-bbm-widget.php:23
+msgid "Displays the daily Bible verse powered by the Midvash API."
+msgstr "通过 Midvash API 显示每日圣经经文。"
+
+#: includes/class-bbm-widget.php:61
+msgid "Verse of the Day"
+msgstr "每日经文"
+
+#: includes/class-bbm-widget.php:68
+msgid "Title:"
+msgstr "标题："
+
+#: includes/class-bbm-widget.php:74
+msgid "Language (leave empty to use plugin setting):"
+msgstr "语言（留空以使用插件设置）："
+
+#: includes/class-bbm-widget.php:77
+msgid "— Use plugin setting —"
+msgstr "— 使用插件设置 —"
+
+#: includes/class-bbm-widget.php:97
+msgid "Version (leave empty for locale default):"
+msgstr "版本（留空以使用语言默认值）："
+
+#: includes/class-bbm-widget.php:101
+msgid "e.g. nvt, kjv, lsg"
+msgstr "例如：cuv, cuvs"
+
+#: includes/class-bbm-widget.php:106
+msgid "Show reference (e.g. João 3:16)"
+msgstr "显示引用（例如：约翰福音 3:16）"
+
+#: includes/class-bbm-widget.php:112
+msgid "Link verse to Midvash"
+msgstr "将经文链接到 Midvash"
+
+#: includes/class-bbm-widget.php:164 includes/class-bbm-block.php:88
+msgid "Verse currently unavailable."
+msgstr "经文暂时无法显示。"
+
+#: includes/class-bbm-parser.php:108
 msgid "Online Bible"
 msgstr "在线圣经"
 
-#: includes/class-bbm-parser.php:200
+#: includes/class-bbm-parser.php:175
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "在 Midvash 上阅读 %s"
-
-#: includes/class-bbm-admin.php:46 includes/class-bbm-admin.php:47 includes/class-bbm-admin.php:770
-msgid "Bible by Midvash"
-msgstr "圣经 by Midvash"

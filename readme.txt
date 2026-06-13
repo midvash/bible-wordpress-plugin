@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -115,6 +115,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.6.1 =
+* **Infrastructure.** Update and download endpoints moved from wordpress.midvash.com to midvash.app (the plugin now checks `midvash.app/api/wordpress/update-info.json`). No functional change; existing installs should be updated once to point at the new endpoint.
 
 = 0.6.0 =
 * **WordPress.org compliance.** Drops the explicit `load_plugin_textdomain` call (WP 4.6+ auto-loads `.mo` files by slug match and Plugin Check flags it as "discouraged"), wraps every `$_POST`/`$_GET` access in `wp_unslash()` + `sanitize_*`, validates the admin tab against a whitelist, and moves the inline admin JS into a properly enqueued asset with `wp_localize_script`. The settings page now passes WordPress Plugin Check with zero errors.

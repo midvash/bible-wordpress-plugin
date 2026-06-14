@@ -1,5 +1,7 @@
 # Bible by Midvash — WordPress plugin
 
+> 🌐 **English** · [Português (BR)](./README.pt-BR.md) · [Español](./README.es.md)
+
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2%2B-blue.svg)](LICENSE)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)](https://wordpress.org/)
 

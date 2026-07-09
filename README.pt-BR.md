@@ -7,7 +7,7 @@
 
 Detecta automaticamente referências bíblicas nos seus posts do WordPress e as transforma em links com tooltip ao passar o mouse — sem chave de API, sem cadastro, sem configuração além de instalar o plugin.
 
-> Download e documentação em **[midvash.app/wordpress-plugin](https://midvash.app/wordpress-plugin)**
+> Download e documentação em **[midvash.com/wordpress-plugin](https://midvash.com/wordpress-plugin)**
 
 ## O que faz
 
@@ -19,9 +19,9 @@ Detecta automaticamente referências bíblicas nos seus posts do WordPress e as 
 
 ## Instalação
 
-### Pelo site [midvash.app/wordpress-plugin](https://midvash.app/wordpress-plugin)
+### Pelo site [midvash.com/wordpress-plugin](https://midvash.com/wordpress-plugin)
 
-1. Baixe o `.zip` mais recente em [midvash.app/wordpress-plugin](https://midvash.app/wordpress-plugin)
+1. Baixe o `.zip` mais recente em [midvash.com/wordpress-plugin](https://midvash.com/wordpress-plugin)
 2. Admin do WordPress → Plugins → Adicionar Novo → Enviar Plugin → selecione o zip
 3. Ative e configure em **Configurações → Bible by Midvash**
 
@@ -36,7 +36,7 @@ Depois ative no admin do WordPress.
 
 ## Atualizações
 
-A atualização automática vem embutida via [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker). O plugin verifica `midvash.app/api/wordpress/update-info.json` a cada ~12 horas e exibe o banner padrão "Atualização disponível" no admin do WordPress, como os plugins do diretório oficial.
+A atualização automática vem embutida via [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker). O plugin verifica `midvash.com/api/wordpress/update-info.json` a cada ~12 horas e exibe o banner padrão "Atualização disponível" no admin do WordPress, como os plugins do diretório oficial.
 
 ## Arquitetura
 
@@ -90,12 +90,12 @@ Faz parte do [**Midvash**](https://midvash.com) — uma plataforma gratuita de l
 | | |
 |---|---|
 | 📖 **Leitor (web)** | [midvash.com](https://midvash.com) — 9 idiomas |
-| 📱 **App iOS** | [midvash.app/ios](https://midvash.app/ios) |
+| 📱 **App iOS** | [midvash.com/ios](https://midvash.com/ios) |
 | 🔌 **API** | [api.midvash.com](https://api.midvash.com) · [`bible-api`](https://github.com/midvash/bible-api) |
 | 🤖 **Servidor MCP** | [mcp.midvash.com](https://mcp.midvash.com) · [`bible-mcp`](https://github.com/midvash/bible-mcp) |
-| 🧩 **Plugin WordPress** | [midvash.app/wordpress-plugin](https://midvash.app/wordpress-plugin) · [`bible-wordpress-plugin`](https://github.com/midvash/bible-wordpress-plugin) |
-| 🧩 **Plugin EmDash** | [midvash.app/emdash-plugin](https://midvash.app/emdash-plugin) · [`emdash-plugin-bible`](https://github.com/midvash/emdash-plugin-bible) |
-| 🌐 **Extensão Chrome** | [midvash.app/chrome-extension](https://midvash.app/chrome-extension) · [`bible-chrome-extension`](https://github.com/midvash/bible-chrome-extension) |
+| 🧩 **Plugin WordPress** | [midvash.com/wordpress-plugin](https://midvash.com/wordpress-plugin) · [`bible-wordpress-plugin`](https://github.com/midvash/bible-wordpress-plugin) |
+| 🧩 **Plugin EmDash** | [midvash.com/emdash-plugin](https://midvash.com/emdash-plugin) · [`emdash-plugin-bible`](https://github.com/midvash/emdash-plugin-bible) |
+| 🌐 **Extensão Chrome** | [midvash.com/chrome-extension](https://midvash.com/chrome-extension) · [`bible-chrome-extension`](https://github.com/midvash/bible-chrome-extension) |
 | 📦 **Dados abertos** | [`bible-data`](https://github.com/midvash/bible-data) · [`bible-data-js`](https://github.com/midvash/bible-data-js) · [`bible-cross-references`](https://github.com/midvash/bible-cross-references) |
 
-<sub>Gratuito e aberto, feito pela [Midvash](https://midvash.com) · [midvash.com](https://midvash.com) · [midvash.app](https://midvash.app)</sub>
+<sub>Gratuito e aberto, feito pela [Midvash](https://midvash.com) · [midvash.com](https://midvash.com) · [midvash.com](https://midvash.com)</sub>

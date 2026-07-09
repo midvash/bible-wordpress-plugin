@@ -117,7 +117,7 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 == Changelog ==
 
 = 0.6.1 =
-* **Infrastructure.** Update and download endpoints moved from wordpress.midvash.com to midvash.app (the plugin now checks `midvash.app/api/wordpress/update-info.json`). No functional change; existing installs should be updated once to point at the new endpoint.
+* **Infrastructure.** Update and download endpoints moved from wordpress.midvash.com to midvash.com (the plugin now checks `midvash.com/api/wordpress/update-info.json`). No functional change; existing installs should be updated once to point at the new endpoint.
 
 = 0.6.0 =
 * **WordPress.org compliance.** Drops the explicit `load_plugin_textdomain` call (WP 4.6+ auto-loads `.mo` files by slug match and Plugin Check flags it as "discouraged"), wraps every `$_POST`/`$_GET` access in `wp_unslash()` + `sanitize_*`, validates the admin tab against a whitelist, and moves the inline admin JS into a properly enqueued asset with `wp_localize_script`. The settings page now passes WordPress Plugin Check with zero errors.

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Bible by Midvash
- * Plugin URI:  https://midvash.app/wordpress-plugin
+ * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
  * Version: 0.6.1
  * Author: Neto Gregório
@@ -43,7 +43,7 @@ if ( file_exists( BBM_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-c
 	require_once BBM_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 	if ( class_exists( 'YahnisElsts\\PluginUpdateChecker\\v5\\PucFactory' ) ) {
 		$bbm_update_checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-			'https://midvash.app/api/wordpress/update-info.json',
+			'https://midvash.com/api/wordpress/update-info.json',
 			__FILE__,
 			'bible-by-midvash'
 		);

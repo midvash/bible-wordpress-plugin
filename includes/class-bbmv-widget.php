@@ -5,15 +5,21 @@
  * Registers a classic WordPress widget (WP_Widget) and a [bbm_votd] shortcode
  * that display the daily Bible verse fetched from the Midvash API.
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Verse of the Day widget backed by the Midvash API.
+ */
 class BBMV_Widget extends WP_Widget {
 
+	/**
+	 * Registers the widget with its id, name and description.
+	 */
 	public function __construct() {
 		parent::__construct(
 			'bbm_votd_widget',
@@ -27,6 +33,9 @@ class BBMV_Widget extends WP_Widget {
 
 	/**
 	 * Front-end display
+	 *
+	 * @param array $args     Display arguments (before_widget, after_widget, before_title, after_title).
+	 * @param array $instance Saved settings for this widget instance.
 	 */
 	public function widget( $args, $instance ) {
 		$title          = ! empty( $instance['title'] ) ? $instance['title'] : '';
@@ -60,6 +69,8 @@ class BBMV_Widget extends WP_Widget {
 
 	/**
 	 * Admin form
+	 *
+	 * @param array $instance Previously saved settings for this widget instance.
 	 */
 	public function form( $instance ) {
 		$title          = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Verse of the Day', 'bible-by-midvash' );
@@ -121,6 +132,9 @@ class BBMV_Widget extends WP_Widget {
 
 	/**
 	 * Save settings
+	 *
+	 * @param array $new_instance Settings submitted from the admin form.
+	 * @param array $old_instance Previously saved settings.
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$valid_locales = array( '', 'pt-br', 'en', 'es', 'fr', 'de', 'it', 'ru', 'ko', 'zh' );
@@ -143,11 +157,13 @@ class BBMV_Widget extends WP_Widget {
  * Renders the VOTD HTML — used by both the widget and the shortcode.
  *
  * @param array $atts {
+ *   Optional. Rendering options.
+ *
  *   @type string $locale         Content locale. Empty = use plugin setting.
  *   @type string $version        Bible version slug. Empty = locale default.
  *   @type bool   $show_reference Whether to display the reference string.
  *   @type bool   $link_verse     Whether to wrap reference in a link to Midvash.
- * }
+ * }.
  * @return string HTML output.
  */
 function bbmv_render_votd( $atts = array() ) {
@@ -217,6 +233,7 @@ function bbmv_render_votd( $atts = array() ) {
  *   link_verse      — true | false
  *   title           — text displayed above the verse
  *
+ * @param array $atts Shortcode attributes as listed above.
  * @return string HTML
  */
 function bbmv_votd_shortcode( $atts ) {

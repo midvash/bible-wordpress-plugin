@@ -1,12 +1,18 @@
 <?php
 /**
  * Class responsible for the plugin settings page.
+ *
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Admin settings screen: registers the options page, sections, fields and
+ * sanitization for the plugin's settings.
+ */
 class BBMV_Admin {
 
 
@@ -22,6 +28,8 @@ class BBMV_Admin {
 
 	/**
 	 * Enqueue admin CSS/JS only on the plugin's settings page
+	 *
+	 * @param string $hook Hook suffix of the current admin page.
 	 */
 	public function enqueue_admin_assets( $hook ) {
 		if ( 'settings_page_bbm' !== $hook ) {
@@ -80,7 +88,7 @@ class BBMV_Admin {
 	public function settings_init() {
 		register_setting( 'bbm', 'bbm_options', array( $this, 'sanitize_options' ) );
 
-		// Main section
+		// Main section.
 		add_settings_section(
 			'bbm_section_main',
 			esc_html__( 'General Settings', 'bible-by-midvash' ),
@@ -88,7 +96,7 @@ class BBMV_Admin {
 			'bbm_general'
 		);
 
-		// Cache section
+		// Cache section.
 		add_settings_section(
 			'bbm_section_cache',
 			esc_html__( 'Cache and Performance', 'bible-by-midvash' ),
@@ -96,7 +104,7 @@ class BBMV_Admin {
 			'bbm_cache'
 		);
 
-		// Field: Language/Locale
+		// Field: Language/Locale.
 		add_settings_field(
 			'locale',
 			esc_html__( 'Language', 'bible-by-midvash' ),
@@ -105,7 +113,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Bible Version
+		// Field: Bible Version.
 		add_settings_field(
 			'versao',
 			esc_html__( 'Bible Version', 'bible-by-midvash' ),
@@ -114,7 +122,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Link Color (sempre visível, aplicada quando use_custom_color estiver marcado)
+		// Field: Link Color (sempre visível, aplicada quando use_custom_color estiver marcado).
 		add_settings_field(
 			'link_color',
 			esc_html__( 'Link Color', 'bible-by-midvash' ),
@@ -123,7 +131,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Use Custom Color
+		// Field: Use Custom Color.
 		add_settings_field(
 			'use_custom_color',
 			esc_html__( 'Enable custom color', 'bible-by-midvash' ),
@@ -132,7 +140,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Underline Link
+		// Field: Underline Link.
 		add_settings_field(
 			'underline_link',
 			esc_html__( 'Underline links', 'bible-by-midvash' ),
@@ -141,7 +149,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Underline Color
+		// Field: Underline Color.
 		add_settings_field(
 			'underline_color',
 			esc_html__( 'Underline Color', 'bible-by-midvash' ),
@@ -150,7 +158,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Underline Style
+		// Field: Underline Style.
 		add_settings_field(
 			'underline_style',
 			esc_html__( 'Underline Style', 'bible-by-midvash' ),
@@ -159,7 +167,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Open in new tab
+		// Field: Open in new tab.
 		add_settings_field(
 			'new_tab',
 			esc_html__( 'Open in new tab', 'bible-by-midvash' ),
@@ -168,7 +176,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Show version in tooltip
+		// Field: Show version in tooltip.
 		add_settings_field(
 			'show_version',
 			esc_html__( 'Show version in tooltip', 'bible-by-midvash' ),
@@ -177,7 +185,7 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
-		// Field: Cache enabled
+		// Field: Cache enabled.
 		add_settings_field(
 			'cache_enabled',
 			esc_html__( 'Enable cache', 'bible-by-midvash' ),
@@ -186,7 +194,7 @@ class BBMV_Admin {
 			'bbm_section_cache'
 		);
 
-		// Field: Cache TTL
+		// Field: Cache TTL.
 		add_settings_field(
 			'cache_ttl',
 			esc_html__( 'Cache duration (seconds)', 'bible-by-midvash' ),
@@ -195,7 +203,7 @@ class BBMV_Admin {
 			'bbm_section_cache'
 		);
 
-		// Field: Timeout
+		// Field: Timeout.
 		add_settings_field(
 			'timeout',
 			esc_html__( 'API Timeout (seconds)', 'bible-by-midvash' ),
@@ -204,7 +212,7 @@ class BBMV_Admin {
 			'bbm_section_cache'
 		);
 
-		// Auto-linking section
+		// Auto-linking section.
 		add_settings_section(
 			'bbm_section_linking',
 			esc_html__( 'Auto-linking Settings', 'bible-by-midvash' ),
@@ -212,7 +220,7 @@ class BBMV_Admin {
 			'bbm_general'
 		);
 
-		// Field: Link "Bíblia"
+		// Field: Link "Bíblia".
 		add_settings_field(
 			'link_biblia',
 			esc_html__( 'Link the word "Bíblia"', 'bible-by-midvash' ),
@@ -221,7 +229,7 @@ class BBMV_Admin {
 			'bbm_section_linking'
 		);
 
-		// Field: Link Versions
+		// Field: Link Versions.
 		add_settings_field(
 			'link_versions',
 			esc_html__( 'Link Bible version names', 'bible-by-midvash' ),
@@ -230,7 +238,7 @@ class BBMV_Admin {
 			'bbm_section_linking'
 		);
 
-		// Field: Link Books
+		// Field: Link Books.
 		add_settings_field(
 			'link_books',
 			esc_html__( 'Link Bible book names', 'bible-by-midvash' ),
@@ -239,7 +247,7 @@ class BBMV_Admin {
 			'bbm_section_linking'
 		);
 
-		// Field: Link Dictionary Terms
+		// Field: Link Dictionary Terms.
 		add_settings_field(
 			'link_terms',
 			esc_html__( 'Link dictionary terms', 'bible-by-midvash' ),
@@ -248,7 +256,7 @@ class BBMV_Admin {
 			'bbm_section_linking'
 		);
 
-		// Field: Link Biblical Characters
+		// Field: Link Biblical Characters.
 		add_settings_field(
 			'link_characters',
 			esc_html__( 'Link biblical characters', 'bible-by-midvash' ),
@@ -314,6 +322,8 @@ class BBMV_Admin {
 
 	/**
 	 * Sanitizes options
+	 *
+	 * @param array $input Raw options array submitted via the Settings API.
 	 */
 	public function sanitize_options( $input ) {
 		$existing  = get_option( 'bbm_options', array() );
@@ -479,15 +489,15 @@ class BBMV_Admin {
 		$locale  = isset( $options['locale'] ) ? $options['locale'] : 'pt-br';
 		$locale  = BBMV_Books::normalize_locale( $locale );
 
-		// Get default version for current locale
+		// Get default version for current locale.
 		$default_version = BBMV_Books::get_default_version( $locale );
 		$versao          = isset( $options['versao'] ) ? $options['versao'] : $default_version;
 
 		$api = new BBMV_API();
-		// Get versions filtered by current locale from API
+		// Get versions filtered by current locale from API.
 		$api_versions = $api->get_versions( $locale );
 
-		// If API fails, show empty state (will be loaded via AJAX)
+		// If API fails, show empty state (will be loaded via AJAX).
 		$versions_to_show = $api_versions ? $api_versions : array();
 		?>
 		<select name="bbm_options[versao]" id="bbm_versao">

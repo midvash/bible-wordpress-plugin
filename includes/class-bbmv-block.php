@@ -5,15 +5,21 @@
  * Lets post authors insert a specific Bible verse inline in the block editor.
  * Renders server-side via PHP so the verse is always fetched fresh (with caching).
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Registers and renders the bible-by-midvash/verse Gutenberg block.
+ */
 class BBMV_Block {
 
+	/**
+	 * Hook block registration and editor assets into WordPress.
+	 */
 	public function init() {
 		add_action( 'init', array( $this, 'register_block' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
@@ -106,7 +112,7 @@ class BBMV_Block {
 		$text    = $data['text'];
 		$ref_str = isset( $data['reference'] ) ? $data['reference'] : $reference;
 
-		// Build URL
+		// Build URL.
 		$url = '';
 		if ( $link ) {
 			$url = $this->build_url( $reference, $locale, $version );

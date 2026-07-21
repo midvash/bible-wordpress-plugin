@@ -9,14 +9,14 @@
  * Hardcoded prefixes (bbm_, bbm_votd_, bbm_versions_, bbm_rl_) are intentionally
  * spelled out so future renames stay caught here.
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Single-site
+// Single-site.
 if ( ! is_multisite() ) {
 	bbmv_uninstall_cleanup();
 	return;

@@ -5,13 +5,16 @@
  * Centralized book definitions with multilingual support.
  * Based on api-publica/src/books.ts
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Static catalog of Bible books with multilingual names, slugs and abbreviations.
+ */
 class BBMV_Books {
 
 	/**
@@ -42,6 +45,8 @@ class BBMV_Books {
 	/**
 	 * Complete book definitions with multilingual support
 	 * Each book has: id, chapters, testament, slugs (by locale), names (by locale), abbrev (by locale)
+	 *
+	 * @var array|null
 	 */
 	private static $books = null;
 
@@ -57,6 +62,8 @@ class BBMV_Books {
 
 	/**
 	 * Get book by ID
+	 *
+	 * @param int $id Numeric book ID (1-66).
 	 */
 	public static function get_book_by_id( $id ) {
 		$books = self::get_books();
@@ -65,6 +72,8 @@ class BBMV_Books {
 
 	/**
 	 * Get book by slug (searches all locales)
+	 *
+	 * @param string $slug URL slug of the book (e.g. 'matthew', 'mateus').
 	 */
 	public static function get_book_by_slug( $slug ) {
 		$normalized = strtolower( trim( $slug ) );
@@ -83,6 +92,8 @@ class BBMV_Books {
 
 	/**
 	 * Get book by name or abbreviation (searches all locales)
+	 *
+	 * @param string $name Book name or abbreviation in any supported locale.
 	 */
 	public static function get_book_by_name( $name ) {
 		$normalized = self::lower( trim( $name ) );
@@ -106,6 +117,9 @@ class BBMV_Books {
 
 	/**
 	 * Get slug for book in specific locale
+	 *
+	 * @param int    $book_id Numeric book ID (1-66).
+	 * @param string $locale  Target locale code (defaults to 'en').
 	 */
 	public static function get_book_slug( $book_id, $locale = 'en' ) {
 		$book = self::get_book_by_id( $book_id );
@@ -118,6 +132,9 @@ class BBMV_Books {
 
 	/**
 	 * Get name for book in specific locale
+	 *
+	 * @param int    $book_id Numeric book ID (1-66).
+	 * @param string $locale  Target locale code (defaults to 'en').
 	 */
 	public static function get_book_name( $book_id, $locale = 'en' ) {
 		$book = self::get_book_by_id( $book_id );
@@ -134,10 +151,12 @@ class BBMV_Books {
 	 * Maps WordPress locale codes (and other common variants) to the short
 	 * locale codes we use internally (see self::LOCALES). Unknown inputs
 	 * fall back to 'en'.
+	 *
+	 * @param string $locale Raw locale string (e.g. 'pt_BR', 'en-US').
 	 */
 	public static function normalize_locale( $locale ) {
 		$locale = strtolower( trim( $locale ) );
-		// Treat underscores and hyphens equivalently
+		// Treat underscores and hyphens equivalently.
 		$normalized = str_replace( '_', '-', $locale );
 
 		$map = array(
@@ -179,6 +198,8 @@ class BBMV_Books {
 
 	/**
 	 * Get default version for locale
+	 *
+	 * @param string $locale Locale code to look up (normalized internally).
 	 */
 	public static function get_default_version( $locale ) {
 		$locale = self::normalize_locale( $locale );
@@ -193,6 +214,8 @@ class BBMV_Books {
 	 * implementation rebuilt a ~1.2k-element string on every `the_content`
 	 * filter call — wasteful for pages that render multiple post bodies
 	 * (related posts, sticky posts, archives in custom themes…).
+	 *
+	 * @param string|null $locale Locale to restrict the pattern to, or null for all locales.
 	 */
 	public static function get_matching_pattern( $locale = null ) {
 		static $cache = array();
@@ -217,7 +240,7 @@ class BBMV_Books {
 			}
 		}
 
-		// Sort by length descending to match longer names first
+		// Sort by length descending to match longer names first.
 		usort(
 			$patterns,
 			function ( $a, $b ) {
@@ -233,6 +256,8 @@ class BBMV_Books {
 	 * Lowercase a string, preferring the multibyte function when available.
 	 * Some shared hosts ship PHP without `mbstring` enabled; we fall back to
 	 * `strtolower()` which still works for the ASCII portion of book names.
+	 *
+	 * @param string $str String to lowercase.
 	 */
 	public static function lower( $str ) {
 		if ( function_exists( 'mb_strtolower' ) ) {
@@ -245,6 +270,8 @@ class BBMV_Books {
 	 * Removes Latin accents from a string for tolerant book matching.
 	 * Used as a second lookup pass when the verbatim lower-cased input misses
 	 * (e.g. "Joao 3:16" → "joao" → match against "joão").
+	 *
+	 * @param string $str String to strip accents from.
 	 */
 	public static function strip_accents( $str ) {
 		static $map = array(
@@ -1851,7 +1878,7 @@ class BBMV_Books {
 				),
 			),
 
-			// New Testament
+			// New Testament.
 			40 => array(
 				'id'        => 40,
 				'chapters'  => 28,
@@ -2886,6 +2913,8 @@ class BBMV_Books {
 	/**
 	 * Build lookup table for fast name/abbreviation/slug → book_id mapping.
 	 * Memoized per-locale for the same reason as get_matching_pattern().
+	 *
+	 * @param string|null $locale Locale to restrict the table to, or null for all locales.
 	 */
 	public static function get_lookup_table( $locale = null ) {
 		static $cache = array();

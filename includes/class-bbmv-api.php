@@ -5,27 +5,36 @@
  * Responsible for making requests to the public API and managing cache.
  * Uses the new REST API format: /{version}/{book}/{chapter}/{verse}
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * HTTP client for the Midvash Bible API with transient/object caching.
+ */
 class BBMV_API {
 
 	/**
-	 * API Base URL
+	 * API Base URL.
+	 *
+	 * @var string
 	 */
 	private $api_url;
 
 	/**
-	 * Plugin options
+	 * Plugin options.
+	 *
+	 * @var array
 	 */
 	private $options;
 
 	/**
-	 * Current locale
+	 * Current locale.
+	 *
+	 * @var string
 	 */
 	private $locale;
 
@@ -61,12 +70,12 @@ class BBMV_API {
 	/**
 	 * Builds API path from parsed reference
 	 *
-	 * @param array  $parsed Parsed reference data
-	 * @param string $version Bible version
+	 * @param array  $parsed Parsed reference data.
+	 * @param string $version Bible version.
 	 * @return string API path
 	 */
 	private function build_api_path( $parsed, $version ) {
-		// Get slug in English for API (API uses English slugs)
+		// Get slug in English for API (API uses English slugs).
 		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], 'en' );
 		$path      = '/' . strtolower( $version ) . '/' . $book_slug . '/' . $parsed['chapter'];
 
@@ -84,7 +93,7 @@ class BBMV_API {
 	/**
 	 * Validates reference before making request
 	 *
-	 * @param string $reference Reference to validate
+	 * @param string $reference Reference to validate.
 	 * @return bool|string True if valid, error message if invalid
 	 */
 	private function validate_reference( $reference ) {
@@ -96,7 +105,7 @@ class BBMV_API {
 			return 'Reference too long (maximum 100 characters)';
 		}
 
-		// Check maximum range (50 verses)
+		// Check maximum range (50 verses).
 		if ( preg_match( '/(\d+):(\d+)-(\d+)/', $reference, $matches ) ) {
 			$start = intval( $matches[2] );
 			$end   = intval( $matches[3] );
@@ -116,6 +125,8 @@ class BBMV_API {
 	 * because it lengthened the round-trip for the *next* visitor. We now
 	 * let the upstream 429 (with our bounded backoff in make_request) handle
 	 * real throttling, and don't react to soft-budget warnings at all.
+	 *
+	 * @param array $response HTTP response array from wp_remote_get(), unused.
 	 */
 	private function check_rate_limit( $response ) {
 		// Intentionally empty.
@@ -124,33 +135,33 @@ class BBMV_API {
 	/**
 	 * Fetches a verse from the API
 	 *
-	 * @param string $reference Bible reference (e.g. "John 3:16")
-	 * @param string $version Bible version (e.g. "nvt")
+	 * @param string $reference Bible reference (e.g. "John 3:16").
+	 * @param string $version Bible version (e.g. "nvt").
 	 * @return array|null Verse data or null on error
 	 */
 	public function get_verse( $reference, $version = null ) {
 		$version = $version ? $version : $this->options['versao'];
 		$version = strtolower( $version );
 
-		// Validate reference
+		// Validate reference.
 		$validation = $this->validate_reference( $reference );
 		if ( true !== $validation ) {
 			return null;
 		}
 
-		// Parse reference (centralized in BBMV_Books)
+		// Parse reference (centralized in BBMV_Books).
 		$parsed = BBMV_Books::parse_reference( $reference );
 		if ( ! $parsed ) {
 			return null;
 		}
 
-		// Build API path
+		// Build API path.
 		$path = $this->build_api_path( $parsed, $version );
 		if ( ! $path ) {
 			return null;
 		}
 
-		// Check cache first
+		// Check cache first.
 		if ( $this->is_cache_enabled() ) {
 			$cached = $this->get_from_cache( $path, $version );
 			if ( false !== $cached ) {
@@ -158,11 +169,11 @@ class BBMV_API {
 			}
 		}
 
-		// Make API request
+		// Make API request.
 		$data = $this->make_request( $path );
 
 		if ( $data ) {
-			// Add reference info to response
+			// Add reference info to response.
 			$data['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
 			if ( $parsed['verse'] ) {
 				$data['reference'] .= ':' . $parsed['verse'];
@@ -171,7 +182,7 @@ class BBMV_API {
 				}
 			}
 
-			// Save to cache
+			// Save to cache.
 			if ( $this->is_cache_enabled() ) {
 				$this->save_to_cache( $path, $version, $data );
 			}
@@ -197,7 +208,7 @@ class BBMV_API {
 	private function make_request( $path, $args = array(), $attempt = 1 ) {
 		$max_retries = 2;
 		$timeout     = isset( $this->options['timeout'] ) ? intval( $this->options['timeout'] ) : 5;
-		$timeout     = max( 1, min( 30, $timeout ) ); // matches admin field constraint
+		$timeout     = max( 1, min( 30, $timeout ) ); // Matches admin field constraint.
 
 		$url = $this->api_url . $path;
 		if ( ! empty( $args ) ) {
@@ -209,8 +220,8 @@ class BBMV_API {
 			array(
 				'timeout'             => $timeout,
 				'sslverify'           => true,
-				'reject_unsafe_urls'  => true, // hard-blocks local/private redirects (SSRF defence)
-				'limit_response_size' => 256 * 1024, // 256 KB — verses are small JSON
+				'reject_unsafe_urls'  => true, // Hard-blocks local/private redirects (SSRF defence).
+				'limit_response_size' => 256 * 1024, // 256 KB — verses are small JSON.
 				'headers'             => array(
 					'Accept'     => 'application/json',
 					'User-Agent' => 'Midvash-WP-Plugin/' . BBMV_VERSION,
@@ -236,7 +247,7 @@ class BBMV_API {
 				if ( $reset_at ) {
 					$reset_ts = strtotime( $reset_at );
 					if ( $reset_ts ) {
-						$wait = max( 1, min( 2, $reset_ts - time() ) ); // cap at 2s
+						$wait = max( 1, min( 2, $reset_ts - time() ) ); // Cap at 2s.
 					}
 				}
 				sleep( $wait );
@@ -270,6 +281,9 @@ class BBMV_API {
 
 	/**
 	 * Generates cache key
+	 *
+	 * @param string $reference API path or reference used to build the key.
+	 * @param string $version Bible version slug.
 	 */
 	private function get_cache_key( $reference, $version ) {
 		return 'bbm_' . md5( $reference . '_' . $version );
@@ -281,6 +295,9 @@ class BBMV_API {
 	 * On WPCom / managed hosts with a persistent object cache (Redis…), reads
 	 * stay in-memory between requests — significantly faster than the options
 	 * table round-trip that transients fall back to.
+	 *
+	 * @param string $reference API path or reference used to build the key.
+	 * @param string $version Bible version slug.
 	 */
 	private function get_from_cache( $reference, $version ) {
 		$key = $this->get_cache_key( $reference, $version );
@@ -298,6 +315,10 @@ class BBMV_API {
 
 	/**
 	 * Write-through cache: persist via transient, mirror in object cache.
+	 *
+	 * @param string $reference API path or reference used to build the key.
+	 * @param string $version Bible version slug.
+	 * @param array  $data Verse data to cache.
 	 */
 	private function save_to_cache( $reference, $version, $data ) {
 		$key = $this->get_cache_key( $reference, $version );
@@ -309,14 +330,14 @@ class BBMV_API {
 	/**
 	 * Fetches available Bible versions, optionally filtered by locale
 	 *
-	 * @param string|null $locale Filter versions by language (pt-br, en, es)
+	 * @param string|null $locale Filter versions by language (pt-br, en, es).
 	 * @return array|null Array of versions or null on error
 	 */
 	public function get_versions( $locale = null ) {
 		$locale = $locale ? $locale : $this->locale;
 		$locale = BBMV_Books::normalize_locale( $locale );
 
-		// Normalize locale for API (pt-br -> pt for filtering)
+		// Normalize locale for API (pt-br -> pt for filtering).
 		$api_locale = ( 'pt-br' === $locale ) ? 'pt' : $locale;
 
 		$cache_key = 'bbm_versions_' . $api_locale;
@@ -333,7 +354,7 @@ class BBMV_API {
 			return $versions;
 		}
 
-		// Fallback: fetch all and filter client-side
+		// Fallback: fetch all and filter client-side.
 		$all_cache_key = 'bbm_versions_all';
 		$all_cached    = get_transient( $all_cache_key );
 		if ( false !== $all_cached ) {
@@ -341,7 +362,7 @@ class BBMV_API {
 				$all_cached,
 				function ( $v ) use ( $locale ) {
 					$version_locale = isset( $v['language'] ) ? $v['language'] : '';
-					// Normalize for comparison
+					// Normalize for comparison.
 					if ( 'pt-br' === $version_locale || 'pt' === $version_locale ) {
 						return ( 'pt-br' === $locale );
 					}
@@ -353,17 +374,17 @@ class BBMV_API {
 			}
 		}
 
-		// Fetch all versions
+		// Fetch all versions.
 		$all_result = $this->make_request( '/versions' );
 		if ( $all_result && isset( $all_result['versions'] ) ) {
 			set_transient( $all_cache_key, $all_result['versions'], 7 * DAY_IN_SECONDS );
 
-			// Filter by locale
+			// Filter by locale.
 			$filtered = array_filter(
 				$all_result['versions'],
 				function ( $v ) use ( $locale ) {
 					$version_locale = isset( $v['language'] ) ? $v['language'] : '';
-					// Normalize for comparison
+					// Normalize for comparison.
 					if ( 'pt-br' === $version_locale || 'pt' === $version_locale ) {
 						return ( 'pt-br' === $locale );
 					}
@@ -384,8 +405,8 @@ class BBMV_API {
 	/**
 	 * Fetches the verse of the day from the API
 	 *
-	 * @param string $locale  Content locale (pt-br, en, es…)
-	 * @param string $version Bible version slug (nvt, kjv…)
+	 * @param string $locale  Content locale (pt-br, en, es…).
+	 * @param string $version Bible version slug (nvt, kjv…).
 	 * @return array|null Verse data or null on error
 	 */
 	public function get_votd( $locale = null, $version = null ) {
@@ -408,7 +429,7 @@ class BBMV_API {
 		);
 
 		if ( $result && isset( $result['text'] ) ) {
-			// Retry with locale default version if the chosen version returned an error
+			// Retry with locale default version if the chosen version returned an error.
 			if ( isset( $result['error'] ) ) {
 				$fallback = BBMV_Books::get_default_version( $locale );
 				if ( $fallback !== $version ) {

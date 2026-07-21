@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ruleset name="Bible by Midvash">
+	<description>WordPress Coding Standards + PHP 7.4 compatibility for the Bible by Midvash plugin.</description>
+
+	<file>bible-by-midvash.php</file>
+	<file>uninstall.php</file>
+	<file>includes</file>
+
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<exclude-pattern>dist/*</exclude-pattern>
+	<exclude-pattern>node_modules/*</exclude-pattern>
+
+	<arg value="sp"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="4"/>
+
+	<!-- WordPress Coding Standards -->
+	<rule ref="WordPress">
+		<!-- Filename convention conflicts with the existing class-bbm-*.php layout only if renamed; keep default. -->
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="bible-by-midvash"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="bbmv"/>
+				<element value="BBMV"/>
+				<element value="bible_by_midvash"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Declared minimum: WP 5.0, PHP 7.4 -->
+	<config name="minimum_wp_version" value="5.0"/>
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="7.4-"/>
+</ruleset>

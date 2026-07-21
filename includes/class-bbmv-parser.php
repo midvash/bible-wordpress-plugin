@@ -2,29 +2,38 @@
 /**
  * Class responsible for identifying and linking Bible references.
  *
- * Uses BBM_Books for centralized book data with multilingual support.
+ * Uses BBMV_Books for centralized book data with multilingual support.
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Parser {
+/**
+ * Parses post content for Bible references and turns them into Midvash links.
+ */
+class BBMV_Parser {
 
 	/**
 	 * Plugin options
+	 *
+	 * @var array
 	 */
 	private $options;
 
 	/**
 	 * Current locale
+	 *
+	 * @var string
 	 */
 	private $locale;
 
 	/**
 	 * Books referenced in the current post
+	 *
+	 * @var array
 	 */
 	private $referenced_books = array();
 
@@ -54,31 +63,33 @@ class BBM_Parser {
 		);
 
 		$this->locale = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
-		$this->locale = BBM_Books::normalize_locale( $this->locale );
+		$this->locale = BBMV_Books::normalize_locale( $this->locale );
 
-		// Add filter to content
+		// Add filter to content.
 		add_filter( 'the_content', array( $this, 'parse_content' ), 20 );
 	}
 
 	/**
 	 * Processes content and adds links
+	 *
+	 * @param string $content Post content filtered via the_content.
 	 */
 	public function parse_content( $content ) {
-		// Only on single posts/pages, not in admin
+		// Only on single posts/pages, not in admin.
 		if ( ! is_singular() || is_admin() ) {
 			return $content;
 		}
 
 		$this->referenced_books = array();
 
-		// Build the regex pattern using book names and abbreviations
-		$pattern = BBM_Books::get_matching_pattern();
+		// Build the regex pattern using book names and abbreviations.
+		$pattern = BBMV_Books::get_matching_pattern();
 
-		// Regex that skips content inside <a> tags and headers h1-h6
+		// Regex that skips content inside <a> tags and headers h1-h6.
 		$skip_tags = '<a\b[^>]*>.*?<\/a>|<h[1-6]\b[^>]*>.*?<\/h[1-6]>(*SKIP)(*F)';
 
 		// Pattern: BookName Chapter:Verse(-VerseEnd)?
-		// Supports both : and . as separators
+		// Supports both : and . as separators.
 		$pattern_verses = '/' . $skip_tags . '|\b(' . $pattern . ')\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?\b/iu';
 
 		$content = preg_replace_callback(
@@ -92,7 +103,7 @@ class BBM_Parser {
 			$content
 		);
 
-		// Link "Bíblia" word if enabled
+		// Link "Bíblia" word if enabled.
 		if ( ! empty( $this->options['link_biblia'] ) ) {
 			$content = preg_replace_callback(
 				'/' . $skip_tags . '|\b(Bíblia|Biblia|Bible)\b/iu',
@@ -101,7 +112,7 @@ class BBM_Parser {
 						return $matches[0];
 					}
 
-					$url = BBM_SITE_URL . '/' . $this->locale;
+					$url = BBMV_SITE_URL . '/' . $this->locale;
 
 					$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
 					$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
@@ -125,6 +136,8 @@ class BBM_Parser {
 
 	/**
 	 * Replaces the reference with a link and data attributes for tooltip
+	 *
+	 * @param array $matches Regex matches from parse_content: full match at 0, book name at 1, chapter at 2, verse at 3, optional verse range end at 4.
 	 */
 	public function replace_reference( $matches ) {
 		$original = $matches[0];
@@ -133,7 +146,7 @@ class BBM_Parser {
 		// the original substring and adds accent fallback + chapter validation
 		// against the book's known chapter count. Sharing this path with the
 		// API client and the Gutenberg block keeps behaviour aligned.
-		$parsed = BBM_Books::parse_reference( $original );
+		$parsed = BBMV_Books::parse_reference( $original );
 		if ( ! $parsed ) {
 			return $original;
 		}
@@ -141,22 +154,22 @@ class BBM_Parser {
 		$book_id = $parsed['book_id'];
 		$book    = $parsed['book'];
 
-		// Track this book as referenced
+		// Track this book as referenced.
 		if ( ! in_array( $book_id, $this->referenced_books, true ) ) {
 			$this->referenced_books[] = $book_id;
 		}
 
-		// Get settings
+		// Get settings.
 		$versao    = isset( $this->options['versao'] ) ? strtolower( $this->options['versao'] ) : 'nvt';
 		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
 		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
 
-		// Get slug for the current locale
-		$book_slug = BBM_Books::get_book_slug( $book_id, $this->locale );
+		// Get slug for the current locale.
+		$book_slug = BBMV_Books::get_book_slug( $book_id, $this->locale );
 
-		// Build URL with locale prefix
-		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}/{verse}
-		$url = BBM_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
+		// Build URL with locale prefix.
+		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}/{verse}.
+		$url = BBMV_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
 			if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
@@ -166,7 +179,7 @@ class BBM_Parser {
 			}
 		}
 
-		// Link attributes
+		// Link attributes.
 		$target = $new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
 
 		return sprintf(

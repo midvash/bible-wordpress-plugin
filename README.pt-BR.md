@@ -41,10 +41,10 @@ A atualização automática vem embutida via [Plugin Update Checker](https://git
 ## Arquitetura
 
 - **`bible-by-midvash.php`** — arquivo principal do plugin, hooks, endpoints AJAX, limpeza do cache de transients
-- **`includes/class-bbm-parser.php`** — detecção de referências (regex + dicionários de nomes de livros por locale)
-- **`includes/class-bbm-api.php`** — chama a API pública do Midvash (somente leitura, sem auth) com tratamento de rate-limit e cache de transients
-- **`includes/class-bbm-admin.php`** — tela de configurações
-- **`includes/class-bbm-books.php`** — metadados dos livros (nomes, abreviações, capítulos) por idioma
+- **`includes/class-bbmv-parser.php`** — detecção de referências (regex + dicionários de nomes de livros por locale)
+- **`includes/class-bbmv-api.php`** — chama a API pública do Midvash (somente leitura, sem auth) com tratamento de rate-limit e cache de transients
+- **`includes/class-bbmv-admin.php`** — tela de configurações
+- **`includes/class-bbmv-books.php`** — metadados dos livros (nomes, abreviações, capítulos) por idioma
 - **`assets/js/bbm-tooltip.js`** — renderização do tooltip no frontend
 - **`languages/`** — arquivos de tradução `.po`/`.mo`
 
@@ -66,7 +66,7 @@ O plugin apenas **lê** da API pública do Midvash — não envia nenhum conteú
 
 PRs são bem-vindos — especialmente para:
 
-- Suporte a novos idiomas (nomes de livros + ajustes de regex em `class-bbm-books.php` e `class-bbm-parser.php`)
+- Suporte a novos idiomas (nomes de livros + ajustes de regex em `class-bbmv-books.php` e `class-bbmv-parser.php`)
 - Arquivos de tradução `.po` em `languages/`
 - Melhorias de performance
 

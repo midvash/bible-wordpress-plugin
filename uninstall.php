@@ -9,16 +9,16 @@
  * Hardcoded prefixes (bbm_, bbm_votd_, bbm_versions_, bbm_rl_) are intentionally
  * spelled out so future renames stay caught here.
  *
- * @package Bible_by_Midvash
+ * @package Bible_By_Midvash
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Single-site
+// Single-site.
 if ( ! is_multisite() ) {
-	bbm_uninstall_cleanup();
+	bbmv_uninstall_cleanup();
 	return;
 }
 
@@ -27,20 +27,20 @@ if ( ! is_multisite() ) {
 // paths) — there is no higher-level "for each blog" helper at uninstall time.
 global $wpdb;
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-$blog_ids = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" );
-if ( ! is_array( $blog_ids ) ) {
+$bbmv_blog_ids = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" );
+if ( ! is_array( $bbmv_blog_ids ) ) {
 	return;
 }
-foreach ( $blog_ids as $bbm_blog_id ) {
-	switch_to_blog( (int) $bbm_blog_id );
-	bbm_uninstall_cleanup();
+foreach ( $bbmv_blog_ids as $bbmv_blog_id ) {
+	switch_to_blog( (int) $bbmv_blog_id );
+	bbmv_uninstall_cleanup();
 	restore_current_blog();
 }
 
 /**
  * Wipes plugin state on the current blog.
  */
-function bbm_uninstall_cleanup() {
+function bbmv_uninstall_cleanup() {
 	global $wpdb;
 
 	delete_option( 'bbm_options' );

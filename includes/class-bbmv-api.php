@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_API {
+class BBMV_API {
 
 	/**
 	 * API Base URL
@@ -43,7 +43,7 @@ class BBM_API {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->api_url = BBM_API_BASE_URL;
+		$this->api_url = BBMV_API_BASE_URL;
 		$this->options = get_option(
 			'bbm_options',
 			array(
@@ -55,19 +55,19 @@ class BBM_API {
 			)
 		);
 		$this->locale  = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
-		$this->locale  = BBM_Books::normalize_locale( $this->locale );
+		$this->locale  = BBMV_Books::normalize_locale( $this->locale );
 	}
 
 	/**
 	 * Builds API path from parsed reference
 	 *
-	 * @param array $parsed Parsed reference data
+	 * @param array  $parsed Parsed reference data
 	 * @param string $version Bible version
 	 * @return string API path
 	 */
 	private function build_api_path( $parsed, $version ) {
 		// Get slug in English for API (API uses English slugs)
-		$book_slug = BBM_Books::get_book_slug( $parsed['book_id'], 'en' );
+		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], 'en' );
 		$path      = '/' . strtolower( $version ) . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
@@ -138,8 +138,8 @@ class BBM_API {
 			return null;
 		}
 
-		// Parse reference (centralized in BBM_Books)
-		$parsed = BBM_Books::parse_reference( $reference );
+		// Parse reference (centralized in BBMV_Books)
+		$parsed = BBMV_Books::parse_reference( $reference );
 		if ( ! $parsed ) {
 			return null;
 		}
@@ -213,7 +213,7 @@ class BBM_API {
 				'limit_response_size' => 256 * 1024, // 256 KB — verses are small JSON
 				'headers'             => array(
 					'Accept'     => 'application/json',
-					'User-Agent' => 'Midvash-WP-Plugin/' . BBM_VERSION,
+					'User-Agent' => 'Midvash-WP-Plugin/' . BBMV_VERSION,
 				),
 			)
 		);
@@ -314,7 +314,7 @@ class BBM_API {
 	 */
 	public function get_versions( $locale = null ) {
 		$locale = $locale ? $locale : $this->locale;
-		$locale = BBM_Books::normalize_locale( $locale );
+		$locale = BBMV_Books::normalize_locale( $locale );
 
 		// Normalize locale for API (pt-br -> pt for filtering)
 		$api_locale = ( 'pt-br' === $locale ) ? 'pt' : $locale;
@@ -390,8 +390,8 @@ class BBM_API {
 	 */
 	public function get_votd( $locale = null, $version = null ) {
 		$locale  = $locale ? $locale : $this->locale;
-		$locale  = BBM_Books::normalize_locale( $locale );
-		$version = $version ? $version : BBM_Books::get_default_version( $locale );
+		$locale  = BBMV_Books::normalize_locale( $locale );
+		$version = $version ? $version : BBMV_Books::get_default_version( $locale );
 
 		$cache_key = 'bbm_votd_' . $locale . '_' . $version . '_' . gmdate( 'Y-m-d' );
 		$cached    = get_transient( $cache_key );
@@ -410,7 +410,7 @@ class BBM_API {
 		if ( $result && isset( $result['text'] ) ) {
 			// Retry with locale default version if the chosen version returned an error
 			if ( isset( $result['error'] ) ) {
-				$fallback = BBM_Books::get_default_version( $locale );
+				$fallback = BBMV_Books::get_default_version( $locale );
 				if ( $fallback !== $version ) {
 					$result = $this->make_request(
 						'/votd',
@@ -433,6 +433,6 @@ class BBM_API {
 
 	// Note: an HTTP-backed get_books() and a direct-SQL clear_cache() lived
 	// here in earlier versions but had zero callers (the parser uses the
-	// static BBM_Books data, and cache wiping moved to uninstall.php). They
+	// static BBMV_Books data, and cache wiping moved to uninstall.php). They
 	// were removed to keep the API surface minimal.
 }

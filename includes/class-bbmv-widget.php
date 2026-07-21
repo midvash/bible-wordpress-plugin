@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Widget extends WP_Widget {
+class BBMV_Widget extends WP_Widget {
 
 	public function __construct() {
 		parent::__construct(
@@ -41,12 +41,12 @@ class BBM_Widget extends WP_Widget {
 			echo wp_kses_post( $args['before_title'] . esc_html( $title ) . $args['after_title'] );
 		}
 
-		// bbm_render_votd() returns HTML assembled exclusively via esc_html()
+		// bbmv_render_votd() returns HTML assembled exclusively via esc_html()
 		// / esc_url() with a known-safe Schema.org microdata wrapper — using
 		// wp_kses_post() here would strip the itemscope / itemtype / itemprop
 		// attributes that power the structured data the widget exists to emit.
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo bbm_render_votd(
+		echo bbmv_render_votd(
 			array(
 				'locale'         => $locale,
 				'version'        => $version,
@@ -134,8 +134,8 @@ class BBM_Widget extends WP_Widget {
 	}
 }
 
-// Co-locating bbm_render_votd() and the [bbm_votd] shortcode callback in
-// the same file as BBM_Widget is intentional: all three share the rendering
+// Co-locating bbmv_render_votd() and the [bbm_votd] shortcode callback in
+// the same file as BBMV_Widget is intentional: all three share the rendering
 // path and editing them apart would invite drift. WordPress core itself uses
 // the same pattern in widget files (cf. wp-includes/widgets/class-wp-widget-*).
 // phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed
@@ -150,7 +150,7 @@ class BBM_Widget extends WP_Widget {
  * }
  * @return string HTML output.
  */
-function bbm_render_votd( $atts = array() ) {
+function bbmv_render_votd( $atts = array() ) {
 	$atts = wp_parse_args(
 		$atts,
 		array(
@@ -162,11 +162,11 @@ function bbm_render_votd( $atts = array() ) {
 	);
 
 	$options = get_option( 'bbm_options', array() );
-	$locale  = $atts['locale'] ? BBM_Books::normalize_locale( $atts['locale'] )
+	$locale  = $atts['locale'] ? BBMV_Books::normalize_locale( $atts['locale'] )
 								: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-	$version = $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : BBM_Books::get_default_version( $locale ) );
+	$version = $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) );
 
-	$api  = new BBM_API();
+	$api  = new BBMV_API();
 	$data = $api->get_votd( $locale, $version );
 
 	if ( ! $data ) {
@@ -203,7 +203,7 @@ function bbm_render_votd( $atts = array() ) {
 		. '</div>',
 		esc_html( $text ),
 		$ref_html,
-		esc_url( BBM_SITE_URL . '/' . $locale )
+		esc_url( BBMV_SITE_URL . '/' . $locale )
 	);
 }
 
@@ -219,7 +219,7 @@ function bbm_render_votd( $atts = array() ) {
  *
  * @return string HTML
  */
-function bbm_votd_shortcode( $atts ) {
+function bbmv_votd_shortcode( $atts ) {
 	$atts = shortcode_atts(
 		array(
 			'locale'         => '',
@@ -238,7 +238,7 @@ function bbm_votd_shortcode( $atts ) {
 		$html .= '<h3 class="bbm-votd__title">' . esc_html( $atts['title'] ) . '</h3>';
 	}
 
-	$html .= bbm_render_votd(
+	$html .= bbmv_render_votd(
 		array(
 			'locale'         => sanitize_text_field( $atts['locale'] ),
 			'version'        => sanitize_text_field( $atts['version'] ),

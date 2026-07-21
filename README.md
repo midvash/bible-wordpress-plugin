@@ -41,10 +41,10 @@ Auto-update is built in via [Plugin Update Checker](https://github.com/YahnisEls
 ## Architecture
 
 - **`bible-by-midvash.php`** — main plugin file, hooks, AJAX endpoints, transient cache cleanup
-- **`includes/class-bbm-parser.php`** — reference detection (regex + book-name dictionaries per locale)
-- **`includes/class-bbm-api.php`** — calls the Midvash public API (read-only, no auth) with rate-limit handling and transient cache
-- **`includes/class-bbm-admin.php`** — settings screen
-- **`includes/class-bbm-books.php`** — book metadata (names, abbreviations, chapters) per language
+- **`includes/class-bbmv-parser.php`** — reference detection (regex + book-name dictionaries per locale)
+- **`includes/class-bbmv-api.php`** — calls the Midvash public API (read-only, no auth) with rate-limit handling and transient cache
+- **`includes/class-bbmv-admin.php`** — settings screen
+- **`includes/class-bbmv-books.php`** — book metadata (names, abbreviations, chapters) per language
 - **`assets/js/bbm-tooltip.js`** — frontend tooltip rendering
 - **`languages/`** — translation `.po`/`.mo` files
 
@@ -66,7 +66,7 @@ The plugin only **reads** from the Midvash public API — it doesn't send any po
 
 PRs welcome — especially for:
 
-- New language support (book names + regex tweaks in `class-bbm-books.php` and `class-bbm-parser.php`)
+- New language support (book names + regex tweaks in `class-bbmv-books.php` and `class-bbmv-parser.php`)
 - Translation `.po` files in `languages/`
 - Performance improvements
 

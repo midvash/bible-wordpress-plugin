@@ -30,8 +30,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="bbm"/>
-				<element value="BBM"/>
+				<element value="bbmv"/>
+				<element value="BBMV"/>
 				<element value="bible_by_midvash"/>
 			</property>
 		</properties>

@@ -31,7 +31,7 @@ Pipeline em [.github/workflows/release.yml](.github/workflows/release.yml), gati
 
 **Pra cortar um release**, 3 lugares precisam casar (verifique antes de abrir o PR):
 - [bible-by-midvash.php](bible-by-midvash.php) → `* Version: X.Y.Z`
-- [bible-by-midvash.php](bible-by-midvash.php) → `define('BBM_VERSION', 'X.Y.Z')`
+- [bible-by-midvash.php](bible-by-midvash.php) → `define('BBMV_VERSION', 'X.Y.Z')`
 - [readme.txt](readme.txt) → `Stable tag: X.Y.Z` + entrada em `== Changelog ==` + entrada em `== Upgrade Notice ==`
 
 **SemVer**:
@@ -72,7 +72,7 @@ Conteúdo orgânico, regular e relevante > volume artificial.
 - Text domain: `bible-by-midvash`. **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
 - Nada de `echo` direto sem `esc_html` / `esc_attr` / `wp_kses`. Sanitizar input com `sanitize_text_field`, `absint`, etc.
 - Nonces em qualquer form de admin. Capabilities corretas (`manage_options` pra settings).
-- Prefixo `bbm_` / `BBM_` em funções, constantes e options globais.
+- Prefixo `bbmv_` / `BBMV_` em funções, classes e constantes (wp.org exige ≥4 chars). **Exceção intencional**: nomes já persistidos ou user-facing continuam `bbm` — options no banco (`bbm_options`), nonces/ajax actions (`bbm_nonce`, `wp_ajax_bbm_*`), shortcode `[bbm_votd]`, classes CSS `.bbm-` e handles de assets. Não renomear esses sem migração.
 - Cache de versículos via Transients API (já implementado). Default 30 dias.
 - API calls com `wp_remote_get` + timeout configurável + tratamento de erro silencioso (fallback amigável, não fatal).
 
@@ -100,10 +100,10 @@ Conteúdo orgânico, regular e relevante > volume artificial.
 ```
 bible-by-midvash.php        # entry point + header WP + autoload de includes/
 includes/
-  class-bbm-admin.php       # tela de settings, abas, rendering de campos
-  class-bbm-api.php         # cliente HTTP pra api.midvash.com + cache
-  class-bbm-books.php       # mapa de livros bíblicos (pt/en/es) + abreviações
-  class-bbm-parser.php      # regex e substituição de referências por links
+  class-bbmv-admin.php       # tela de settings, abas, rendering de campos
+  class-bbmv-api.php         # cliente HTTP pra api.midvash.com + cache
+  class-bbmv-books.php       # mapa de livros bíblicos (pt/en/es) + abreviações
+  class-bbmv-parser.php      # regex e substituição de referências por links
 assets/
   css/, js/, images/        # estilos e scripts de frontend + admin
 languages/
@@ -130,7 +130,7 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 - **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções de uso no `$comment` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.6.0 passa sem erros.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 
-Erro novo de PHPCS/PHPStan bloqueia release; débito pré-existente conhecido: prefixo `bbm`/`BBM` tem 3 chars e o WPCS/wp.org pede ≥4 (decisão pendente — ver backlog).
+Erro novo de PHPCS/PHPStan bloqueia release.
 
 ## Áreas de melhoria conhecidas (backlog informal)
 
@@ -149,6 +149,6 @@ Use como inspiração quando o usuário pedir "o que dá pra melhorar". Não imp
 
 - Sempre confirmar antes de: push em main, force-push, deletar branch remota, criar release, alterar workflow CI, mexer em `vendor/`.
 - Pode rodar livre: edits locais, branch novo, commit local, `xgettext`/`msgfmt`, build local do ZIP, leitura de R2 (não escrita).
-- Quando bumpar versão: lembrar dos 3 lugares (header, `BBM_VERSION`, `readme.txt`). Esquecer um dos três quebra auto-update OU build OU display no admin.
+- Quando bumpar versão: lembrar dos 3 lugares (header, `BBMV_VERSION`, `readme.txt`). Esquecer um dos três quebra auto-update OU build OU display no admin.
 - Quando adicionar string nova traduzível: regenerar `.pot`, atualizar os 9 `.po`, recompilar `.mo`. Não deixar tradução faltando em release.
 - Não inventar features sem pedido. Backlog acima é referência, não autorização.

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Block {
+class BBMV_Block {
 
 	public function init() {
 		add_action( 'init', array( $this, 'register_block' ) );
@@ -63,9 +63,9 @@ class BBM_Block {
 	public function enqueue_editor_assets() {
 		wp_enqueue_script(
 			'bbm-block',
-			BBM_PLUGIN_URL . 'assets/js/bbm-block.js',
+			BBMV_PLUGIN_URL . 'assets/js/bbm-block.js',
 			array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-i18n' ),
-			BBM_VERSION,
+			BBMV_VERSION,
 			true
 		);
 
@@ -86,15 +86,15 @@ class BBM_Block {
 
 		$options  = get_option( 'bbm_options', array() );
 		$locale   = ! empty( $atts['locale'] )
-			? BBM_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
+			? BBMV_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
 			: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
 		$version  = ! empty( $atts['version'] )
 			? strtolower( sanitize_text_field( $atts['version'] ) )
-			: ( isset( $options['versao'] ) ? $options['versao'] : BBM_Books::get_default_version( $locale ) );
+			: ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) );
 		$show_ref = isset( $atts['show_reference'] ) ? (bool) $atts['show_reference'] : true;
 		$link     = isset( $atts['link_verse'] ) ? (bool) $atts['link_verse'] : true;
 
-		$api  = new BBM_API();
+		$api  = new BBMV_API();
 		$data = $api->get_verse( $reference, $version );
 
 		if ( ! $data || empty( $data['text'] ) ) {
@@ -134,7 +134,7 @@ class BBM_Block {
 	/**
 	 * Builds the Midvash URL for a given reference + locale + version.
 	 *
-	 * Delegates parsing to BBM_Books::parse_reference() so book-name lookup,
+	 * Delegates parsing to BBMV_Books::parse_reference() so book-name lookup,
 	 * accent tolerance and chapter validation stay consistent across the
 	 * parser, the API client and this block.
 	 *
@@ -144,13 +144,13 @@ class BBM_Block {
 	 * @return string URL or empty string if reference cannot be parsed.
 	 */
 	private function build_url( $reference, $locale, $version ) {
-		$parsed = BBM_Books::parse_reference( $reference );
+		$parsed = BBMV_Books::parse_reference( $reference );
 		if ( ! $parsed ) {
 			return '';
 		}
 
-		$book_slug = BBM_Books::get_book_slug( $parsed['book_id'], $locale );
-		$url       = BBM_SITE_URL . '/' . $locale . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
+		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], $locale );
+		$url       = BBMV_SITE_URL . '/' . $locale . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
 			$url .= '/' . $parsed['verse'];

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Books {
+class BBMV_Books {
 
 	/**
 	 * Supported locales
@@ -301,7 +301,7 @@ class BBM_Books {
 	}
 
 	/**
-	 * Centralized reference parser used by BBM_Parser, BBM_API and BBM_Block.
+	 * Centralized reference parser used by BBMV_Parser, BBMV_API and BBMV_Block.
 	 *
 	 * Accepts shapes like:
 	 *   "John 3"            → entire chapter

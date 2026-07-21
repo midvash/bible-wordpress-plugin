@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Admin {
+class BBMV_Admin {
 
 
 
@@ -30,16 +30,16 @@ class BBM_Admin {
 
 		wp_enqueue_style(
 			'bbm-admin-style',
-			BBM_PLUGIN_URL . 'assets/css/bbm-admin.css',
+			BBMV_PLUGIN_URL . 'assets/css/bbm-admin.css',
 			array(),
-			BBM_VERSION
+			BBMV_VERSION
 		);
 
 		wp_enqueue_script(
 			'bbm-admin',
-			BBM_PLUGIN_URL . 'assets/js/bbm-admin.js',
+			BBMV_PLUGIN_URL . 'assets/js/bbm-admin.js',
 			array(),
-			BBM_VERSION,
+			BBMV_VERSION,
 			true
 		);
 
@@ -49,9 +49,9 @@ class BBM_Admin {
 			array(
 				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'bbm_nonce' ),
-				// Kept in sync with BBM_Books::DEFAULT_VERSIONS — passed to JS so
+				// Kept in sync with BBMV_Books::DEFAULT_VERSIONS — passed to JS so
 				// the version select snaps to the preferred default per locale.
-				'defaults' => BBM_Books::DEFAULT_VERSIONS,
+				'defaults' => BBMV_Books::DEFAULT_VERSIONS,
 				'i18n'     => array(
 					'loading' => __( 'Loading…', 'bible-by-midvash' ),
 					'empty'   => __( 'No versions available', 'bible-by-midvash' ),
@@ -297,10 +297,10 @@ class BBM_Admin {
 	 * submitting from the right tab (checkboxes don't POST when unchecked),
 	 * returns false. Otherwise leaves the existing value untouched.
 	 *
-	 * @param array       $input       Raw $_POST input.
-	 * @param string      $key         Option key.
-	 * @param string      $tab         Tab where this checkbox lives.
-	 * @param array       $sanitized   Working sanitized array (passed by ref).
+	 * @param array  $input       Raw $_POST input.
+	 * @param string $key         Option key.
+	 * @param string $tab         Tab where this checkbox lives.
+	 * @param array  $sanitized   Working sanitized array (passed by ref).
 	 */
 	private function read_checkbox( $input, $key, $tab, &$sanitized ) {
 		if ( isset( $input[ $key ] ) ) {
@@ -347,17 +347,17 @@ class BBM_Admin {
 
 		// ----- Locale -----
 		if ( isset( $input['locale'] ) ) {
-			$valid_locales = BBM_Books::LOCALES;
+			$valid_locales = BBMV_Books::LOCALES;
 			$new_locale    = sanitize_text_field( $input['locale'] );
 			$new_locale    = in_array( $new_locale, $valid_locales, true ) ? $new_locale : 'pt-br';
-			$new_locale    = BBM_Books::normalize_locale( $new_locale );
+			$new_locale    = BBMV_Books::normalize_locale( $new_locale );
 
 			$old_locale          = isset( $sanitized['locale'] ) ? $sanitized['locale'] : 'pt-br';
 			$sanitized['locale'] = $new_locale;
 
 			// If locale changed, snap version to that locale's default (unless caller picked one).
 			if ( $new_locale !== $old_locale && ! isset( $input['versao'] ) ) {
-				$sanitized['versao'] = BBM_Books::get_default_version( $new_locale );
+				$sanitized['versao'] = BBMV_Books::get_default_version( $new_locale );
 			}
 		}
 
@@ -477,13 +477,13 @@ class BBM_Admin {
 	public function versao_render() {
 		$options = get_option( 'bbm_options' );
 		$locale  = isset( $options['locale'] ) ? $options['locale'] : 'pt-br';
-		$locale  = BBM_Books::normalize_locale( $locale );
+		$locale  = BBMV_Books::normalize_locale( $locale );
 
 		// Get default version for current locale
-		$default_version = BBM_Books::get_default_version( $locale );
+		$default_version = BBMV_Books::get_default_version( $locale );
 		$versao          = isset( $options['versao'] ) ? $options['versao'] : $default_version;
 
-		$api = new BBM_API();
+		$api = new BBMV_API();
 		// Get versions filtered by current locale from API
 		$api_versions = $api->get_versions( $locale );
 
@@ -746,9 +746,9 @@ class BBM_Admin {
 	 */
 	public function options_page() {
 		$active_tab = $this->get_active_tab();
-		// Cache-buster com BBM_VERSION pra que o browser não sirva ícone antigo
+		// Cache-buster com BBMV_VERSION pra que o browser não sirva ícone antigo
 		// após upgrade (img tag não tem o equivalente de wp_enqueue_style/_script).
-		$icon_url = BBM_PLUGIN_URL . 'assets/images/icon-bbm.svg?v=' . BBM_VERSION;
+		$icon_url = BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg?v=' . BBMV_VERSION;
 		?>
 		<div class="wrap bbm-wrap">
 
@@ -762,7 +762,7 @@ class BBM_Admin {
 						<?php esc_html_e( 'Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips.', 'bible-by-midvash' ); ?>
 					</p>
 					<div class="bbm-hero__meta">
-						<span class="bbm-badge">v<?php echo esc_html( BBM_VERSION ); ?></span>
+						<span class="bbm-badge">v<?php echo esc_html( BBMV_VERSION ); ?></span>
 						<span class="bbm-badge"><?php esc_html_e( 'Powered by Midvash API', 'bible-by-midvash' ); ?></span>
 					</div>
 				</div>

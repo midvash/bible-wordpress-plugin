@@ -2,7 +2,7 @@
 /**
  * Class responsible for identifying and linking Bible references.
  *
- * Uses BBM_Books for centralized book data with multilingual support.
+ * Uses BBMV_Books for centralized book data with multilingual support.
  *
  * @package Bible_by_Midvash
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class BBM_Parser {
+class BBMV_Parser {
 
 	/**
 	 * Plugin options
@@ -54,7 +54,7 @@ class BBM_Parser {
 		);
 
 		$this->locale = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
-		$this->locale = BBM_Books::normalize_locale( $this->locale );
+		$this->locale = BBMV_Books::normalize_locale( $this->locale );
 
 		// Add filter to content
 		add_filter( 'the_content', array( $this, 'parse_content' ), 20 );
@@ -72,7 +72,7 @@ class BBM_Parser {
 		$this->referenced_books = array();
 
 		// Build the regex pattern using book names and abbreviations
-		$pattern = BBM_Books::get_matching_pattern();
+		$pattern = BBMV_Books::get_matching_pattern();
 
 		// Regex that skips content inside <a> tags and headers h1-h6
 		$skip_tags = '<a\b[^>]*>.*?<\/a>|<h[1-6]\b[^>]*>.*?<\/h[1-6]>(*SKIP)(*F)';
@@ -101,7 +101,7 @@ class BBM_Parser {
 						return $matches[0];
 					}
 
-					$url = BBM_SITE_URL . '/' . $this->locale;
+					$url = BBMV_SITE_URL . '/' . $this->locale;
 
 					$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
 					$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
@@ -133,7 +133,7 @@ class BBM_Parser {
 		// the original substring and adds accent fallback + chapter validation
 		// against the book's known chapter count. Sharing this path with the
 		// API client and the Gutenberg block keeps behaviour aligned.
-		$parsed = BBM_Books::parse_reference( $original );
+		$parsed = BBMV_Books::parse_reference( $original );
 		if ( ! $parsed ) {
 			return $original;
 		}
@@ -152,11 +152,11 @@ class BBM_Parser {
 		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
 
 		// Get slug for the current locale
-		$book_slug = BBM_Books::get_book_slug( $book_id, $this->locale );
+		$book_slug = BBMV_Books::get_book_slug( $book_id, $this->locale );
 
 		// Build URL with locale prefix
 		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}/{verse}
-		$url = BBM_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
+		$url = BBMV_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
 			if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {

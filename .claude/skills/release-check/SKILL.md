@@ -12,12 +12,12 @@ Rode cada etapa abaixo e reporte um checklist final com ✅/❌ por item. Não c
 Extraia e compare — os três DEVEM ser idênticos:
 
 - `bible-by-midvash.php` → linha `* Version: X.Y.Z` do header
-- `bible-by-midvash.php` → `define('BBM_VERSION', 'X.Y.Z')`
+- `bible-by-midvash.php` → `define('BBMV_VERSION', 'X.Y.Z')`
 - `readme.txt` → `Stable tag: X.Y.Z`
 
 ```bash
 grep -E '^\s*\*\s*Version:' bible-by-midvash.php
-grep "BBM_VERSION" bible-by-midvash.php
+grep "BBMV_VERSION" bible-by-midvash.php
 grep "Stable tag:" readme.txt
 ```
 

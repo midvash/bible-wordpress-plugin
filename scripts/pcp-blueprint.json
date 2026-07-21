@@ -1,0 +1,23 @@
+{
+	"$comment": "Roda o Plugin Check oficial (wp.org) via WordPress Playground, sem Docker. Uso: extrair dist/bible-by-midvash-<v>-wporg.zip num dir temporario e rodar: npx @wp-playground/cli run-blueprint --blueprint=scripts/pcp-blueprint.json --mount=<dir-extraido>/bible-by-midvash:/wordpress/wp-content/plugins/bible-by-midvash --mount=<dir-saida>:/wordpress/pcp-out — resultado em <dir-saida>/result.txt. O stdout do wp-cli e engolido pelo Playground e o subprocess do runcommand nao funciona la, dai o eval-file + launch=false + arquivo montado.",
+	"landingPage": "/",
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "plugin-check"
+			},
+			"options": { "activate": true }
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/run-pcp.php",
+			"data": "<?php $out = WP_CLI::runcommand('plugin check bible-by-midvash --format=json', array('return' => 'all', 'exit_error' => false, 'launch' => false)); file_put_contents('/wordpress/pcp-out/result.txt', $out->stdout . \"\\n--STDERR--\\n\" . $out->stderr . \"\\ncode=\" . $out->return_code);"
+		},
+		{
+			"step": "wp-cli",
+			"command": "wp eval-file /wordpress/run-pcp.php"
+		}
+	]
+}

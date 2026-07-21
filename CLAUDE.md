@@ -121,6 +121,17 @@ README.md                   # readme público do GitHub
 
 Manter essa convenção. Não criar diretórios novos sem motivo claro (ex: `docs/`, `tests/` só se houver conteúdo real).
 
+## Ferramentas de qualidade
+
+Instaladas globalmente via `composer global` (não estão em `vendor/` de propósito — `vendor/` é commitado e vai no ZIP). Configs versionadas no repo:
+
+- **PHPCS + WordPress Coding Standards + PHPCompatibilityWP** — config em [phpcs.xml.dist](phpcs.xml.dist). Rodar: `~/.composer/vendor/bin/phpcs -q --report=summary .`
+- **PHPStan (level 5) + extensão WordPress** — config em [phpstan.neon.dist](phpstan.neon.dist). Rodar: `~/.composer/vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções de uso no `$comment` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.6.0 passa sem erros.
+- **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
+
+Erro novo de PHPCS/PHPStan bloqueia release; débito pré-existente conhecido: prefixo `bbm`/`BBM` tem 3 chars e o WPCS/wp.org pede ≥4 (decisão pendente — ver backlog).
+
 ## Áreas de melhoria conhecidas (backlog informal)
 
 Use como inspiração quando o usuário pedir "o que dá pra melhorar". Não implementar sem pedido explícito.

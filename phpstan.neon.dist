@@ -1,0 +1,17 @@
+# PHPStan config — tools are installed globally (composer global), see CLAUDE.md.
+# The szepeviktor/phpstan-wordpress extension is auto-loaded via phpstan/extension-installer.
+parameters:
+    level: 5
+    paths:
+        - bible-by-midvash.php
+        - uninstall.php
+        - includes
+    scanFiles:
+        - %env.HOME%/.composer/vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    excludePaths:
+        - vendor
+        - dist
+    ignoreErrors:
+        # BBM_* constants are defined at runtime in bible-by-midvash.php (top-level define()).
+        - identifier: constant.notFound
+          message: '#Constant BBM_[A-Z_]+ not found#'

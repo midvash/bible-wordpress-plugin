@@ -30,17 +30,17 @@ jobs:
           echo "Plugin version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Verify version coherence (header / BBM_VERSION / readme.txt)
+      - name: Verify version coherence (header / BBMV_VERSION / readme.txt)
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
-          BBM_CONST=$(grep -oE "BBM_VERSION', '[^']+'" bible-by-midvash.php | sed -E "s/.*'([0-9.]+)'/\1/")
+          BBM_CONST=$(grep -oE "BBMV_VERSION', '[^']+'" bible-by-midvash.php | sed -E "s/.*'([0-9.]+)'/\1/")
           STABLE_TAG=$(grep -E "^Stable tag:" readme.txt | sed -E 's/.*:\s*//')
           echo "Header:    $VERSION"
           echo "Constant:  $BBM_CONST"
           echo "Stable tag:$STABLE_TAG"
           if [ "$VERSION" != "$BBM_CONST" ]; then
-            echo "::error::Header version ($VERSION) ≠ BBM_VERSION constant ($BBM_CONST)"
+            echo "::error::Header version ($VERSION) ≠ BBMV_VERSION constant ($BBM_CONST)"
             exit 1
           fi
           if [ "$VERSION" != "$STABLE_TAG" ]; then

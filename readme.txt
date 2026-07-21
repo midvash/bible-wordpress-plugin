@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 0.6.1
+Stable tag: 0.7.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,11 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
+= 0.7.0 =
+* **WordPress.org readiness.** Renames every global PHP symbol from the 3-character `bbm_`/`BBM_` prefix to `bbmv_`/`BBMV_` — WordPress.org requires plugin prefixes of at least 4 characters. Purely internal: stored options, the `[bbm_votd]` shortcode, AJAX endpoints, CSS classes and asset handles are unchanged, so existing sites update in place with settings intact and nothing to reconfigure.
+* **Code quality.** The whole codebase now passes PHPCS with the full WordPress Coding Standards ruleset (plus PHPCompatibilityWP for PHP 7.4+) and PHPStan level 5 with the WordPress extension — zero errors, zero warnings. Every function, class and member variable is now fully documented with accurate PHPDoc.
+* **Tooling.** Adds versioned linter configs (`phpcs.xml.dist`, `phpstan.neon.dist`) and a WordPress Playground blueprint that runs the official wordpress.org Plugin Check without Docker. The 0.7.0 wp.org build passes Plugin Check with no errors.
+
 = 0.6.1 =
 * **Infrastructure.** Update and download endpoints moved from wordpress.midvash.com to midvash.app (the plugin now checks `midvash.app/api/wordpress/update-info.json`). No functional change; existing installs should be updated once to point at the new endpoint.
 
@@ -158,6 +163,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://wordpress.midvash.com.
 
 == Upgrade Notice ==
+
+= 0.7.0 =
+Internal code-quality release preparing for WordPress.org submission: 4-character symbol prefix (bbmv_), full WordPress Coding Standards + PHPStan compliance, official Plugin Check passing clean. Safe update — settings, shortcodes and styling untouched.
 
 = 0.6.0 =
 WordPress.org compliance pass — security, performance and i18n cleanups. Significantly faster on archive pages, no more PHP notices on WP 6.7+. New uninstall.php cleans up after itself. Catalogue updated with 11 new Bible versions across pt-br, es, fr and de.

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bible by Midvash\n"
-"Report-Msgid-Bugs-To: https://github.com/midvash/bible-by-midvash/issues\n"
-"POT-Creation-Date: 2026-05-28 08:19-0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-21 20:20-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Russian\n"
@@ -13,140 +13,184 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: bible-by-midvash.php:176
+#: bible-by-midvash.php:167
 msgid "Verse currently unavailable"
 msgstr "Стих временно недоступен"
 
-#: bible-by-midvash.php:177
+#: bible-by-midvash.php:168
 msgid "Read more"
 msgstr "Читать далее"
 
-#: bible-by-midvash.php:230
+#: bible-by-midvash.php:224
 msgid "Too many requests"
 msgstr "Слишком много запросов"
 
-#: bible-by-midvash.php:237
+#: bible-by-midvash.php:231
 msgid "Reference not provided"
 msgstr "Ссылка не указана"
 
-#: bible-by-midvash.php:246
+#: bible-by-midvash.php:240
 msgid "Verse not found"
 msgstr "Стих не найден"
 
-#: bible-by-midvash.php:262
+#: bible-by-midvash.php:255
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: bible-by-midvash.php:275
+#: bible-by-midvash.php:268
 msgid "Failed to fetch versions"
 msgstr "Не удалось загрузить переводы"
 
-#: includes/class-bbm-admin.php:55
+#: includes/class-bbmv-widget.php:26
+msgid "Verse of the Day — Midvash"
+msgstr "Стих дня — Midvash"
+
+#: includes/class-bbmv-widget.php:28
+msgid "Displays the daily Bible verse powered by the Midvash API."
+msgstr "Показывает ежедневный библейский стих через API Midvash."
+
+#: includes/class-bbmv-widget.php:76
+msgid "Verse of the Day"
+msgstr "Стих дня"
+
+#: includes/class-bbmv-widget.php:83
+msgid "Title:"
+msgstr "Заголовок:"
+
+#: includes/class-bbmv-widget.php:89
+msgid "Language (leave empty to use plugin setting):"
+msgstr "Язык (оставьте пустым, чтобы использовать настройку плагина):"
+
+#: includes/class-bbmv-widget.php:92
+msgid "— Use plugin setting —"
+msgstr "— Использовать настройку плагина —"
+
+#: includes/class-bbmv-widget.php:112
+msgid "Version (leave empty for locale default):"
+msgstr "Версия (оставьте пустым для версии по умолчанию для языка):"
+
+#: includes/class-bbmv-widget.php:116
+msgid "e.g. nvt, kjv, lsg"
+msgstr "например, synodal"
+
+#: includes/class-bbmv-widget.php:121
+msgid "Show reference (e.g. João 3:16)"
+msgstr "Показывать ссылку (например, Иоанн 3:16)"
+
+#: includes/class-bbmv-widget.php:127
+msgid "Link verse to Midvash"
+msgstr "Связать стих с Midvash"
+
+#: includes/class-bbmv-widget.php:190 includes/class-bbmv-block.php:108
+msgid "Verse currently unavailable."
+msgstr "Стих временно недоступен."
+
+#: includes/class-bbmv-admin.php:64
 msgid "Loading…"
 msgstr "Загрузка…"
 
-#: includes/class-bbm-admin.php:56
+#: includes/class-bbmv-admin.php:65
 msgid "No versions available"
 msgstr "Нет доступных переводов"
 
-#: includes/class-bbm-admin.php:57
+#: includes/class-bbmv-admin.php:66
 msgid "Error loading versions"
 msgstr "Ошибка при загрузке переводов"
 
-#: includes/class-bbm-admin.php:68 includes/class-bbm-admin.php:69
-#: includes/class-bbm-admin.php:785
+#: includes/class-bbmv-admin.php:77 includes/class-bbmv-admin.php:78
+#: includes/class-bbmv-admin.php:770
 msgid "Bible by Midvash"
 msgstr "Библия by Midvash"
 
-#: includes/class-bbm-admin.php:86
+#: includes/class-bbmv-admin.php:94
 msgid "General Settings"
 msgstr "Общие настройки"
 
-#: includes/class-bbm-admin.php:94
+#: includes/class-bbmv-admin.php:102
 msgid "Cache and Performance"
 msgstr "Кеш и производительность"
 
-#: includes/class-bbm-admin.php:102
+#: includes/class-bbmv-admin.php:110
 msgid "Language"
 msgstr "Язык"
 
-#: includes/class-bbm-admin.php:111
+#: includes/class-bbmv-admin.php:119
 msgid "Bible Version"
 msgstr "Перевод Библии"
 
-#: includes/class-bbm-admin.php:120
+#: includes/class-bbmv-admin.php:128
 msgid "Link Color"
 msgstr "Цвет ссылки"
 
-#: includes/class-bbm-admin.php:129
+#: includes/class-bbmv-admin.php:137
 msgid "Enable custom color"
 msgstr "Включить пользовательский цвет"
 
-#: includes/class-bbm-admin.php:138
+#: includes/class-bbmv-admin.php:146
 msgid "Underline links"
 msgstr "Подчёркивать ссылки"
 
-#: includes/class-bbm-admin.php:147
+#: includes/class-bbmv-admin.php:155
 msgid "Underline Color"
 msgstr "Цвет подчёркивания"
 
-#: includes/class-bbm-admin.php:156
+#: includes/class-bbmv-admin.php:164
 msgid "Underline Style"
 msgstr "Стиль подчёркивания"
 
-#: includes/class-bbm-admin.php:165
+#: includes/class-bbmv-admin.php:173
 msgid "Open in new tab"
 msgstr "Открывать в новой вкладке"
 
-#: includes/class-bbm-admin.php:174
+#: includes/class-bbmv-admin.php:182
 msgid "Show version in tooltip"
 msgstr "Показывать перевод во всплывающей подсказке"
 
-#: includes/class-bbm-admin.php:183
+#: includes/class-bbmv-admin.php:191
 msgid "Enable cache"
 msgstr "Включить кеш"
 
-#: includes/class-bbm-admin.php:192
+#: includes/class-bbmv-admin.php:200
 msgid "Cache duration (seconds)"
 msgstr "Длительность кеша (секунды)"
 
-#: includes/class-bbm-admin.php:201
+#: includes/class-bbmv-admin.php:209
 msgid "API Timeout (seconds)"
 msgstr "Таймаут API (секунды)"
 
-#: includes/class-bbm-admin.php:210
+#: includes/class-bbmv-admin.php:218
 msgid "Auto-linking Settings"
 msgstr "Настройки автосвязывания"
 
-#: includes/class-bbm-admin.php:218 includes/class-bbm-admin.php:696
+#: includes/class-bbmv-admin.php:226 includes/class-bbmv-admin.php:686
 msgid "Link the word \"Bíblia\""
 msgstr "Создавать ссылку на слово \"Bíblia\""
 
-#: includes/class-bbm-admin.php:227
+#: includes/class-bbmv-admin.php:235
 msgid "Link Bible version names"
 msgstr "Создавать ссылки на названия переводов Библии"
 
-#: includes/class-bbm-admin.php:236
+#: includes/class-bbmv-admin.php:244
 msgid "Link Bible book names"
 msgstr "Создавать ссылки на названия книг Библии"
 
-#: includes/class-bbm-admin.php:245 includes/class-bbm-admin.php:746
+#: includes/class-bbmv-admin.php:253 includes/class-bbmv-admin.php:733
 msgid "Link dictionary terms"
 msgstr "Создавать ссылки на словарные термины"
 
-#: includes/class-bbm-admin.php:254 includes/class-bbm-admin.php:762
+#: includes/class-bbmv-admin.php:262 includes/class-bbmv-admin.php:748
 msgid "Link biblical characters"
 msgstr "Создавать ссылки на библейских персонажей"
 
-#: includes/class-bbm-admin.php:401
+#: includes/class-bbmv-admin.php:406
 msgid "Configure how Bible references will be displayed."
 msgstr "Настройте отображение библейских ссылок."
 
-#: includes/class-bbm-admin.php:409
+#: includes/class-bbmv-admin.php:413
 msgid "Configure cache settings to improve tooltip performance."
 msgstr "Настройте кеш для улучшения производительности подсказок."
 
-#: includes/class-bbm-admin.php:476
+#: includes/class-bbmv-admin.php:479
 msgid ""
 "Select the language for links and book names. This determines the URL "
 "structure on Midvash."
@@ -154,7 +198,7 @@ msgstr ""
 "Выберите язык для ссылок и названий книг. Это определяет структуру URL на "
 "Midvash."
 
-#: includes/class-bbm-admin.php:517
+#: includes/class-bbmv-admin.php:519
 msgid ""
 "Select the Bible version for links and tooltips. Versions are fetched "
 "dynamically from Midvash."
@@ -162,104 +206,104 @@ msgstr ""
 "Выберите перевод Библии для ссылок и подсказок. Переводы загружаются "
 "динамически с Midvash."
 
-#: includes/class-bbm-admin.php:532
+#: includes/class-bbmv-admin.php:533
 msgid "Enable custom color for links"
 msgstr "Включить пользовательский цвет для ссылок"
 
-#: includes/class-bbm-admin.php:547
+#: includes/class-bbmv-admin.php:547
 msgid "Main color of the generated links."
 msgstr "Основной цвет создаваемых ссылок."
 
-#: includes/class-bbm-admin.php:561
+#: includes/class-bbmv-admin.php:560
 msgid "Enable underline for links"
 msgstr "Включить подчёркивание ссылок"
 
-#: includes/class-bbm-admin.php:576
+#: includes/class-bbmv-admin.php:574
 msgid "Color of the link underline."
 msgstr "Цвет подчёркивания ссылки."
 
-#: includes/class-bbm-admin.php:588
+#: includes/class-bbmv-admin.php:585
 msgid "Solid"
 msgstr "Сплошное"
 
-#: includes/class-bbm-admin.php:589
+#: includes/class-bbmv-admin.php:586
 msgid "Double"
 msgstr "Двойное"
 
-#: includes/class-bbm-admin.php:590
+#: includes/class-bbmv-admin.php:587
 msgid "Dotted"
 msgstr "Пунктирное"
 
-#: includes/class-bbm-admin.php:591
+#: includes/class-bbmv-admin.php:588
 msgid "Dashed"
 msgstr "Штриховое"
 
-#: includes/class-bbm-admin.php:592
+#: includes/class-bbmv-admin.php:589
 msgid "Wavy"
 msgstr "Волнистое"
 
-#: includes/class-bbm-admin.php:601
+#: includes/class-bbmv-admin.php:598
 msgid "Style of the link underline."
 msgstr "Стиль подчёркивания ссылки."
 
-#: includes/class-bbm-admin.php:615
+#: includes/class-bbmv-admin.php:611
 msgid "Open links in a new browser tab"
 msgstr "Открывать ссылки в новой вкладке браузера"
 
-#: includes/class-bbm-admin.php:630
+#: includes/class-bbmv-admin.php:625
 msgid "Display Bible version in tooltip"
 msgstr "Отображать перевод Библии во всплывающей подсказке"
 
-#: includes/class-bbm-admin.php:645
+#: includes/class-bbmv-admin.php:639
 msgid "Store verses in cache to improve performance"
 msgstr "Сохранять стихи в кеше для повышения производительности"
 
-#: includes/class-bbm-admin.php:660
+#: includes/class-bbmv-admin.php:653
 msgid "Time in seconds (default: 2592000 = 30 days)."
 msgstr "Время в секундах (по умолчанию: 2592000 = 30 дней)."
 
-#: includes/class-bbm-admin.php:674
+#: includes/class-bbmv-admin.php:666
 msgid "Maximum wait time for the API."
 msgstr "Максимальное время ожидания ответа API."
 
-#: includes/class-bbm-admin.php:683
+#: includes/class-bbmv-admin.php:674
 msgid "Configure auto-linking for various elements in your content."
 msgstr "Настройте автосвязывание для различных элементов вашего контента."
 
-#: includes/class-bbm-admin.php:698
+#: includes/class-bbmv-admin.php:688
 msgid "Auto-link the word \"Bíblia\" to Midvash"
 msgstr "Автоматически создавать ссылку на слово \"Bíblia\", ведущую на Midvash"
 
-#: includes/class-bbm-admin.php:712
+#: includes/class-bbmv-admin.php:701
 msgid "Link version names"
 msgstr "Связывать названия переводов"
 
-#: includes/class-bbm-admin.php:714
+#: includes/class-bbmv-admin.php:703
 msgid "Auto-link Bible version names mentioned in text"
 msgstr ""
 "Автоматически создавать ссылки на названия переводов Библии, упомянутые в "
 "тексте"
 
-#: includes/class-bbm-admin.php:730
+#: includes/class-bbmv-admin.php:718
 msgid "Link book names"
 msgstr "Связывать названия книг"
 
-#: includes/class-bbm-admin.php:732
+#: includes/class-bbmv-admin.php:720
 msgid "Auto-link Bible book names mentioned in text"
 msgstr ""
 "Автоматически создавать ссылки на названия книг Библии, упомянутые в тексте"
 
-#: includes/class-bbm-admin.php:748
+#: includes/class-bbmv-admin.php:735
 msgid "Auto-link dictionary terms mentioned in text"
 msgstr ""
 "Автоматически создавать ссылки на словарные термины, упомянутые в тексте"
 
-#: includes/class-bbm-admin.php:764
+#: includes/class-bbmv-admin.php:750
 msgid "Auto-link biblical characters mentioned in text"
 msgstr ""
 "Автоматически создавать ссылки на библейских персонажей, упомянутых в тексте"
 
-#: includes/class-bbm-admin.php:787
+#: includes/class-bbmv-admin.php:772
 msgid ""
 "Auto-detect Bible references in your posts and turn them into beautiful "
 "links with verse tooltips."
@@ -267,35 +311,35 @@ msgstr ""
 "Автоматически распознаёт библейские ссылки в ваших записях и превращает их в "
 "красивые ссылки с подсказками со стихами."
 
-#: includes/class-bbm-admin.php:791
+#: includes/class-bbmv-admin.php:776
 msgid "Powered by Midvash API"
 msgstr "Работает на API Midvash"
 
-#: includes/class-bbm-admin.php:796
+#: includes/class-bbmv-admin.php:781
 msgid "Plugin site"
 msgstr "Сайт плагина"
 
-#: includes/class-bbm-admin.php:799
+#: includes/class-bbmv-admin.php:784
 msgid "Open Midvash"
 msgstr "Открыть Midvash"
 
-#: includes/class-bbm-admin.php:807
+#: includes/class-bbmv-admin.php:792
 msgid "General"
 msgstr "Общие"
 
-#: includes/class-bbm-admin.php:811
+#: includes/class-bbmv-admin.php:796
 msgid "Cache & Performance"
 msgstr "Кеш и производительность"
 
-#: includes/class-bbm-admin.php:826
+#: includes/class-bbmv-admin.php:811
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
-#: includes/class-bbm-admin.php:832
+#: includes/class-bbmv-admin.php:817
 msgid "How to use"
 msgstr "Как использовать"
 
-#: includes/class-bbm-admin.php:833
+#: includes/class-bbmv-admin.php:818
 msgid ""
 "The plugin automatically detects Bible references in your posts. When "
 "hovering over a reference, a tooltip displays the verse text fetched from "
@@ -305,79 +349,35 @@ msgstr ""
 "наведении на ссылку всплывающая подсказка отображает текст стиха, полученный "
 "из API Midvash."
 
-#: includes/class-bbm-admin.php:834
+#: includes/class-bbmv-admin.php:819
 msgid "Supported formats"
 msgstr "Поддерживаемые форматы"
 
-#: includes/class-bbm-admin.php:836
+#: includes/class-bbmv-admin.php:821
 msgid "Single verse"
 msgstr "Один стих"
 
-#: includes/class-bbm-admin.php:837
+#: includes/class-bbmv-admin.php:822
 msgid "Alternative separator"
 msgstr "Альтернативный разделитель"
 
-#: includes/class-bbm-admin.php:838
+#: includes/class-bbmv-admin.php:823
 msgid "Verse range"
 msgstr "Диапазон стихов"
 
-#: includes/class-bbm-admin.php:839
+#: includes/class-bbmv-admin.php:824
 msgid "Abbreviation"
 msgstr "Сокращение"
 
-#: includes/class-bbm-admin.php:840
+#: includes/class-bbmv-admin.php:825
 msgid "Entire chapter"
 msgstr "Вся глава"
 
-#: includes/class-bbm-widget.php:21
-msgid "Verse of the Day — Midvash"
-msgstr "Стих дня — Midvash"
-
-#: includes/class-bbm-widget.php:23
-msgid "Displays the daily Bible verse powered by the Midvash API."
-msgstr "Показывает ежедневный библейский стих через API Midvash."
-
-#: includes/class-bbm-widget.php:61
-msgid "Verse of the Day"
-msgstr "Стих дня"
-
-#: includes/class-bbm-widget.php:68
-msgid "Title:"
-msgstr "Заголовок:"
-
-#: includes/class-bbm-widget.php:74
-msgid "Language (leave empty to use plugin setting):"
-msgstr "Язык (оставьте пустым, чтобы использовать настройку плагина):"
-
-#: includes/class-bbm-widget.php:77
-msgid "— Use plugin setting —"
-msgstr "— Использовать настройку плагина —"
-
-#: includes/class-bbm-widget.php:97
-msgid "Version (leave empty for locale default):"
-msgstr "Версия (оставьте пустым для версии по умолчанию для языка):"
-
-#: includes/class-bbm-widget.php:101
-msgid "e.g. nvt, kjv, lsg"
-msgstr "например, synodal"
-
-#: includes/class-bbm-widget.php:106
-msgid "Show reference (e.g. João 3:16)"
-msgstr "Показывать ссылку (например, Иоанн 3:16)"
-
-#: includes/class-bbm-widget.php:112
-msgid "Link verse to Midvash"
-msgstr "Связать стих с Midvash"
-
-#: includes/class-bbm-widget.php:164 includes/class-bbm-block.php:88
-msgid "Verse currently unavailable."
-msgstr "Стих временно недоступен."
-
-#: includes/class-bbm-parser.php:108
+#: includes/class-bbmv-parser.php:126
 msgid "Online Bible"
 msgstr "Библия онлайн"
 
-#: includes/class-bbm-parser.php:175
+#: includes/class-bbmv-parser.php:195
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Читать %s на Midvash"

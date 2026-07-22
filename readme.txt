@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -96,8 +96,8 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "nvt"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.6.0`).
-* **When it is sent.** A verse request is made the first time a visitor hovers a reference (or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "nvt"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.8.0`).
+* **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
 * **Terms of Service.** https://midvash.com/terms
@@ -117,6 +117,12 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.8.0 =
+* **Instant tooltips (batch prefetch).** Shortly after a post renders, the plugin now prefetches every Bible reference on the page in a single request through the Midvash API's new `/v1/passages` batch endpoint (up to 60 references per page, 20 per upstream call). Hovering a reference shows the verse instantly instead of waiting for a per-hover round-trip. Hovers that land before the prefetch finishes fall back to the previous per-verse fetch, so nothing ever blocks on it.
+* **Localized version names.** The Settings version dropdown now shows each Bible version's name in the site's display language (e.g. "Bíblia em Inglês Básico" instead of "Bible in Basic English" on a Portuguese site), powered by the enriched `/v1/versions` catalogue.
+* **Copyright attribution in the tooltip.** Versions with a copyright notice now display a discreet attribution line in the tooltip footer (full notice on hover) — good practice for licensed translations and a requirement-friendly touch for a future WordPress.org submission.
+* **Leaner HTTP client.** Removed the defensive 429/`X-RateLimit-Reset` handling: the API now documents that it serves without rate limits, so the client keeps only transport-error and 5xx retries.
 
 = 0.7.0 =
 * **WordPress.org readiness.** Renames every global PHP symbol from the 3-character `bbm_`/`BBM_` prefix to `bbmv_`/`BBMV_` — WordPress.org requires plugin prefixes of at least 4 characters. Purely internal: stored options, the `[bbm_votd]` shortcode, AJAX endpoints, CSS classes and asset handles are unchanged, so existing sites update in place with settings intact and nothing to reconfigure.
@@ -165,6 +171,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://wordpress.midvash.com.
 
 == Upgrade Notice ==
+
+= 0.8.0 =
+Tooltips now open instantly: all references on a page are prefetched in one batched API call. Version names appear localized in Settings and licensed translations show copyright attribution in the tooltip. Safe update, no reconfiguration.
 
 = 0.7.0 =
 Internal code-quality release preparing for WordPress.org submission: 4-character symbol prefix (bbmv_), full WordPress Coding Standards + PHPStan compliance, official Plugin Check passing clean. Safe update — settings, shortcodes and styling untouched.

@@ -44,12 +44,17 @@
         versionSelect.innerHTML = '';
         versions.forEach(function (v) {
             var slug      = (v.slug || v.code || '').toLowerCase();
-            var name      = v.name || '';
+            // Version name localized to the selected display locale when the
+            // catalogue provides one (falls back to the native name).
+            var name      = (v.localizedNames && v.localizedNames[locale]) || v.name || '';
             var shortName = v.shortName || v.code || '';
             var label     = name ? (name + ' (' + shortName + ')') : shortName;
             var opt       = document.createElement('option');
             opt.value       = slug;
             opt.textContent = label;
+            if (v.copyright) {
+                opt.title = v.copyright;
+            }
             versionSelect.appendChild(opt);
         });
 

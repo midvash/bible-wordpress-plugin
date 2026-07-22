@@ -17,9 +17,6 @@ parameters:
         # BBMV_* constants are defined at runtime in bible-by-midvash.php (top-level define()).
         - identifier: constant.notFound
           message: '#Constant BBMV_[A-Z_]+ not found#'
-        # check_rate_limit() is an intentional no-op kept as a telemetry hook point.
-        - identifier: method.resultUnused
-          message: '#BBMV_API::check_rate_limit#'
         # PCRE sets non-participating groups before a matched later group to '' — the
         # emptiness check is load-bearing for ranges like "Gen 3-5"; PHPStan infers
         # numeric-string and thinks it can never be ''.

@@ -20,7 +20,8 @@
         read_more: 'Read more',
         locale: 'pt-br',
         site_url: 'https://midvash.com',
-        icon_url: ''
+        icon_url: '',
+        version_copyright: ''
     };
 
     // Cache for fetched verses
@@ -75,8 +76,18 @@
                     </svg>
                     <span class="bbm-tooltip__read-more-text"></span>
                 </a>
+                <span class="bbm-tooltip__copyright"></span>
             </div>
         `;
+
+        // Version copyright attribution: compact first line in the footer,
+        // full multi-line notice on hover via the title attribute.
+        if (config.version_copyright) {
+            const copyrightEl = tooltipElement.querySelector('.bbm-tooltip__copyright');
+            const lines = config.version_copyright.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+            copyrightEl.textContent = lines[0] || '';
+            copyrightEl.title = config.version_copyright;
+        }
 
         if (config.icon_url) {
             const header = tooltipElement.querySelector('.bbm-tooltip__header');
@@ -340,6 +351,62 @@
     }
 
     /**
+     * Prefetch every reference on the page in a single request.
+     *
+     * Runs off the critical path (idle callback / delayed) and fills the same
+     * in-memory cache the hover path reads, so tooltips open instantly. A
+     * hover that lands before the batch returns simply falls back to the
+     * existing single-verse fetch — no coordination needed.
+     */
+    function prefetchAll() {
+        const links = document.querySelectorAll('.bbm-link[data-midvash-ref]');
+        if (!links.length) return;
+
+        const refs = [];
+        links.forEach(function(link) {
+            const ref = link.getAttribute('data-midvash-ref');
+            const cacheKey = ref + '_' + config.version;
+            if (ref && refs.indexOf(ref) === -1 && !verseCache.has(cacheKey)) {
+                refs.push(ref);
+            }
+        });
+        if (refs.length < 2) return; // A single ref isn't worth a batch round-trip.
+
+        const body = new URLSearchParams({
+            action: 'bbm_get_verses',
+            nonce: config.nonce,
+            refs: refs.slice(0, 60).join('|'),
+            version: config.version
+        });
+
+        fetch(config.ajax_url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: body.toString()
+        })
+        .then(function(response) {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(function(result) {
+            if (result.success && result.data) {
+                Object.keys(result.data).forEach(function(ref) {
+                    if (result.data[ref]) {
+                        verseCache.set(ref + '_' + config.version, result.data[ref]);
+                    }
+                });
+            }
+        })
+        .catch(function(error) {
+            // Prefetch is best-effort; hover fetch remains the fallback.
+            if (config.debug && typeof console !== 'undefined') {
+                console.warn('Midvash prefetch skipped:', error);
+            }
+        });
+    }
+
+    /**
      * Initialize event listeners
      */
     function init() {
@@ -403,11 +470,26 @@
         }, { passive: true });
     }
 
+    /**
+     * Schedule the batch prefetch off the critical rendering path.
+     */
+    function schedulePrefetch() {
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(prefetchAll, { timeout: 3000 });
+        } else {
+            setTimeout(prefetchAll, 1200);
+        }
+    }
+
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            schedulePrefetch();
+        });
     } else {
         init();
+        schedulePrefetch();
     }
 
 })();

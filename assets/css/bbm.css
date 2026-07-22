@@ -184,11 +184,38 @@ body.theme-dark .bbm-tooltip__verse-number,
 .bbm-tooltip__footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+    gap: 12px;
     padding: 10px 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     background: rgba(0, 0, 0, 0.02);
     border-radius: 0 0 11px 11px;
+}
+
+/* Version copyright attribution — compact, muted, truncates gracefully.
+   Empty when the version has no copyright notice (public-domain texts). */
+.bbm-tooltip__copyright {
+    order: -1;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 10px;
+    line-height: 1.3;
+    color: rgba(0, 0, 0, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (prefers-color-scheme: dark) {
+    .bbm-tooltip__copyright {
+        color: rgba(255, 255, 255, 0.4);
+    }
+}
+
+body.dark-mode .bbm-tooltip__copyright,
+body.theme-dark .bbm-tooltip__copyright,
+.wp-dark-mode .bbm-tooltip__copyright {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 @media (prefers-color-scheme: dark) {

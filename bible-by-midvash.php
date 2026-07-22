@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.app/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.8.0
+ * Version: 0.9.0
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.8.0' );
+define( 'BBMV_VERSION', '0.9.0' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -181,6 +181,63 @@ function bbmv_enqueue_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'bbmv_enqueue_assets' );
+
+/**
+ * Hydrates the tooltip cache server-side with every reference the parser
+ * linked on this page, in one batched API call.
+ *
+ * Runs at wp_footer priority 5 — after the_content has executed (so the
+ * parser's collected refs are complete) and before footer scripts print, so
+ * wp_add_inline_script still attaches to bbm-tooltip. Cached references cost
+ * nothing; misses go upstream in a single /v1/passages call (chunked at 50)
+ * and land in the same transients the AJAX paths use. The first hover of the
+ * first visitor is already instant; the client-side batch prefetch remains as
+ * fallback for anything missing here (e.g. upstream hiccup at render time).
+ */
+function bbmv_hydrate_tooltips() {
+	if ( ! is_singular() || ! wp_script_is( 'bbm-tooltip', 'enqueued' ) ) {
+		return;
+	}
+
+	$refs = BBMV_Parser::get_collected_refs();
+	if ( empty( $refs ) ) {
+		return;
+	}
+
+	$options = get_option( 'bbm_options', array() );
+	$version = isset( $options['versao'] ) ? strtolower( $options['versao'] ) : 'nvt';
+
+	$api     = new BBMV_API();
+	$results = $api->get_passages( array_slice( $refs, 0, 60 ), $version );
+	if ( empty( $results ) ) {
+		return;
+	}
+
+	// Keep the inline payload lean: long passages (whole chapters, big ranges)
+	// are trimmed at a verse-friendly cut and flagged, and bulky verses[]
+	// arrays are dropped — the tooltip renders `text` and links to the full
+	// chapter. The full payload stays cached server-side for the AJAX paths.
+	$payload = array();
+	foreach ( $results as $ref => $data ) {
+		if ( isset( $data['verses'] ) && count( $data['verses'] ) > 12 ) {
+			unset( $data['verses'] );
+		}
+		if ( isset( $data['text'] ) && strlen( $data['text'] ) > 700 ) {
+			$cut = strrpos( substr( $data['text'], 0, 700 ), ' ' );
+			$data['text']      = substr( $data['text'], 0, $cut ? $cut : 700 ) . '…';
+			$data['truncated'] = true;
+			unset( $data['verses'] );
+		}
+		$payload[ $ref ] = $data;
+	}
+
+	wp_add_inline_script(
+		'bbm-tooltip',
+		'window.bbm_prefetched = ' . wp_json_encode( $payload ) . ';',
+		'before'
+	);
+}
+add_action( 'wp_footer', 'bbmv_hydrate_tooltips', 5 );
 
 /**
  * Returns a stable identifier for rate-limit bucketing.

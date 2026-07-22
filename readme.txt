@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 0.8.0
+Stable tag: 0.9.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -96,8 +96,8 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "nvt"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.8.0`).
-* **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "nvt"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.0`).
+* **When it is sent.** When a post renders, your server fetches the referenced verses in one batched request (browser-side requests only happen as a fallback when that call missed something, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
 * **Terms of Service.** https://midvash.com/terms
@@ -117,6 +117,11 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.9.0 =
+* **Zero-latency tooltips (server-side hydration).** The verses for every reference on a page are now fetched server-side at render time — one batched `/v1/passages` call (now up to 50 references per request, raised from 20) — and inlined into the page, so even the very first hover of the very first visitor opens instantly, with no network round-trip at all. The 0.8.0 client-side batch prefetch stays as a safety net for anything the render-time call missed.
+* **Lean chapter tooltips.** Whole-chapter references (e.g. Psalms 119) no longer inline hundreds of verses: long passages are trimmed at a verse-friendly cut with an ellipsis, and the tooltip's "Read more" link opens the full chapter on midvash.com. Chapter payloads from the API now carry the same `text`/`verse`/`verseEnd` shape as single verses, which also fixes verse numbering for chapter-only tooltips.
+* Housekeeping: batch chunk size aligned with the API's new 50-ref limit; External Services disclosure updated.
 
 = 0.8.0 =
 * **Instant tooltips (batch prefetch).** Shortly after a post renders, the plugin now prefetches every Bible reference on the page in a single request through the Midvash API's new `/v1/passages` batch endpoint (up to 60 references per page, 20 per upstream call). Hovering a reference shows the verse instantly instead of waiting for a per-hover round-trip. Hovers that land before the prefetch finishes fall back to the previous per-verse fetch, so nothing ever blocks on it.
@@ -171,6 +176,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://wordpress.midvash.com.
 
 == Upgrade Notice ==
+
+= 0.9.0 =
+Tooltips are now zero-latency: verses are fetched server-side at render time in one batched call and inlined into the page — the first hover opens instantly for every visitor. Chapter tooltips got leaner and their verse numbering fixed. Safe update.
 
 = 0.8.0 =
 Tooltips now open instantly: all references on a page are prefetched in one batched API call. Version names appear localized in Settings and licensed translations show copyright attribution in the tooltip. Safe update, no reconfiguration.

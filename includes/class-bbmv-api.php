@@ -182,7 +182,7 @@ class BBMV_API {
 	 *
 	 * Cache-aware: references already cached (same keys used by get_verse)
 	 * are served locally; only misses go upstream, chunked at the API's
-	 * 20-refs-per-request limit. Refs are sent in canonical English-slug
+	 * 50-refs-per-request limit. Refs are sent in canonical English-slug
 	 * form ("john 3:16-18") built from the parsed reference, never as raw
 	 * user text.
 	 *
@@ -228,7 +228,7 @@ class BBMV_API {
 			);
 		}
 
-		foreach ( array_chunk( array_keys( $misses ), 20 ) as $chunk ) {
+		foreach ( array_chunk( array_keys( $misses ), 50 ) as $chunk ) {
 			$response = $this->make_request(
 				'/v1/passages',
 				array(

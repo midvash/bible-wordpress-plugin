@@ -38,6 +38,15 @@ class BBMV_Parser {
 	private $referenced_books = array();
 
 	/**
+	 * Every reference string linked during this request, in order of
+	 * appearance. Static because the footer hydration hook runs outside the
+	 * parser instance created in bbmv_init(). Read via get_collected_refs().
+	 *
+	 * @var array
+	 */
+	private static $collected_refs = array();
+
+	/**
 	 * Initializes the parser
 	 */
 	public function init() {
@@ -159,6 +168,11 @@ class BBMV_Parser {
 			$this->referenced_books[] = $book_id;
 		}
 
+		// Track the reference itself for the footer tooltip hydration.
+		if ( ! in_array( $original, self::$collected_refs, true ) ) {
+			self::$collected_refs[] = $original;
+		}
+
 		// Get settings.
 		$versao    = isset( $this->options['versao'] ) ? strtolower( $this->options['versao'] ) : 'nvt';
 		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
@@ -205,5 +219,12 @@ class BBMV_Parser {
 	 */
 	public function get_referenced_books() {
 		return $this->referenced_books;
+	}
+
+	/**
+	 * References linked during this request (unique, in order of appearance).
+	 */
+	public static function get_collected_refs() {
+		return self::$collected_refs;
 	}
 }

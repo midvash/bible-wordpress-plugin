@@ -27,6 +27,17 @@
     // Cache for fetched verses
     const verseCache = new Map();
 
+    // Server-side hydration: PHP prefetches every reference on the page in one
+    // batched API call at render time and inlines the result. Seeding the cache
+    // here makes the very first hover instant, with no network at all.
+    if (window.bbm_prefetched && typeof window.bbm_prefetched === 'object') {
+        Object.keys(window.bbm_prefetched).forEach(function(ref) {
+            if (window.bbm_prefetched[ref]) {
+                verseCache.set(ref + '_' + config.version, window.bbm_prefetched[ref]);
+            }
+        });
+    }
+
     // Current tooltip element
     let tooltipElement = null;
     let activeLink = null;
@@ -207,16 +218,16 @@
             versionLink.style.display = 'none';
         }
         
-        // Set content
+        // Set content. Numbered per-verse rendering needs both verses[] and a
+        // numeric starting verse (chapter payloads now carry verse: 1); plain
+        // text covers everything else, including server-truncated passages.
         let contentHtml = '';
-        if (data.verses && Array.isArray(data.verses)) {
-            // Multiple verses
+        if (data.verses && Array.isArray(data.verses) && typeof data.verse === 'number') {
             contentHtml = data.verses.map((verse, index) => {
                 const verseNum = data.verse + index;
                 return '<sup class="bbm-tooltip__verse-number">' + verseNum + '</sup>' + escapeHtml(verse);
             }).join(' ');
         } else if (data.text) {
-            // Single verse
             contentHtml = escapeHtml(data.text);
         }
         

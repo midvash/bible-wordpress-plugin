@@ -42,7 +42,7 @@ It works on any post or page in any of nine languages, recognises both the full 
 The version list below mirrors `api.midvash.com/versions` and may grow over time. The plugin's Settings → Bible by Midvash page always shows the current catalogue.
 
 **Portuguese (Brazil) — 20:** NVT, NVI, ACF, AA, ARA, ARC, AS21, JFAA, KJA, KJF, NAA, NBV, NTLH, MSGPT, ALMEIDA-LIVRE, BPM, ONBV, NVA, BLPT, TFT
-**English — 11:** NLT, NIV, ESV, KJV, NKJV, MSG, WEB, ASV, YLT, DRA, GENEVA1599
+**English — 12:** NLT, NIV, ESV, KJV, NKJV, MSG, WEB, ASV, YLT, DRA, BBE, GENEVA1599
 **Spanish — 5:** NTV, NVIES, RVR1960, RVR1909, RVG
 **French — 5:** LSG, DARBY-FR, MARTIN1744, CRAMPON, FRASBL
 **German — 5:** LUTH1912, SCHL1951, ELB1905, MEN, LUTH1545
@@ -52,6 +52,8 @@ The version list below mirrors `api.midvash.com/versions` and may grow over time
 **Chinese (Simplified) — 2:** CUV, CUVS
 
 Default version per locale: NVT (pt-br), NLT (en), NTV (es), LSG (fr), LUTH1912 (de), NRI (it), SYNODAL (ru), KOR (ko), CUV (zh).
+
+Beyond the plugin's nine display locales, the full Midvash API catalogue now spans **86 Bible versions in 32 languages** — including original-language texts such as the Hebrew Aleppo Codex and WLC, the Greek LXX and SBLGNT, and the Latin Vulgate. As new versions land in the API they appear in the plugin's settings automatically, no update required.
 
 == Installation ==
 

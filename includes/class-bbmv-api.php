@@ -118,21 +118,6 @@ class BBMV_API {
 	}
 
 	/**
-	 * No-op kept as a hook point for future telemetry.
-	 *
-	 * An earlier version `sleep(2)`-ed when the remaining rate-limit budget
-	 * fell below 5 — fine for cron, brutal for a synchronous tooltip handler
-	 * because it lengthened the round-trip for the *next* visitor. We now
-	 * let the upstream 429 (with our bounded backoff in make_request) handle
-	 * real throttling, and don't react to soft-budget warnings at all.
-	 *
-	 * @param array $response HTTP response array from wp_remote_get(), unused.
-	 */
-	private function check_rate_limit( $response ) {
-		// Intentionally empty.
-	}
-
-	/**
 	 * Fetches a verse from the API
 	 *
 	 * @param string $reference Bible reference (e.g. "John 3:16").
@@ -193,12 +178,102 @@ class BBMV_API {
 	}
 
 	/**
+	 * Fetches several references in one round-trip via /v1/passages.
+	 *
+	 * Cache-aware: references already cached (same keys used by get_verse)
+	 * are served locally; only misses go upstream, chunked at the API's
+	 * 20-refs-per-request limit. Refs are sent in canonical English-slug
+	 * form ("john 3:16-18") built from the parsed reference, never as raw
+	 * user text.
+	 *
+	 * @param array  $references List of Bible references as typed in content.
+	 * @param string $version    Bible version slug; defaults to the configured one.
+	 * @return array Map of input reference => verse data array (or null when unresolvable).
+	 */
+	public function get_passages( $references, $version = null ) {
+		$version = $version ? strtolower( $version ) : strtolower( $this->options['versao'] );
+		$results = array();
+		$misses  = array(); // canonical ref => input ref.
+
+		foreach ( $references as $reference ) {
+			$reference = trim( (string) $reference );
+			if ( '' === $reference || true !== $this->validate_reference( $reference ) ) {
+				continue;
+			}
+			$parsed = BBMV_Books::parse_reference( $reference );
+			if ( ! $parsed ) {
+				continue;
+			}
+
+			$path = $this->build_api_path( $parsed, $version );
+			if ( $this->is_cache_enabled() ) {
+				$cached = $this->get_from_cache( $path, $version );
+				if ( false !== $cached ) {
+					$results[ $reference ] = $cached;
+					continue;
+				}
+			}
+
+			$canonical = BBMV_Books::get_book_slug( $parsed['book_id'], 'en' ) . ' ' . $parsed['chapter'];
+			if ( $parsed['verse'] ) {
+				$canonical .= ':' . $parsed['verse'];
+				if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
+					$canonical .= '-' . $parsed['verse_end'];
+				}
+			}
+			$misses[ $canonical ] = array(
+				'input'  => $reference,
+				'parsed' => $parsed,
+				'path'   => $path,
+			);
+		}
+
+		foreach ( array_chunk( array_keys( $misses ), 20 ) as $chunk ) {
+			$response = $this->make_request(
+				'/v1/passages',
+				array(
+					'refs'    => implode( ',', $chunk ),
+					'version' => $version,
+				)
+			);
+			if ( ! $response || ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+				continue;
+			}
+			foreach ( $response['data'] as $item ) {
+				if ( ! isset( $item['ref'] ) || ! isset( $misses[ $item['ref'] ] ) || isset( $item['error'] ) ) {
+					continue;
+				}
+				$miss   = $misses[ $item['ref'] ];
+				$parsed = $miss['parsed'];
+				unset( $item['ref'] );
+
+				// Localized display reference, mirroring get_verse().
+				$item['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
+				if ( $parsed['verse'] ) {
+					$item['reference'] .= ':' . $parsed['verse'];
+					if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
+						$item['reference'] .= '-' . $parsed['verse_end'];
+					}
+				}
+
+				$results[ $miss['input'] ] = $item;
+				if ( $this->is_cache_enabled() ) {
+					$this->save_to_cache( $miss['path'], $version, $item );
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Makes a GET request to the Midvash API.
 	 *
 	 * Retry policy is deliberately *minimal* (1 retry, 1s backoff): this code
 	 * runs synchronously inside AJAX handlers and `the_content` filters, where
-	 * long sleep() chains snowball into PHP-FPM timeouts and bad UX. For 429s
-	 * we honour `X-RateLimit-Reset` but cap the wait at 2s, then give up.
+	 * long sleep() chains snowball into PHP-FPM timeouts and bad UX. The API
+	 * documents that it has no rate limit (no 429s, no X-RateLimit-* headers),
+	 * so only transport errors and 5xx get the single retry.
 	 *
 	 * @param string $path    API endpoint path (with leading slash).
 	 * @param array  $args    Query parameters.
@@ -238,23 +313,6 @@ class BBMV_API {
 		}
 
 		$status_code = wp_remote_retrieve_response_code( $response );
-		$this->check_rate_limit( $response );
-
-		if ( 429 === $status_code ) {
-			if ( $attempt < $max_retries ) {
-				$reset_at = wp_remote_retrieve_header( $response, 'X-RateLimit-Reset' );
-				$wait     = 1;
-				if ( $reset_at ) {
-					$reset_ts = strtotime( $reset_at );
-					if ( $reset_ts ) {
-						$wait = max( 1, min( 2, $reset_ts - time() ) ); // Cap at 2s.
-					}
-				}
-				sleep( $wait );
-				return $this->make_request( $path, $args, $attempt + 1 );
-			}
-			return null;
-		}
 
 		if ( $status_code >= 500 && $attempt < $max_retries ) {
 			sleep( 1 );
@@ -328,77 +386,80 @@ class BBMV_API {
 	}
 
 	/**
-	 * Fetches available Bible versions, optionally filtered by locale
+	 * Fetches the full version catalogue from /v1/versions (enriched with
+	 * localizedNames and copyright), cached for 7 days.
 	 *
-	 * @param string|null $locale Filter versions by language (pt-br, en, es).
+	 * @return array|null List of version arrays or null on error.
+	 */
+	private function get_catalog() {
+		$cache_key = 'bbm_versions_v1';
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$result = $this->make_request( '/v1/versions' );
+		if ( $result && isset( $result['data'] ) && is_array( $result['data'] ) && ! empty( $result['data'] ) ) {
+			set_transient( $cache_key, $result['data'], 7 * DAY_IN_SECONDS );
+			return $result['data'];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Fetches available Bible versions, optionally filtered by locale.
+	 *
+	 * Same array-of-versions shape as before, now with the additive
+	 * `localizedNames` and `copyright` fields from /v1/versions.
+	 *
+	 * @param string|null $locale Filter versions by language (pt-br, en, es…).
 	 * @return array|null Array of versions or null on error
 	 */
 	public function get_versions( $locale = null ) {
 		$locale = $locale ? $locale : $this->locale;
 		$locale = BBMV_Books::normalize_locale( $locale );
 
-		// Normalize locale for API (pt-br -> pt for filtering).
-		$api_locale = ( 'pt-br' === $locale ) ? 'pt' : $locale;
-
-		$cache_key = 'bbm_versions_' . $api_locale;
-		$cached    = get_transient( $cache_key );
-		if ( false !== $cached ) {
-			return $cached;
+		$catalog = $this->get_catalog();
+		if ( ! $catalog ) {
+			return null;
 		}
 
-		$result = $this->make_request( '/versions', array( 'locale' => $api_locale ) );
-
-		if ( $result && isset( $result['versions'] ) ) {
-			$versions = $result['versions'];
-			set_transient( $cache_key, $versions, 7 * DAY_IN_SECONDS );
-			return $versions;
-		}
-
-		// Fallback: fetch all and filter client-side.
-		$all_cache_key = 'bbm_versions_all';
-		$all_cached    = get_transient( $all_cache_key );
-		if ( false !== $all_cached ) {
-			$filtered = array_filter(
-				$all_cached,
-				function ( $v ) use ( $locale ) {
-					$version_locale = isset( $v['language'] ) ? $v['language'] : '';
-					// Normalize for comparison.
-					if ( 'pt-br' === $version_locale || 'pt' === $version_locale ) {
-						return ( 'pt-br' === $locale );
-					}
-					return ( $version_locale === $locale );
+		$filtered = array_filter(
+			$catalog,
+			function ( $v ) use ( $locale ) {
+				$version_locale = isset( $v['language'] ) ? $v['language'] : '';
+				// pt-pt groups with pt-br, matching the API's legacy locale rule.
+				if ( 'pt-br' === $version_locale || 'pt' === $version_locale || 'pt-pt' === $version_locale ) {
+					return ( 'pt-br' === $locale );
 				}
-			);
-			if ( ! empty( $filtered ) ) {
-				return array_values( $filtered );
+				return ( $version_locale === $locale );
+			}
+		);
+
+		return ! empty( $filtered ) ? array_values( $filtered ) : null;
+	}
+
+	/**
+	 * Returns the catalogue entry for a single version slug, or null.
+	 *
+	 * Used to surface the localized version name and copyright attribution
+	 * in the admin and in the tooltip footer.
+	 *
+	 * @param string $version_slug Version slug (nvt, kjv…).
+	 * @return array|null Version array with localizedNames/copyright, or null.
+	 */
+	public function get_version_meta( $version_slug ) {
+		$version_slug = strtolower( (string) $version_slug );
+		$catalog      = $this->get_catalog();
+		if ( ! $catalog ) {
+			return null;
+		}
+		foreach ( $catalog as $v ) {
+			if ( isset( $v['slug'] ) && strtolower( $v['slug'] ) === $version_slug ) {
+				return $v;
 			}
 		}
-
-		// Fetch all versions.
-		$all_result = $this->make_request( '/versions' );
-		if ( $all_result && isset( $all_result['versions'] ) ) {
-			set_transient( $all_cache_key, $all_result['versions'], 7 * DAY_IN_SECONDS );
-
-			// Filter by locale.
-			$filtered = array_filter(
-				$all_result['versions'],
-				function ( $v ) use ( $locale ) {
-					$version_locale = isset( $v['language'] ) ? $v['language'] : '';
-					// Normalize for comparison.
-					if ( 'pt-br' === $version_locale || 'pt' === $version_locale ) {
-						return ( 'pt-br' === $locale );
-					}
-					return ( $version_locale === $locale );
-				}
-			);
-
-			if ( ! empty( $filtered ) ) {
-				$filtered_versions = array_values( $filtered );
-				set_transient( $cache_key, $filtered_versions, 7 * DAY_IN_SECONDS );
-				return $filtered_versions;
-			}
-		}
-
 		return null;
 	}
 

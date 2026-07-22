@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.app/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.7.0
+ * Version: 0.8.0
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.7.0' );
+define( 'BBMV_VERSION', '0.8.0' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -155,20 +155,28 @@ function bbmv_enqueue_assets() {
 	// against the site's active textdomain (.mo files in /languages) instead
 	// of a hardcoded 9-locale lookup — translations track WordPress’s normal
 	// i18n pipeline and new locales come for free as we add .po files.
+	// Copyright attribution for the configured version, shown in the tooltip
+	// footer. Served from the 7-day catalogue transient; on a cold cache this
+	// is one bounded upstream request per week.
+	$api          = new BBMV_API();
+	$version_slug = isset( $options['versao'] ) ? $options['versao'] : 'nvt';
+	$version_meta = $api->get_version_meta( $version_slug );
+
 	wp_localize_script(
 		'bbm-tooltip',
 		'bbm_config',
 		array(
-			'ajax_url'         => admin_url( 'admin-ajax.php' ),
-			'nonce'            => wp_create_nonce( 'bbm_nonce' ),
-			'version'          => isset( $options['versao'] ) ? $options['versao'] : 'nvt',
-			'locale'           => $locale,
-			'show_version'     => isset( $options['show_version'] ) ? $options['show_version'] : true,
-			'fallback_message' => __( 'Verse currently unavailable', 'bible-by-midvash' ),
-			'read_more'        => __( 'Read more', 'bible-by-midvash' ),
-			'site_url'         => BBMV_SITE_URL,
-			'icon_url'         => BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
-			'debug'            => defined( 'WP_DEBUG' ) && WP_DEBUG,
+			'ajax_url'          => admin_url( 'admin-ajax.php' ),
+			'nonce'             => wp_create_nonce( 'bbm_nonce' ),
+			'version'           => isset( $options['versao'] ) ? $options['versao'] : 'nvt',
+			'version_copyright' => ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? $version_meta['copyright'] : '',
+			'locale'            => $locale,
+			'show_version'      => isset( $options['show_version'] ) ? $options['show_version'] : true,
+			'fallback_message'  => __( 'Verse currently unavailable', 'bible-by-midvash' ),
+			'read_more'         => __( 'Read more', 'bible-by-midvash' ),
+			'site_url'          => BBMV_SITE_URL,
+			'icon_url'          => BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
+			'debug'             => defined( 'WP_DEBUG' ) && WP_DEBUG,
 		)
 	);
 }
@@ -242,6 +250,40 @@ function bbmv_ajax_get_verse() {
 }
 add_action( 'wp_ajax_bbm_get_verse', 'bbmv_ajax_get_verse' );
 add_action( 'wp_ajax_nopriv_bbm_get_verse', 'bbmv_ajax_get_verse' );
+
+/**
+ * AJAX handler that prefetches every reference on a page in one round-trip.
+ *
+ * The tooltip script collects the unique data-midvash-ref values after render
+ * and calls this once, instead of one bbm_get_verse request per hover. The
+ * upstream fan-out is batched through the API's /v1/passages endpoint.
+ */
+function bbmv_ajax_get_verses() {
+	check_ajax_referer( 'bbm_nonce', 'nonce' );
+
+	// One batch covers a whole page view, so the budget is much smaller than
+	// the per-verse endpoint's. 20/min per IP still allows brisk browsing.
+	if ( bbmv_is_rate_limited( 'batch', 20 ) ) {
+		wp_send_json_error( array( 'message' => __( 'Too many requests', 'bible-by-midvash' ) ), 429 );
+	}
+
+	$refs_raw = isset( $_POST['refs'] ) ? sanitize_text_field( wp_unslash( $_POST['refs'] ) ) : '';
+	$version  = isset( $_POST['version'] ) ? sanitize_text_field( wp_unslash( $_POST['version'] ) ) : 'nvt';
+
+	$references = array_filter( array_map( 'trim', explode( '|', $refs_raw ) ) );
+	if ( empty( $references ) ) {
+		wp_send_json_error( array( 'message' => __( 'Reference not provided', 'bible-by-midvash' ) ) );
+	}
+	// Cap the page budget: 60 unique references (3 upstream batch requests).
+	$references = array_slice( array_unique( $references ), 0, 60 );
+
+	$api     = new BBMV_API();
+	$results = $api->get_passages( $references, $version );
+
+	wp_send_json_success( $results );
+}
+add_action( 'wp_ajax_bbm_get_verses', 'bbmv_ajax_get_verses' );
+add_action( 'wp_ajax_nopriv_bbm_get_verses', 'bbmv_ajax_get_verses' );
 
 /**
  * AJAX handler to fetch Bible versions by locale (admin only).

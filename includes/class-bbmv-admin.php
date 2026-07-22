@@ -504,12 +504,19 @@ class BBMV_Admin {
 			<?php if ( $versions_to_show ) : ?>
 				<?php foreach ( $versions_to_show as $v ) : ?>
 					<?php
-					$slug         = isset( $v['slug'] ) ? $v['slug'] : ( isset( $v['code'] ) ? strtolower( $v['code'] ) : '' );
-					$name         = isset( $v['name'] ) ? $v['name'] : '';
-					$short_name   = isset( $v['shortName'] ) ? $v['shortName'] : ( isset( $v['code'] ) ? $v['code'] : '' );
+					$slug       = isset( $v['slug'] ) ? $v['slug'] : ( isset( $v['code'] ) ? strtolower( $v['code'] ) : '' );
+					$name       = isset( $v['name'] ) ? $v['name'] : '';
+					$short_name = isset( $v['shortName'] ) ? $v['shortName'] : ( isset( $v['code'] ) ? $v['code'] : '' );
+					// Prefer the version name localized to the site's display locale
+					// (e.g. "Bíblia em Inglês Básico" on a pt-BR site), falling back
+					// to the native name.
+					if ( isset( $v['localizedNames'][ $locale ] ) && '' !== $v['localizedNames'][ $locale ] ) {
+						$name = $v['localizedNames'][ $locale ];
+					}
 					$display_name = $name ? ( $name . ' (' . $short_name . ')' ) : $short_name;
+					$copyright    = isset( $v['copyright'] ) ? $v['copyright'] : '';
 					?>
-					<option value="<?php echo esc_attr( strtolower( $slug ) ); ?>" <?php selected( strtolower( $versao ), strtolower( $slug ) ); ?>>
+					<option value="<?php echo esc_attr( strtolower( $slug ) ); ?>" title="<?php echo esc_attr( $copyright ); ?>" <?php selected( strtolower( $versao ), strtolower( $slug ) ); ?>>
 						<?php echo esc_html( $display_name ); ?>
 					</option>
 				<?php endforeach; ?>

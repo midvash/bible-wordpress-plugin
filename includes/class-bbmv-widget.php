@@ -113,7 +113,7 @@ class BBMV_Widget extends WP_Widget {
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'version' ) ); ?>"
 					name="<?php echo esc_attr( $this->get_field_name( 'version' ) ); ?>"
 					type="text" value="<?php echo esc_attr( $version ); ?>"
-					placeholder="<?php esc_attr_e( 'e.g. nvt, kjv, lsg', 'bible-by-midvash' ); ?>">
+					placeholder="<?php esc_attr_e( 'e.g. onbv, kjv, lsg', 'bible-by-midvash' ); ?>">
 		</p>
 		<p>
 			<label>
@@ -180,7 +180,7 @@ function bbmv_render_votd( $atts = array() ) {
 	$options = get_option( 'bbm_options', array() );
 	$locale  = $atts['locale'] ? BBMV_Books::normalize_locale( $atts['locale'] )
 								: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-	$version = $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) );
+	$version = BBMV_Books::resolve_version( $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) ) );
 
 	$api  = new BBMV_API();
 	$data = $api->get_votd( $locale, $version );
@@ -211,14 +211,27 @@ function bbmv_render_votd( $atts = array() ) {
 		}
 	}
 
+	// Version attribution as returned by the API alongside the text, falling
+	// back to the (cached) catalogue entry for responses that predate it.
+	$copyright = ( ! empty( $data['copyright'] ) && is_string( $data['copyright'] ) ) ? $data['copyright'] : '';
+	if ( '' === $copyright ) {
+		$version_meta = $api->get_version_meta( $version );
+		$copyright    = ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? (string) $version_meta['copyright'] : '';
+	}
+	$copyright_html = '' !== trim( $copyright )
+		? '<small class="bbm-votd__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
+		: '';
+
 	return sprintf(
 		'<div class="bbm-votd" itemscope itemtype="https://schema.org/Quotation">'
 		. '<p class="bbm-votd__text" itemprop="text">%s</p>'
+		. '%s'
 		. '%s'
 		. '<p class="bbm-votd__powered"><a href="%s" target="_blank" rel="noopener noreferrer">Midvash</a></p>'
 		. '</div>',
 		esc_html( $text ),
 		$ref_html,
+		$copyright_html,
 		esc_url( BBMV_SITE_URL . '/' . $locale )
 	);
 }
@@ -228,7 +241,7 @@ function bbmv_render_votd( $atts = array() ) {
  *
  * Attributes (all optional):
  *   locale          — pt-br | en | es | fr | de | it | ru | ko | zh
- *   version         — nvt | kjv | lsg | … (any valid slug)
+ *   version         — onbv | kjv | lsg | … (any valid slug)
  *   show_reference  — true | false
  *   link_verse      — true | false
  *   title           — text displayed above the verse

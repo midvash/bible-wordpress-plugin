@@ -29,9 +29,9 @@ class BBMV_Books {
 	const DEFAULT_VERSIONS = array(
 		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- Sync-script marker, not commented-out code.
 		// {{SYNCED_VERSIONS_START}}
-		'en'    => 'nlt',
-		'pt-br' => 'nvt',
-		'es'    => 'ntv',
+		'en'    => 'bsb',
+		'pt-br' => 'onbv',
+		'es'    => 'rvr1909',
 		'fr'    => 'lsg',
 		'de'    => 'luth1912',
 		'it'    => 'nri',
@@ -40,6 +40,47 @@ class BBMV_Books {
 		'zh'    => 'cuv',
 		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- Sync-script marker, not commented-out code.
 		// {{SYNCED_VERSIONS_END}}
+	);
+
+	/**
+	 * Versions the public API no longer distributes (all rights reserved, no
+	 * licence), mapped to the openly licensed version of the same language
+	 * that the API now serves in their place. Used to migrate saved settings
+	 * and to normalise slugs stored in widgets, blocks and shortcodes.
+	 */
+	const RETIRED_VERSIONS = array(
+		// Portuguese (Brazil / Portugal).
+		'aa'      => 'almeida-livre',
+		'jfaa'    => 'almeida-livre',
+		'acf'     => 'almeida-livre',
+		'ara'     => 'almeida-livre',
+		'arc'     => 'almeida-livre',
+		'as21'    => 'almeida-livre',
+		'naa'     => 'almeida-livre',
+		'kjf'     => 'almeida-livre',
+		'bpt'     => 'almeida-livre',
+		'nvi'     => 'onbv',
+		'nvt'     => 'onbv',
+		'ntlh'    => 'onbv',
+		'nbv'     => 'onbv',
+		'kja'     => 'onbv',
+		'msgpt'   => 'onbv',
+		'ol'      => 'onbv',
+		// English.
+		'esv'     => 'bsb',
+		'niv'     => 'bsb',
+		'nlt'     => 'bsb',
+		'msg'     => 'bsb',
+		'nkjv'    => 'kjv',
+		// Spanish.
+		'ntv'     => 'rvr1909',
+		'nvies'   => 'rvr1909',
+		'rvr1960' => 'rvr1909',
+		// Latin.
+		'nvl'     => 'vulg',
+		// Hebrew.
+		'bhs'     => 'wlc',
+		'mh'      => 'wlc',
 	);
 
 	/**
@@ -203,7 +244,20 @@ class BBMV_Books {
 	 */
 	public static function get_default_version( $locale ) {
 		$locale = self::normalize_locale( $locale );
-		return isset( self::DEFAULT_VERSIONS[ $locale ] ) ? self::DEFAULT_VERSIONS[ $locale ] : 'nlt';
+		return isset( self::DEFAULT_VERSIONS[ $locale ] ) ? self::DEFAULT_VERSIONS[ $locale ] : 'bsb';
+	}
+
+	/**
+	 * Maps a retired version slug to its openly licensed replacement.
+	 *
+	 * Slugs that were never retired are returned lowercased and unchanged.
+	 *
+	 * @param string $slug Version slug (any case).
+	 * @return string Lowercased slug the API still distributes.
+	 */
+	public static function resolve_version( $slug ) {
+		$slug = strtolower( trim( (string) $slug ) );
+		return isset( self::RETIRED_VERSIONS[ $slug ] ) ? self::RETIRED_VERSIONS[ $slug ] : $slug;
 	}
 
 	/**

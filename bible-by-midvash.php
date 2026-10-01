@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.app/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.8.0
+ * Version: 0.8.1
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.8.0' );
+define( 'BBMV_VERSION', '0.8.1' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -159,7 +159,7 @@ function bbmv_enqueue_assets() {
 	// footer. Served from the 7-day catalogue transient; on a cold cache this
 	// is one bounded upstream request per week.
 	$api          = new BBMV_API();
-	$version_slug = isset( $options['versao'] ) ? $options['versao'] : 'nvt';
+	$version_slug = isset( $options['versao'] ) ? BBMV_Books::resolve_version( $options['versao'] ) : BBMV_Books::get_default_version( $locale );
 	$version_meta = $api->get_version_meta( $version_slug );
 
 	wp_localize_script(
@@ -168,7 +168,7 @@ function bbmv_enqueue_assets() {
 		array(
 			'ajax_url'          => admin_url( 'admin-ajax.php' ),
 			'nonce'             => wp_create_nonce( 'bbm_nonce' ),
-			'version'           => isset( $options['versao'] ) ? $options['versao'] : 'nvt',
+			'version'           => $version_slug,
 			'version_copyright' => ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? $version_meta['copyright'] : '',
 			'locale'            => $locale,
 			'show_version'      => isset( $options['show_version'] ) ? $options['show_version'] : true,
@@ -233,7 +233,7 @@ function bbmv_ajax_get_verse() {
 	}
 
 	$reference = isset( $_GET['reference'] ) ? sanitize_text_field( wp_unslash( $_GET['reference'] ) ) : '';
-	$version   = isset( $_GET['version'] ) ? sanitize_text_field( wp_unslash( $_GET['version'] ) ) : 'nvt';
+	$version   = isset( $_GET['version'] ) ? sanitize_text_field( wp_unslash( $_GET['version'] ) ) : '';
 
 	if ( empty( $reference ) ) {
 		wp_send_json_error( array( 'message' => __( 'Reference not provided', 'bible-by-midvash' ) ) );
@@ -268,7 +268,7 @@ function bbmv_ajax_get_verses() {
 	}
 
 	$refs_raw = isset( $_POST['refs'] ) ? sanitize_text_field( wp_unslash( $_POST['refs'] ) ) : '';
-	$version  = isset( $_POST['version'] ) ? sanitize_text_field( wp_unslash( $_POST['version'] ) ) : 'nvt';
+	$version  = isset( $_POST['version'] ) ? sanitize_text_field( wp_unslash( $_POST['version'] ) ) : '';
 
 	$references = array_filter( array_map( 'trim', explode( '|', $refs_raw ) ) );
 	if ( empty( $references ) ) {
@@ -311,6 +311,29 @@ function bbmv_ajax_get_versions() {
 	}
 }
 add_action( 'wp_ajax_bbm_get_versions', 'bbmv_ajax_get_versions' );
+
+/**
+ * Swaps a retired Bible version saved in the settings for its openly licensed
+ * replacement (see BBMV_Books::RETIRED_VERSIONS).
+ *
+ * The public API stopped distributing all-rights-reserved versions without a
+ * licence; it aliases them server-side, but the saved slug would still drive
+ * the tooltip badge, the midvash.com links and the attribution lookup. Runs on
+ * every load because it costs one array lookup on an autoloaded option and
+ * only writes when there is something to migrate.
+ */
+function bbmv_migrate_retired_version() {
+	$options = get_option( 'bbm_options' );
+	if ( ! is_array( $options ) || empty( $options['versao'] ) ) {
+		return;
+	}
+	$resolved = BBMV_Books::resolve_version( $options['versao'] );
+	if ( strtolower( $options['versao'] ) !== $resolved ) {
+		$options['versao'] = $resolved;
+		update_option( 'bbm_options', $options );
+	}
+}
+add_action( 'plugins_loaded', 'bbmv_migrate_retired_version' );
 
 /**
  * Plugin activation - set default options

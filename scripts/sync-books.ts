@@ -4,7 +4,7 @@
  *
  * - Busca https://api.midvash.com/books → reescreve init_books() entre os
  *   marcadores `// {{SYNCED_BOOKS_START}}` e `// {{SYNCED_BOOKS_END}}` em
- *   includes/class-bbm-books.php.
+ *   includes/class-bbmv-books.php.
  * - Busca https://api.midvash.com/versions → reescreve o conteúdo de
  *   DEFAULT_VERSIONS entre `// {{SYNCED_VERSIONS_START}}` e
  *   `// {{SYNCED_VERSIONS_END}}`.
@@ -18,15 +18,15 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ROOT = resolve(__dirname, '..');
-const BOOKS_PHP = join(ROOT, 'includes', 'class-bbm-books.php');
+const BOOKS_PHP = join(ROOT, 'includes', 'class-bbmv-books.php');
 
 const LOCALES = ['en', 'pt-br', 'es', 'fr', 'de', 'it', 'ru', 'ko', 'zh'] as const;
 type Locale = (typeof LOCALES)[number];
 
 const PREFERRED_VERSIONS: Record<Locale, string> = {
-  en: 'nlt',
-  'pt-br': 'nvt',
-  es: 'ntv',
+  en: 'bsb',
+  'pt-br': 'onbv',
+  es: 'rvr1909',
   fr: 'lsg',
   de: 'luth1912',
   it: 'nri',
@@ -51,6 +51,17 @@ interface ApiVersion {
   shortName: string;
   language: string;
 }
+
+// Versões que a API pública deixou de distribuir (direitos reservados, sem
+// licença). Espelha BBMV_Books::RETIRED_VERSIONS; nunca viram padrão, mesmo
+// que a API ainda as liste durante a transição.
+const RETIRED_VERSIONS = new Set([
+  'aa', 'jfaa', 'acf', 'ara', 'arc', 'as21', 'naa', 'kjf', 'bpt',
+  'nvi', 'nvt', 'ntlh', 'nbv', 'kja', 'msgpt', 'ol',
+  'esv', 'niv', 'nlt', 'msg', 'nkjv',
+  'ntv', 'nvies', 'rvr1960',
+  'nvl', 'bhs', 'mh',
+]);
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -123,7 +134,9 @@ function pickDefaultVersion(
   locale: Locale,
   versions: ApiVersion[],
 ): { slug: string; warning?: string } {
-  const inLocale = versions.filter((v) => v.language === locale);
+  const inLocale = versions.filter(
+    (v) => v.language === locale && !RETIRED_VERSIONS.has(v.slug.toLowerCase()),
+  );
   if (inLocale.length === 0) {
     return { slug: PREFERRED_VERSIONS[locale], warning: `[warn] no versions in API for locale '${locale}'; using preferred '${PREFERRED_VERSIONS[locale]}'` };
   }

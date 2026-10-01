@@ -13,7 +13,7 @@ Detecta automáticamente referencias bíblicas en tus entradas de WordPress y la
 
 - Reconoce referencias como `John 3:16`, `Jo 3.16`, `Salmos 23`, `Rom 8:28-30` — en **inglés, portugués y español**, con acentos y abreviaturas de libros.
 - Las reemplaza con enlaces sutiles a [midvash.com](https://midvash.com) en el frontend, abriendo el versículo completo en un tooltip al pasar el cursor.
-- 50+ versiones bíblicas para elegir como predeterminada de tu sitio (NVT, NVI, NLT, KJV, RVR1960 y más).
+- 60+ versiones bíblicas de licencia abierta para elegir como predeterminada de tu sitio (RVR1909, BSB, KJV, ONBV, Almeida Livre y más), cada una con el crédito de su licencia.
 - Color del enlace, estilo de subrayado y comportamiento del tooltip personalizables.
 - Gratis para siempre, sin necesidad de cuenta.
 

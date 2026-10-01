@@ -373,7 +373,7 @@ class BBMV_Admin {
 
 		// ----- Version -----
 		if ( isset( $input['versao'] ) ) {
-			$sanitized['versao'] = sanitize_text_field( $input['versao'] );
+			$sanitized['versao'] = BBMV_Books::resolve_version( sanitize_text_field( $input['versao'] ) );
 		}
 
 		// ----- Underline style (constrained list) -----
@@ -424,17 +424,17 @@ class BBMV_Admin {
 			'pt-br' => array(
 				'name'            => 'Português (Brasil)',
 				'flag'            => '🇧🇷',
-				'default_version' => 'nvt',
+				'default_version' => 'onbv',
 			),
 			'en'    => array(
 				'name'            => 'English',
 				'flag'            => '🇺🇸',
-				'default_version' => 'nlt',
+				'default_version' => 'bsb',
 			),
 			'es'    => array(
 				'name'            => 'Español',
 				'flag'            => '🇪🇸',
-				'default_version' => 'ntv',
+				'default_version' => 'rvr1909',
 			),
 			'fr'    => array(
 				'name'            => 'Français',
@@ -491,7 +491,7 @@ class BBMV_Admin {
 
 		// Get default version for current locale.
 		$default_version = BBMV_Books::get_default_version( $locale );
-		$versao          = isset( $options['versao'] ) ? $options['versao'] : $default_version;
+		$versao          = isset( $options['versao'] ) ? BBMV_Books::resolve_version( $options['versao'] ) : $default_version;
 
 		$api = new BBMV_API();
 		// Get versions filtered by current locale from API.

@@ -45,7 +45,7 @@ class BBMV_Parser {
 			'bbm_options',
 			array(
 				'locale'           => 'pt-br',
-				'versao'           => 'nvt',
+				'versao'           => 'onbv',
 				'use_custom_color' => false,
 				'link_color'       => '#B17027',
 				'underline_link'   => false,
@@ -160,7 +160,7 @@ class BBMV_Parser {
 		}
 
 		// Get settings.
-		$versao    = isset( $this->options['versao'] ) ? strtolower( $this->options['versao'] ) : 'nvt';
+		$versao    = isset( $this->options['versao'] ) ? BBMV_Books::resolve_version( $this->options['versao'] ) : BBMV_Books::get_default_version( $this->locale );
 		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
 		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
 

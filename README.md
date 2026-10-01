@@ -13,7 +13,7 @@ Auto-detect Bible references in your WordPress posts and turn them into hover-to
 
 - Recognizes references like `John 3:16`, `Jo 3.16`, `Salmos 23`, `Rom 8:28-30` — in **English, Portuguese, and Spanish**, with accents and book abbreviations.
 - Replaces them with subtle links to [midvash.com](https://midvash.com) on the frontend, opening the full verse in a hover tooltip.
-- 50+ Bible versions to pick as your site default (NVT, NVI, NLT, KJV, RVR1960, and more).
+- 60+ openly licensed Bible versions to pick as your site default (ONBV, Almeida Livre, BSB, KJV, RVR1909, and more), each shown with its licence attribution.
 - Customizable link color, underline style, and tooltip behavior.
 - Free forever, no account required.
 

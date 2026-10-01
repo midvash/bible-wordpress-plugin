@@ -475,6 +475,29 @@ body.theme-dark .bbm-tooltip__loader,
     letter-spacing: 0.05em;
 }
 
+/* Version attribution under the verse — small and muted. */
+.bbm-verse__copyright,
+.bbm-votd__copyright {
+    display: block;
+    margin-top: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    font-style: normal;
+    line-height: 1.4;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.bbm-votd__copyright {
+    margin-bottom: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .bbm-verse__copyright,
+    .bbm-votd__copyright {
+        color: rgba(255, 255, 255, 0.45);
+    }
+}
+
 .bbm-verse--error {
     font-style: italic;
     color: #999;

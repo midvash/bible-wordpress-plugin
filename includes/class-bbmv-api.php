@@ -59,12 +59,31 @@ class BBMV_API {
 				'cache_enabled' => true,
 				'cache_ttl'     => 2592000,
 				'timeout'       => 5,
-				'versao'        => 'nvt',
+				'versao'        => 'onbv',
 				'locale'        => 'pt-br',
 			)
 		);
 		$this->locale  = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
 		$this->locale  = BBMV_Books::normalize_locale( $this->locale );
+	}
+
+	/**
+	 * Resolves the version slug to request: the explicit one, else the saved
+	 * setting, else the locale default — always mapped away from versions the
+	 * API no longer distributes (BBMV_Books::RETIRED_VERSIONS), so widgets,
+	 * blocks and shortcodes that stored an old slug keep working and never
+	 * share cache keys with the retired text.
+	 *
+	 * @param string|null $version Requested version slug, if any.
+	 * @return string Lowercased slug.
+	 */
+	private function resolve_version( $version ) {
+		if ( ! $version ) {
+			$version = ! empty( $this->options['versao'] )
+				? $this->options['versao']
+				: BBMV_Books::get_default_version( $this->locale );
+		}
+		return BBMV_Books::resolve_version( $version );
 	}
 
 	/**
@@ -121,12 +140,11 @@ class BBMV_API {
 	 * Fetches a verse from the API
 	 *
 	 * @param string $reference Bible reference (e.g. "John 3:16").
-	 * @param string $version Bible version (e.g. "nvt").
-	 * @return array|null Verse data or null on error
+	 * @param string $version Bible version (e.g. "onbv").
+	 * @return array|null Verse data (with `copyright` when the API sends one) or null on error.
 	 */
 	public function get_verse( $reference, $version = null ) {
-		$version = $version ? $version : $this->options['versao'];
-		$version = strtolower( $version );
+		$version = $this->resolve_version( $version );
 
 		// Validate reference.
 		$validation = $this->validate_reference( $reference );
@@ -158,6 +176,12 @@ class BBMV_API {
 		$data = $this->make_request( $path );
 
 		if ( $data ) {
+			// Attribution travels with the text: flat legacy routes send a
+			// top-level `copyright`, /v1 routes nest it under `meta`.
+			if ( empty( $data['copyright'] ) && ! empty( $data['meta']['copyright'] ) ) {
+				$data['copyright'] = $data['meta']['copyright'];
+			}
+
 			// Add reference info to response.
 			$data['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
 			if ( $parsed['verse'] ) {
@@ -191,7 +215,7 @@ class BBMV_API {
 	 * @return array Map of input reference => verse data array (or null when unresolvable).
 	 */
 	public function get_passages( $references, $version = null ) {
-		$version = $version ? strtolower( $version ) : strtolower( $this->options['versao'] );
+		$version = $this->resolve_version( $version );
 		$results = array();
 		$misses  = array(); // canonical ref => input ref.
 
@@ -239,6 +263,8 @@ class BBMV_API {
 			if ( ! $response || ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
 				continue;
 			}
+			// Batch-level attribution (meta.copyright) applies to every item.
+			$batch_copyright = ! empty( $response['meta']['copyright'] ) ? $response['meta']['copyright'] : '';
 			foreach ( $response['data'] as $item ) {
 				if ( ! isset( $item['ref'] ) || ! isset( $misses[ $item['ref'] ] ) || isset( $item['error'] ) ) {
 					continue;
@@ -246,6 +272,9 @@ class BBMV_API {
 				$miss   = $misses[ $item['ref'] ];
 				$parsed = $miss['parsed'];
 				unset( $item['ref'] );
+				if ( empty( $item['copyright'] ) && '' !== $batch_copyright ) {
+					$item['copyright'] = $batch_copyright;
+				}
 
 				// Localized display reference, mirroring get_verse().
 				$item['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
@@ -392,7 +421,8 @@ class BBMV_API {
 	 * @return array|null List of version arrays or null on error.
 	 */
 	private function get_catalog() {
-		$cache_key = 'bbm_versions_v1';
+		// v2: refetch after the API dropped all-rights-reserved versions.
+		$cache_key = 'bbm_versions_v2';
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;
@@ -428,6 +458,10 @@ class BBMV_API {
 		$filtered = array_filter(
 			$catalog,
 			function ( $v ) use ( $locale ) {
+				// Never offer a retired version, even from a stale catalogue.
+				if ( isset( $v['slug'] ) && isset( BBMV_Books::RETIRED_VERSIONS[ strtolower( $v['slug'] ) ] ) ) {
+					return false;
+				}
 				$version_locale = isset( $v['language'] ) ? $v['language'] : '';
 				// pt-pt groups with pt-br, matching the API's legacy locale rule.
 				if ( 'pt-br' === $version_locale || 'pt' === $version_locale || 'pt-pt' === $version_locale ) {
@@ -446,11 +480,11 @@ class BBMV_API {
 	 * Used to surface the localized version name and copyright attribution
 	 * in the admin and in the tooltip footer.
 	 *
-	 * @param string $version_slug Version slug (nvt, kjv…).
+	 * @param string $version_slug Version slug (onbv, kjv…).
 	 * @return array|null Version array with localizedNames/copyright, or null.
 	 */
 	public function get_version_meta( $version_slug ) {
-		$version_slug = strtolower( (string) $version_slug );
+		$version_slug = BBMV_Books::resolve_version( $version_slug );
 		$catalog      = $this->get_catalog();
 		if ( ! $catalog ) {
 			return null;
@@ -467,13 +501,13 @@ class BBMV_API {
 	 * Fetches the verse of the day from the API
 	 *
 	 * @param string $locale  Content locale (pt-br, en, es…).
-	 * @param string $version Bible version slug (nvt, kjv…).
+	 * @param string $version Bible version slug (onbv, kjv…).
 	 * @return array|null Verse data or null on error
 	 */
 	public function get_votd( $locale = null, $version = null ) {
 		$locale  = $locale ? $locale : $this->locale;
 		$locale  = BBMV_Books::normalize_locale( $locale );
-		$version = $version ? $version : BBMV_Books::get_default_version( $locale );
+		$version = BBMV_Books::resolve_version( $version ? $version : BBMV_Books::get_default_version( $locale ) );
 
 		$cache_key = 'bbm_votd_' . $locale . '_' . $version . '_' . gmdate( 'Y-m-d' );
 		$cached    = get_transient( $cache_key );
@@ -506,6 +540,9 @@ class BBMV_API {
 		}
 
 		if ( $result && isset( $result['text'] ) && ! isset( $result['error'] ) ) {
+			if ( empty( $result['copyright'] ) && ! empty( $result['meta']['copyright'] ) ) {
+				$result['copyright'] = $result['meta']['copyright'];
+			}
 			set_transient( $cache_key, $result, DAY_IN_SECONDS );
 			return $result;
 		}

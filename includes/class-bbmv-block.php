@@ -94,9 +94,11 @@ class BBMV_Block {
 		$locale   = ! empty( $atts['locale'] )
 			? BBMV_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
 			: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-		$version  = ! empty( $atts['version'] )
-			? strtolower( sanitize_text_field( $atts['version'] ) )
-			: ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) );
+		$version  = BBMV_Books::resolve_version(
+			! empty( $atts['version'] )
+				? sanitize_text_field( $atts['version'] )
+				: ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) )
+		);
 		$show_ref = isset( $atts['show_reference'] ) ? (bool) $atts['show_reference'] : true;
 		$link     = isset( $atts['link_verse'] ) ? (bool) $atts['link_verse'] : true;
 
@@ -131,9 +133,21 @@ class BBMV_Block {
 			}
 		}
 
+		// Version attribution as returned by the API alongside the text, falling
+		// back to the (cached) catalogue entry for responses that predate it.
+		$copyright = ( ! empty( $data['copyright'] ) && is_string( $data['copyright'] ) ) ? $data['copyright'] : '';
+		if ( '' === $copyright ) {
+			$version_meta = $api->get_version_meta( $version );
+			$copyright    = ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? (string) $version_meta['copyright'] : '';
+		}
+		$copyright_html = '' !== trim( $copyright )
+			? '<small class="bbm-verse__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
+			: '';
+
 		return '<blockquote class="bbm-verse wp-block-bible-by-midvash-verse" itemscope itemtype="https://schema.org/Quotation">'
 			. '<p class="bbm-verse__text" itemprop="text">' . esc_html( $text ) . '</p>'
 			. $ref_html
+			. $copyright_html
 			. '</blockquote>';
 	}
 

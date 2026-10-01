@@ -69,7 +69,7 @@
                         label:       __('Version', 'bible-by-midvash'),
                         help:        __('Leave empty to use the plugin default.', 'bible-by-midvash'),
                         value:       attributes.version,
-                        placeholder: 'nvt, kjv, lsg…',
+                        placeholder: 'onbv, kjv, lsg…',
                         onChange:    function (v) { setAttributes({ version: v }); },
                     }),
                     el(SelectControl, {

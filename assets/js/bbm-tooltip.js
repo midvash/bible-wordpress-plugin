@@ -14,7 +14,7 @@
     const config = window.bbm_config || {
         ajax_url: '/wp-admin/admin-ajax.php',
         nonce: '',
-        version: 'nvt',
+        version: 'onbv',
         show_version: true,
         fallback_message: 'Verse currently unavailable',
         read_more: 'Read more',
@@ -80,14 +80,7 @@
             </div>
         `;
 
-        // Version copyright attribution: compact first line in the footer,
-        // full multi-line notice on hover via the title attribute.
-        if (config.version_copyright) {
-            const copyrightEl = tooltipElement.querySelector('.bbm-tooltip__copyright');
-            const lines = config.version_copyright.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
-            copyrightEl.textContent = lines[0] || '';
-            copyrightEl.title = config.version_copyright;
-        }
+        setCopyright(tooltipElement, config.version_copyright);
 
         if (config.icon_url) {
             const header = tooltipElement.querySelector('.bbm-tooltip__header');
@@ -153,6 +146,21 @@
 
         tooltipElement.style.top = top + 'px';
         tooltipElement.style.left = left + 'px';
+    }
+
+    /**
+     * Version copyright attribution: compact first line in the footer,
+     * full multi-line notice on hover via the title attribute.
+     */
+    function setCopyright(tooltip, notice) {
+        const copyrightEl = tooltip.querySelector('.bbm-tooltip__copyright');
+        if (!copyrightEl) {
+            return;
+        }
+        const text  = typeof notice === 'string' ? notice : '';
+        const lines = text.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+        copyrightEl.textContent = lines[0] || '';
+        copyrightEl.title = text;
     }
 
     /**
@@ -223,6 +231,9 @@
         tooltip.querySelector('.bbm-tooltip__content').innerHTML = 
             '<p class="bbm-tooltip__text">' + contentHtml + '</p>';
         
+        // Attribution sent by the API with the text wins over the catalogue's.
+        setCopyright(tooltip, data.copyright || config.version_copyright);
+
         // Set read more link
         const readMoreLink = tooltip.querySelector('.bbm-tooltip__read-more');
         const readMoreText = tooltip.querySelector('.bbm-tooltip__read-more-text');

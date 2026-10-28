@@ -49,6 +49,10 @@
             var name      = (v.localizedNames && v.localizedNames[locale]) || v.name || '';
             var shortName = v.shortName || v.code || '';
             var label     = name ? (name + ' (' + shortName + ')') : shortName;
+            // Versions with reserved rights carry a discreet mark.
+            if (v.restricted) {
+                label += ' \u00a9';
+            }
             var opt       = document.createElement('option');
             opt.value       = slug;
             opt.textContent = label;

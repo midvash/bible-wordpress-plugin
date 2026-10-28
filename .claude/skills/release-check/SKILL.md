@@ -70,4 +70,4 @@ Tabela final: item → ✅/❌ → observação curta. Se tudo ✅, informe o co
 gh release create vX.Y.Z --title "vX.Y.Z — <hook>" --notes "..."
 ```
 
-Lembre: notas de release ricas em markdown (Added/Fixed/Changed, links pra wordpress.midvash.com quando fizer sentido) — são indexadas.
+Lembre: notas de release ricas em markdown (Added/Fixed/Changed, links pra midvash.com/wordpress-plugin quando fizer sentido) — são indexadas.

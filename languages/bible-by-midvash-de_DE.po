@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Bible by Midvash\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 20:20-0300\n"
+"POT-Creation-Date: 2026-10-28 13:48-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: German\n"
@@ -12,31 +12,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: bible-by-midvash.php:167
+#: bible-by-midvash.php:193
 msgid "Verse currently unavailable"
 msgstr "Vers derzeit nicht verfügbar"
 
-#: bible-by-midvash.php:168
+#: bible-by-midvash.php:194
 msgid "Read more"
 msgstr "Mehr lesen"
 
-#: bible-by-midvash.php:224
+#: bible-by-midvash.php:265 bible-by-midvash.php:302
 msgid "Too many requests"
 msgstr "Zu viele Anfragen"
 
-#: bible-by-midvash.php:231
+#: bible-by-midvash.php:274 bible-by-midvash.php:312
 msgid "Reference not provided"
 msgstr "Referenz nicht angegeben"
 
-#: bible-by-midvash.php:240
+#: bible-by-midvash.php:283
 msgid "Verse not found"
 msgstr "Vers nicht gefunden"
 
-#: bible-by-midvash.php:255
+#: bible-by-midvash.php:334
 msgid "Forbidden"
 msgstr "Zugriff verweigert"
 
-#: bible-by-midvash.php:268
+#: bible-by-midvash.php:347
 msgid "Failed to fetch versions"
 msgstr "Versionen konnten nicht abgerufen werden"
 
@@ -48,331 +48,280 @@ msgstr "Vers des Tages — Midvash"
 msgid "Displays the daily Bible verse powered by the Midvash API."
 msgstr "Zeigt den täglichen Bibelvers über die Midvash-API an."
 
-#: includes/class-bbmv-widget.php:76
+#: includes/class-bbmv-widget.php:77
 msgid "Verse of the Day"
 msgstr "Vers des Tages"
 
-#: includes/class-bbmv-widget.php:83
+#: includes/class-bbmv-widget.php:84
 msgid "Title:"
 msgstr "Titel:"
 
-#: includes/class-bbmv-widget.php:89
+#: includes/class-bbmv-widget.php:90
 msgid "Language (leave empty to use plugin setting):"
 msgstr "Sprache (leer lassen, um die Plugin-Einstellung zu verwenden):"
 
-#: includes/class-bbmv-widget.php:92
+#: includes/class-bbmv-widget.php:93
 msgid "— Use plugin setting —"
 msgstr "— Plugin-Einstellung verwenden —"
 
-#: includes/class-bbmv-widget.php:112
+#: includes/class-bbmv-widget.php:113
 msgid "Version (leave empty for locale default):"
 msgstr "Version (leer lassen für die Standardversion der Sprache):"
 
-#: includes/class-bbmv-widget.php:116
-msgid "e.g. nvt, kjv, lsg"
-msgstr "z. B. luth1912, schl1951, elb1905"
+#: includes/class-bbmv-widget.php:117
+msgid "e.g. onbv, kjv, lsg"
+msgstr "z. B. onbv, kjv, lsg"
 
-#: includes/class-bbmv-widget.php:121
+#: includes/class-bbmv-widget.php:122
 msgid "Show reference (e.g. João 3:16)"
 msgstr "Referenz anzeigen (z. B. Johannes 3:16)"
 
-#: includes/class-bbmv-widget.php:127
+#: includes/class-bbmv-widget.php:128
 msgid "Link verse to Midvash"
 msgstr "Vers mit Midvash verlinken"
 
-#: includes/class-bbmv-widget.php:190 includes/class-bbmv-block.php:108
+#: includes/class-bbmv-widget.php:192 includes/class-bbmv-block.php:110
 msgid "Verse currently unavailable."
 msgstr "Vers derzeit nicht verfügbar."
 
-#: includes/class-bbmv-admin.php:64
+#: includes/class-bbmv-admin.php:62
 msgid "Loading…"
 msgstr "Wird geladen…"
 
-#: includes/class-bbmv-admin.php:65
+#: includes/class-bbmv-admin.php:63
 msgid "No versions available"
 msgstr "Keine Übersetzungen verfügbar"
 
-#: includes/class-bbmv-admin.php:66
+#: includes/class-bbmv-admin.php:64
 msgid "Error loading versions"
 msgstr "Fehler beim Laden der Übersetzungen"
 
-#: includes/class-bbmv-admin.php:77 includes/class-bbmv-admin.php:78
-#: includes/class-bbmv-admin.php:770
+#: includes/class-bbmv-admin.php:75 includes/class-bbmv-admin.php:76
+#: includes/class-bbmv-admin.php:702
 msgid "Bible by Midvash"
 msgstr "Bibel by Midvash"
 
-#: includes/class-bbmv-admin.php:94
+#: includes/class-bbmv-admin.php:92
 msgid "General Settings"
 msgstr "Allgemeine Einstellungen"
 
-#: includes/class-bbmv-admin.php:102
+#: includes/class-bbmv-admin.php:100
 msgid "Cache and Performance"
 msgstr "Cache und Leistung"
 
-#: includes/class-bbmv-admin.php:110
+#: includes/class-bbmv-admin.php:108
 msgid "Language"
 msgstr "Sprache"
 
-#: includes/class-bbmv-admin.php:119
+#: includes/class-bbmv-admin.php:117
 msgid "Bible Version"
 msgstr "Bibelübersetzung"
 
-#: includes/class-bbmv-admin.php:128
+#: includes/class-bbmv-admin.php:126
 msgid "Link Color"
 msgstr "Linkfarbe"
 
-#: includes/class-bbmv-admin.php:137
+#: includes/class-bbmv-admin.php:135
 msgid "Enable custom color"
 msgstr "Benutzerdefinierte Farbe aktivieren"
 
-#: includes/class-bbmv-admin.php:146
+#: includes/class-bbmv-admin.php:144
 msgid "Underline links"
 msgstr "Links unterstreichen"
 
-#: includes/class-bbmv-admin.php:155
+#: includes/class-bbmv-admin.php:153
 msgid "Underline Color"
 msgstr "Farbe der Unterstreichung"
 
-#: includes/class-bbmv-admin.php:164
+#: includes/class-bbmv-admin.php:162
 msgid "Underline Style"
 msgstr "Stil der Unterstreichung"
 
-#: includes/class-bbmv-admin.php:173
+#: includes/class-bbmv-admin.php:171
 msgid "Open in new tab"
 msgstr "In neuem Tab öffnen"
 
-#: includes/class-bbmv-admin.php:182
+#: includes/class-bbmv-admin.php:180
 msgid "Show version in tooltip"
 msgstr "Übersetzung im Tooltip anzeigen"
 
-#: includes/class-bbmv-admin.php:191
+#: includes/class-bbmv-admin.php:190
+msgid "Midvash logo in tooltip"
+msgstr "Midvash-Logo im Tooltip"
+
+#: includes/class-bbmv-admin.php:199
 msgid "Enable cache"
 msgstr "Cache aktivieren"
 
-#: includes/class-bbmv-admin.php:200
+#: includes/class-bbmv-admin.php:208
 msgid "Cache duration (seconds)"
 msgstr "Cache-Dauer (Sekunden)"
 
-#: includes/class-bbmv-admin.php:209
+#: includes/class-bbmv-admin.php:217
 msgid "API Timeout (seconds)"
 msgstr "API-Timeout (Sekunden)"
 
-#: includes/class-bbmv-admin.php:218
+#: includes/class-bbmv-admin.php:226
 msgid "Auto-linking Settings"
 msgstr "Einstellungen für automatische Verlinkung"
 
-#: includes/class-bbmv-admin.php:226 includes/class-bbmv-admin.php:686
+#: includes/class-bbmv-admin.php:234 includes/class-bbmv-admin.php:680
 msgid "Link the word \"Bíblia\""
 msgstr "Das Wort \"Bíblia\" verlinken"
 
-#: includes/class-bbmv-admin.php:235
-msgid "Link Bible version names"
-msgstr "Namen von Bibelübersetzungen verlinken"
-
-#: includes/class-bbmv-admin.php:244
-msgid "Link Bible book names"
-msgstr "Namen biblischer Bücher verlinken"
-
-#: includes/class-bbmv-admin.php:253 includes/class-bbmv-admin.php:733
-msgid "Link dictionary terms"
-msgstr "Wörterbuchbegriffe verlinken"
-
-#: includes/class-bbmv-admin.php:262 includes/class-bbmv-admin.php:748
-msgid "Link biblical characters"
-msgstr "Biblische Personen verlinken"
-
-#: includes/class-bbmv-admin.php:406
+#: includes/class-bbmv-admin.php:375
 msgid "Configure how Bible references will be displayed."
 msgstr "Konfiguriere die Darstellung von Bibelstellen."
 
-#: includes/class-bbmv-admin.php:413
+#: includes/class-bbmv-admin.php:382
 msgid "Configure cache settings to improve tooltip performance."
 msgstr "Konfiguriere den Cache, um die Tooltip-Leistung zu verbessern."
 
-#: includes/class-bbmv-admin.php:479
-msgid ""
-"Select the language for links and book names. This determines the URL "
-"structure on Midvash."
-msgstr ""
-"Wähle die Sprache für Links und Buchnamen. Dies bestimmt die URL-Struktur "
-"auf Midvash."
+#: includes/class-bbmv-admin.php:448
+msgid "Select the language for links and book names. This determines the URL structure on Midvash."
+msgstr "Wähle die Sprache für Links und Buchnamen. Dies bestimmt die URL-Struktur auf Midvash."
 
-#: includes/class-bbmv-admin.php:519
-msgid ""
-"Select the Bible version for links and tooltips. Versions are fetched "
-"dynamically from Midvash."
-msgstr ""
-"Wähle die Bibelübersetzung für Links und Tooltips. Die Übersetzungen werden "
-"dynamisch von Midvash geladen."
+#: includes/class-bbmv-admin.php:499
+msgid "Select the Bible version for links and tooltips. Versions are fetched dynamically from Midvash."
+msgstr "Wähle die Bibelübersetzung für Links und Tooltips. Die Übersetzungen werden dynamisch von Midvash geladen."
 
-#: includes/class-bbmv-admin.php:533
+#: includes/class-bbmv-admin.php:513
 msgid "Enable custom color for links"
 msgstr "Benutzerdefinierte Linkfarbe aktivieren"
 
-#: includes/class-bbmv-admin.php:547
+#: includes/class-bbmv-admin.php:527
 msgid "Main color of the generated links."
 msgstr "Hauptfarbe der generierten Links."
 
-#: includes/class-bbmv-admin.php:560
+#: includes/class-bbmv-admin.php:540
 msgid "Enable underline for links"
 msgstr "Unterstreichung für Links aktivieren"
 
-#: includes/class-bbmv-admin.php:574
+#: includes/class-bbmv-admin.php:554
 msgid "Color of the link underline."
 msgstr "Farbe der Link-Unterstreichung."
 
-#: includes/class-bbmv-admin.php:585
+#: includes/class-bbmv-admin.php:565
 msgid "Solid"
 msgstr "Durchgezogen"
 
-#: includes/class-bbmv-admin.php:586
+#: includes/class-bbmv-admin.php:566
 msgid "Double"
 msgstr "Doppelt"
 
-#: includes/class-bbmv-admin.php:587
+#: includes/class-bbmv-admin.php:567
 msgid "Dotted"
 msgstr "Gepunktet"
 
-#: includes/class-bbmv-admin.php:588
+#: includes/class-bbmv-admin.php:568
 msgid "Dashed"
 msgstr "Gestrichelt"
 
-#: includes/class-bbmv-admin.php:589
+#: includes/class-bbmv-admin.php:569
 msgid "Wavy"
 msgstr "Wellig"
 
-#: includes/class-bbmv-admin.php:598
+#: includes/class-bbmv-admin.php:578
 msgid "Style of the link underline."
 msgstr "Stil der Link-Unterstreichung."
 
-#: includes/class-bbmv-admin.php:611
+#: includes/class-bbmv-admin.php:591
 msgid "Open links in a new browser tab"
 msgstr "Links in einem neuen Browser-Tab öffnen"
 
-#: includes/class-bbmv-admin.php:625
+#: includes/class-bbmv-admin.php:605
 msgid "Display Bible version in tooltip"
 msgstr "Bibelübersetzung im Tooltip anzeigen"
 
-#: includes/class-bbmv-admin.php:639
+#: includes/class-bbmv-admin.php:619
+msgid "Show the Midvash logo in the tooltip and link the version badge to midvash.com"
+msgstr "Midvash-Logo im Tooltip anzeigen und das Versionsabzeichen mit midvash.com verlinken"
+
+#: includes/class-bbmv-admin.php:633
 msgid "Store verses in cache to improve performance"
 msgstr "Verse im Cache speichern, um die Leistung zu verbessern"
 
-#: includes/class-bbmv-admin.php:653
+#: includes/class-bbmv-admin.php:647
 msgid "Time in seconds (default: 2592000 = 30 days)."
 msgstr "Zeit in Sekunden (Standard: 2592000 = 30 Tage)."
 
-#: includes/class-bbmv-admin.php:666
+#: includes/class-bbmv-admin.php:660
 msgid "Maximum wait time for the API."
 msgstr "Maximale Wartezeit für die API."
 
-#: includes/class-bbmv-admin.php:674
+#: includes/class-bbmv-admin.php:668
 msgid "Configure auto-linking for various elements in your content."
-msgstr ""
-"Konfiguriere die automatische Verlinkung verschiedener Inhaltselemente."
+msgstr "Konfiguriere die automatische Verlinkung verschiedener Inhaltselemente."
 
-#: includes/class-bbmv-admin.php:688
-msgid "Auto-link the word \"Bíblia\" to Midvash"
-msgstr "Das Wort \"Bíblia\" automatisch mit Midvash verlinken"
+#: includes/class-bbmv-admin.php:682
+msgid "Links the first mention of the word \"Bíblia\" in each post to Midvash"
+msgstr "Verlinkt die erste Erwähnung des Wortes „Bíblia“ in jedem Beitrag mit Midvash"
 
-#: includes/class-bbmv-admin.php:701
-msgid "Link version names"
-msgstr "Namen von Übersetzungen verlinken"
+#: includes/class-bbmv-admin.php:704
+msgid "Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips."
+msgstr "Erkennt automatisch Bibelstellen in deinen Beiträgen und verwandelt sie in ansprechende Links mit Vers-Tooltips."
 
-#: includes/class-bbmv-admin.php:703
-msgid "Auto-link Bible version names mentioned in text"
-msgstr "Im Text erwähnte Namen von Bibelübersetzungen automatisch verlinken"
-
-#: includes/class-bbmv-admin.php:718
-msgid "Link book names"
-msgstr "Buchnamen verlinken"
-
-#: includes/class-bbmv-admin.php:720
-msgid "Auto-link Bible book names mentioned in text"
-msgstr "Im Text erwähnte biblische Buchnamen automatisch verlinken"
-
-#: includes/class-bbmv-admin.php:735
-msgid "Auto-link dictionary terms mentioned in text"
-msgstr "Im Text erwähnte Wörterbuchbegriffe automatisch verlinken"
-
-#: includes/class-bbmv-admin.php:750
-msgid "Auto-link biblical characters mentioned in text"
-msgstr "Im Text erwähnte biblische Personen automatisch verlinken"
-
-#: includes/class-bbmv-admin.php:772
-msgid ""
-"Auto-detect Bible references in your posts and turn them into beautiful "
-"links with verse tooltips."
-msgstr ""
-"Erkennt automatisch Bibelstellen in deinen Beiträgen und verwandelt sie in "
-"ansprechende Links mit Vers-Tooltips."
-
-#: includes/class-bbmv-admin.php:776
+#: includes/class-bbmv-admin.php:708
 msgid "Powered by Midvash API"
 msgstr "Unterstützt durch die Midvash-API"
 
-#: includes/class-bbmv-admin.php:781
+#: includes/class-bbmv-admin.php:713
 msgid "Plugin site"
 msgstr "Plugin-Website"
 
-#: includes/class-bbmv-admin.php:784
+#: includes/class-bbmv-admin.php:716
 msgid "Open Midvash"
 msgstr "Midvash öffnen"
 
-#: includes/class-bbmv-admin.php:792
+#: includes/class-bbmv-admin.php:724
 msgid "General"
 msgstr "Allgemein"
 
-#: includes/class-bbmv-admin.php:796
+#: includes/class-bbmv-admin.php:728
 msgid "Cache & Performance"
 msgstr "Cache & Leistung"
 
-#: includes/class-bbmv-admin.php:811
+#: includes/class-bbmv-admin.php:743
 msgid "Save Settings"
 msgstr "Einstellungen speichern"
 
-#: includes/class-bbmv-admin.php:817
+#: includes/class-bbmv-admin.php:749
 msgid "How to use"
 msgstr "Verwendung"
 
-#: includes/class-bbmv-admin.php:818
-msgid ""
-"The plugin automatically detects Bible references in your posts. When "
-"hovering over a reference, a tooltip displays the verse text fetched from "
-"the Midvash API."
-msgstr ""
-"Das Plugin erkennt automatisch Bibelstellen in deinen Beiträgen. Beim "
-"Überfahren einer Referenz zeigt ein Tooltip den über die Midvash-API "
-"abgerufenen Verstext an."
+#: includes/class-bbmv-admin.php:750
+msgid "The plugin automatically detects Bible references in your posts. When hovering over a reference, a tooltip displays the verse text fetched from the Midvash API."
+msgstr "Das Plugin erkennt automatisch Bibelstellen in deinen Beiträgen. Beim Überfahren einer Referenz zeigt ein Tooltip den über die Midvash-API abgerufenen Verstext an."
 
-#: includes/class-bbmv-admin.php:819
+#: includes/class-bbmv-admin.php:751
 msgid "Supported formats"
 msgstr "Unterstützte Formate"
 
-#: includes/class-bbmv-admin.php:821
+#: includes/class-bbmv-admin.php:753
 msgid "Single verse"
 msgstr "Einzelner Vers"
 
-#: includes/class-bbmv-admin.php:822
+#: includes/class-bbmv-admin.php:754
 msgid "Alternative separator"
 msgstr "Alternatives Trennzeichen"
 
-#: includes/class-bbmv-admin.php:823
+#: includes/class-bbmv-admin.php:755
 msgid "Verse range"
 msgstr "Versbereich"
 
-#: includes/class-bbmv-admin.php:824
+#: includes/class-bbmv-admin.php:756
 msgid "Abbreviation"
 msgstr "Abkürzung"
 
-#: includes/class-bbmv-admin.php:825
+#: includes/class-bbmv-admin.php:757
 msgid "Entire chapter"
 msgstr "Ganzes Kapitel"
 
-#: includes/class-bbmv-parser.php:126
+#: includes/class-bbmv-parser.php:207
 msgid "Online Bible"
 msgstr "Online-Bibel"
 
-#: includes/class-bbmv-parser.php:195
+#: includes/class-bbmv-parser.php:280
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "%s auf Midvash lesen"

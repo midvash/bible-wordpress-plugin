@@ -1,0 +1,26 @@
+{
+	"meta": {
+		"title": "Teste de fumaca do Bible by Midvash",
+		"author": "midvash",
+		"description": "Instala o plugin num WordPress do Playground em pt-BR, renderiza um post com referencias e imagem, abre a tela de configuracoes, o widget e o bloco, e grava o resultado em <dir-saida>/result-<php>.json (errors tem de vir vazio). Node 24. Uso: copiar scripts/smoke.php pra <dir-saida> e rodar npx @wp-playground/cli run-blueprint --blueprint=scripts/smoke-blueprint.json --mount=<plugin-extraido>:/wordpress/wp-content/plugins/bible-by-midvash --mount=<dir-saida>:/wordpress/smoke-out A versao do PHP e do WP vem de preferredVersions (o passo wp-cli ignora a flag --php): troque 7.4 por 8.3 pra testar o outro extremo."
+	},
+	"preferredVersions": {
+		"php": "7.4",
+		"wp": "7.1"
+	},
+	"landingPage": "/",
+	"steps": [
+		{
+			"step": "setSiteLanguage",
+			"language": "pt_BR"
+		},
+		{
+			"step": "activatePlugin",
+			"pluginPath": "bible-by-midvash/bible-by-midvash.php"
+		},
+		{
+			"step": "wp-cli",
+			"command": "wp eval-file /wordpress/smoke-out/smoke.php"
+		}
+	]
+}

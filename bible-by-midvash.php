@@ -1,14 +1,15 @@
 <?php
 /**
  * Plugin Name: Bible by Midvash
- * Plugin URI:  https://midvash.app/wordpress-plugin
+ * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.8.1
+ * Version: 0.10.2
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: bible-by-midvash
+ * Domain Path: /languages
  *
  * @package Bible_By_Midvash
  */
@@ -19,11 +20,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.8.1' );
+define( 'BBMV_VERSION', '0.10.2' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
 define( 'BBMV_SITE_URL', 'https://midvash.com' );
+// Identifies the plugin to the Midvash API, which then serves every version
+// of midvash.com, including the ones with reserved rights. Sent only from PHP
+// (wp_remote_get), never to the visitor's browser. It is public in this open
+// source code: it identifies the plugin, it is not a secret. A site can
+// define its own in wp-config.php. Empty = no header, free versions only.
+if ( ! defined( 'BBMV_PLUGIN_KEY' ) ) {
+	define( 'BBMV_PLUGIN_KEY', '' );
+}
 
 // Include classes.
 require_once BBMV_PLUGIN_DIR . 'includes/class-bbmv-books.php';
@@ -45,7 +54,7 @@ if ( file_exists( BBMV_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-
 	require_once BBMV_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 	if ( class_exists( 'YahnisElsts\\PluginUpdateChecker\\v5\\PucFactory' ) ) {
 		$bbmv_update_checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-			'https://midvash.app/api/wordpress/update-info.json',
+			'https://midvash.com/api/wordpress/update-info.json',
 			__FILE__,
 			'bible-by-midvash'
 		);
@@ -54,16 +63,16 @@ if ( file_exists( BBMV_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-
 // phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- Build-script marker, not commented-out code.
 // {{WPORG_STRIP_END}}
 
-// Translations: WordPress 4.6+ auto-loads `.mo` files based on the textdomain
-// (which matches our slug — bible-by-midvash). For installs hosted on
-// wordpress.org, translations are also pulled from translate.wordpress.org.
-// Explicit load_plugin_textdomain() is no longer required and is in fact
-// flagged by Plugin Check as a "discouraged function" since WP 4.6.
-
 /**
  * Initialize the plugin
  */
 function bbmv_init() {
+	// WordPress only loads translations on its own from wp-content/languages
+	// (translate.wordpress.org). The .mo files bundled in /languages need this
+	// call, or the plugin stays in English on every site.
+	// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Bundled translations.
+	load_plugin_textdomain( 'bible-by-midvash', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
 	// Initialize the parser.
 	$parser = new BBMV_Parser();
 	$parser->init();
@@ -95,24 +104,37 @@ function bbmv_register_block() {
 bbmv_register_block();
 
 /**
- * Register scripts and styles
+ * URL of a bundled asset, preferring the minified copy built into the ZIP.
+ *
+ * The repository keeps only the readable sources; scripts/build-zip.ts adds
+ * `name-<version>.min.ext` next to each one. The version lives in the file
+ * name, not only in `?ver=`, because caching plugins (WP Rocket's "remove
+ * query strings") strip the query and a CDN in front of the site then keeps
+ * serving the previous release's file for weeks. SCRIPT_DEBUG serves the
+ * source.
+ *
+ * @param string $path Path under the plugin directory (e.g. 'assets/js/bbm-tooltip.js').
+ * @return string
  */
-function bbmv_enqueue_assets() {
-	// Load on single posts and pages.
-	if ( ! is_singular() ) {
-		return;
+function bbmv_asset_url( $path ) {
+	$min = preg_replace( '/\.(js|css)$/', '-' . BBMV_VERSION . '.min.$1', $path );
+	if ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) && file_exists( BBMV_PLUGIN_DIR . $min ) ) {
+		return BBMV_PLUGIN_URL . $min;
 	}
+	return BBMV_PLUGIN_URL . $path;
+}
 
+/**
+ * Register scripts and styles.
+ *
+ * Nothing is enqueued here: BBMV_Parser enqueues the tooltip only when a post
+ * actually has a reference, and the verse block enqueues its stylesheet.
+ */
+function bbmv_register_assets() {
 	$options = get_option( 'bbm_options', array() );
-	$locale  = isset( $options['locale'] ) ? $options['locale'] : 'pt-br';
+	$locale  = BBMV_Books::normalize_locale( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
 
-	// CSS.
-	wp_enqueue_style(
-		'bbm-style',
-		BBMV_PLUGIN_URL . 'assets/css/bbm.css',
-		array(),
-		BBMV_VERSION
-	);
+	wp_register_style( 'bbm-style', bbmv_asset_url( 'assets/css/bbm.css' ), array(), BBMV_VERSION );
 
 	// Custom Link Styling.
 	$css_styles = array();
@@ -137,50 +159,58 @@ function bbmv_enqueue_assets() {
 		$css_styles[] = 'text-decoration: none;';
 	}
 
-	if ( ! empty( $css_styles ) ) {
-		$custom_css = '.bbm-link { ' . implode( ' ', $css_styles ) . ' }';
-		wp_add_inline_style( 'bbm-style', $custom_css );
-	}
+	// The tooltip's accent ("Read more", verse numbers) follows the Link Color
+	// setting even when links keep the theme colour.
+	$accent = sanitize_hex_color( isset( $options['link_color'] ) ? $options['link_color'] : '' );
+	$accent = $accent ? $accent : '#B17027';
 
-	// JavaScript.
-	wp_enqueue_script(
-		'bbm-tooltip',
-		BBMV_PLUGIN_URL . 'assets/js/bbm-tooltip.js',
-		array(),
-		BBMV_VERSION,
-		true
-	);
+	wp_add_inline_style( 'bbm-style', '.bbm-link { ' . implode( ' ', $css_styles ) . ' } .bbm-tooltip { --bbm-accent: ' . $accent . '; }' );
 
-	// Pass configuration to JS. Strings flow through __() so they're resolved
-	// against the site's active textdomain (.mo files in /languages) instead
-	// of a hardcoded 9-locale lookup — translations track WordPress’s normal
-	// i18n pipeline and new locales come for free as we add .po files.
-	// Copyright attribution for the configured version, shown in the tooltip
-	// footer. Served from the 7-day catalogue transient; on a cold cache this
-	// is one bounded upstream request per week.
+	wp_register_script( 'bbm-tooltip', bbmv_asset_url( 'assets/js/bbm-tooltip.js' ), array(), BBMV_VERSION, true );
+
+	// Strings flow through __() so they're resolved against the site's
+	// textdomain. The copyright attribution comes from the cached catalogue
+	// only: the API is never called while a page renders (a slow or offline
+	// API would hold the page for the whole timeout). A cold cache is filled
+	// by a background cron event instead.
 	$api          = new BBMV_API();
 	$version_slug = isset( $options['versao'] ) ? BBMV_Books::resolve_version( $options['versao'] ) : BBMV_Books::get_default_version( $locale );
-	$version_meta = $api->get_version_meta( $version_slug );
+	$version_meta = $api->get_version_meta( $version_slug, false );
+	if ( null === $version_meta && ! $api->has_catalog_cache() && ! wp_next_scheduled( 'bbmv_refresh_catalog' ) ) {
+		wp_schedule_single_event( time(), 'bbmv_refresh_catalog' );
+	}
 
 	wp_localize_script(
 		'bbm-tooltip',
 		'bbm_config',
 		array(
 			'ajax_url'          => admin_url( 'admin-ajax.php' ),
-			'nonce'             => wp_create_nonce( 'bbm_nonce' ),
 			'version'           => $version_slug,
+			'version_label'     => $api->get_version_label( $version_slug ),
 			'version_copyright' => ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? $version_meta['copyright'] : '',
 			'locale'            => $locale,
 			'show_version'      => isset( $options['show_version'] ) ? $options['show_version'] : true,
 			'fallback_message'  => __( 'Verse currently unavailable', 'bible-by-midvash' ),
 			'read_more'         => __( 'Read more', 'bible-by-midvash' ),
-			'site_url'          => BBMV_SITE_URL,
-			'icon_url'          => BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
+			'site_url'          => BBMV_Books::site_url( $locale ),
+			// Midvash logo and the version badge's link only with the site
+			// owner's opt-in (WordPress.org guideline 10).
+			'icon_url'          => empty( $options['show_branding'] ) ? '' : BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
+			'link_version'      => ! empty( $options['show_branding'] ),
 			'debug'             => defined( 'WP_DEBUG' ) && WP_DEBUG,
 		)
 	);
 }
-add_action( 'wp_enqueue_scripts', 'bbmv_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'bbmv_register_assets' );
+
+/**
+ * Fills the version catalogue cache outside of a page render.
+ */
+function bbmv_refresh_catalog() {
+	$api = new BBMV_API();
+	$api->get_versions();
+}
+add_action( 'bbmv_refresh_catalog', 'bbmv_refresh_catalog' );
 
 /**
  * Returns a stable identifier for rate-limit bucketing.
@@ -223,7 +253,10 @@ function bbmv_is_rate_limited( $action, $limit ) {
  * AJAX handler to fetch verses (public — used by the tooltip).
  */
 function bbmv_ajax_get_verse() {
-	check_ajax_referer( 'bbm_nonce', 'nonce' );
+	// No nonce: this public, read-only endpoint serves Bible text, so there is
+	// nothing to forge, and a nonce baked into cached HTML expires after a day
+	// and breaks every tooltip on sites behind a page cache. Abuse is bounded
+	// by the rate limit below.
 
 	// Throttle to 120 verse lookups per minute per IP. Generous for normal
 	// browsing (hovering many references), tight against bots flooding our
@@ -232,8 +265,10 @@ function bbmv_ajax_get_verse() {
 		wp_send_json_error( array( 'message' => __( 'Too many requests', 'bible-by-midvash' ) ), 429 );
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public read-only endpoint, see above.
 	$reference = isset( $_GET['reference'] ) ? sanitize_text_field( wp_unslash( $_GET['reference'] ) ) : '';
 	$version   = isset( $_GET['version'] ) ? sanitize_text_field( wp_unslash( $_GET['version'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 	if ( empty( $reference ) ) {
 		wp_send_json_error( array( 'message' => __( 'Reference not provided', 'bible-by-midvash' ) ) );
@@ -259,7 +294,7 @@ add_action( 'wp_ajax_nopriv_bbm_get_verse', 'bbmv_ajax_get_verse' );
  * upstream fan-out is batched through the API's /v1/passages endpoint.
  */
 function bbmv_ajax_get_verses() {
-	check_ajax_referer( 'bbm_nonce', 'nonce' );
+	// No nonce, for the same reason as bbmv_ajax_get_verse().
 
 	// One batch covers a whole page view, so the budget is much smaller than
 	// the per-verse endpoint's. 20/min per IP still allows brisk browsing.
@@ -267,8 +302,10 @@ function bbmv_ajax_get_verses() {
 		wp_send_json_error( array( 'message' => __( 'Too many requests', 'bible-by-midvash' ) ), 429 );
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Public read-only endpoint, see bbmv_ajax_get_verse().
 	$refs_raw = isset( $_POST['refs'] ) ? sanitize_text_field( wp_unslash( $_POST['refs'] ) ) : '';
 	$version  = isset( $_POST['version'] ) ? sanitize_text_field( wp_unslash( $_POST['version'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	$references = array_filter( array_map( 'trim', explode( '|', $refs_raw ) ) );
 	if ( empty( $references ) ) {
@@ -313,29 +350,6 @@ function bbmv_ajax_get_versions() {
 add_action( 'wp_ajax_bbm_get_versions', 'bbmv_ajax_get_versions' );
 
 /**
- * Swaps a retired Bible version saved in the settings for its openly licensed
- * replacement (see BBMV_Books::RETIRED_VERSIONS).
- *
- * The public API stopped distributing all-rights-reserved versions without a
- * licence; it aliases them server-side, but the saved slug would still drive
- * the tooltip badge, the midvash.com links and the attribution lookup. Runs on
- * every load because it costs one array lookup on an autoloaded option and
- * only writes when there is something to migrate.
- */
-function bbmv_migrate_retired_version() {
-	$options = get_option( 'bbm_options' );
-	if ( ! is_array( $options ) || empty( $options['versao'] ) ) {
-		return;
-	}
-	$resolved = BBMV_Books::resolve_version( $options['versao'] );
-	if ( strtolower( $options['versao'] ) !== $resolved ) {
-		$options['versao'] = $resolved;
-		update_option( 'bbm_options', $options );
-	}
-}
-add_action( 'plugins_loaded', 'bbmv_migrate_retired_version' );
-
-/**
  * Plugin activation - set default options
  */
 function bbmv_activate() {
@@ -357,11 +371,8 @@ function bbmv_activate() {
 		'cache_ttl'        => 2592000, // 30 days
 		'timeout'          => 5,
 		'show_version'     => true,
+		'show_branding'    => false,
 		'link_biblia'      => false,
-		'link_books'       => false,
-		'link_versions'    => false,
-		'link_terms'       => false,
-		'link_characters'  => false,
 	);
 
 	if ( ! get_option( 'bbm_options' ) ) {

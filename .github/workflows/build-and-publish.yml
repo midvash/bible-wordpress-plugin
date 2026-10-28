@@ -73,12 +73,12 @@ jobs:
             --arg name "Bible by Midvash" \
             --arg slug "bible-by-midvash" \
             --arg version "$VERSION" \
-            --arg download "https://midvash.app/api/wordpress/download/$VERSION" \
+            --arg download "https://midvash.com/api/wordpress/download/$VERSION" \
             --arg requires "$REQUIRES" \
             --arg tested "$TESTED" \
             --arg requires_php "$REQUIRES_PHP" \
             --arg last_updated "$NOW" \
-            --arg homepage "https://midvash.app/wordpress-plugin" \
+            --arg homepage "https://midvash.com/wordpress-plugin" \
             --arg author "Neto Gregório" \
             --arg author_homepage "https://www.netogregorio.com.br" \
             '{
@@ -147,6 +147,6 @@ jobs:
       - name: Publish info
         run: |
           echo "✅ Plugin v${{ steps.version.outputs.version }} published"
-          echo "   R2 (latest):    https://midvash.app/api/wordpress/download"
-          echo "   R2 (versioned): https://midvash.app/api/wordpress/download/${{ steps.version.outputs.version }}"
+          echo "   R2 (latest):    https://midvash.com/api/wordpress/download"
+          echo "   R2 (versioned): https://midvash.com/api/wordpress/download/${{ steps.version.outputs.version }}"
           echo "   GitHub release: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name || steps.version.outputs.version }}"

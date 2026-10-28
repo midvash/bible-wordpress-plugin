@@ -8,7 +8,7 @@ Plugin WordPress (`bible-by-midvash`) que detecta referências bíblicas em post
 
 **Distribuição**:
 - Repo público: https://github.com/midvash/bible-by-midvash
-- Download/docs: https://wordpress.midvash.com
+- Download/docs: https://midvash.com/wordpress-plugin
 - Auto-update via `vendor/plugin-update-checker` lendo `update-info.json` em R2
 
 ## Objetivos estratégicos
@@ -52,7 +52,7 @@ Tratar o repo como produto editorial. Em qualquer mudança, considere:
 
 - **Commits descritivos em inglês ou português natural** — não "fix stuff". Cada commit é uma página indexada.
 - **PR titles e descrições completas** com seções `## Summary` / `## Test plan`. Mencionar termos relevantes (Bible, WordPress, multilingual, tooltip, verse, biblia, versículo) quando naturais.
-- **Release notes ricas em markdown**, com `Added / Fixed / Changed`. Linkar pra `wordpress.midvash.com` e `midvash.com` quando fizer sentido. Mencionar locales suportados, versões de Bíblia novas, etc.
+- **Release notes ricas em markdown**, com `Added / Fixed / Changed`. Linkar pra `midvash.com/wordpress-plugin` e `midvash.com` quando fizer sentido. Mencionar locales suportados, versões de Bíblia novas, etc.
 - **README.md** mantém o pitch público com keywords naturais, badges e links pra docs. Não inchar — é página de entrada, não manual.
 - **readme.txt** segue rigorosamente o formato wordpress.org (mesmo não estando lá ainda) para preservar a opção de submeter. Tags, `Stable tag`, FAQ, Changelog, Upgrade Notice.
 - **Issues e Discussions abertos** — encorajar uso. Cada issue é uma página. Se o usuário abrir issue genuíno em outro canal, sugerir migrar pro GitHub.
@@ -69,7 +69,8 @@ Conteúdo orgânico, regular e relevante > volume artificial.
 
 ### PHP / WordPress
 - Compatível com **WP 5.0+** e **PHP 7.4+** (declarado em `readme.txt`). Não usar features de PHP 8+ sem polyfill.
-- Text domain: `bible-by-midvash`. **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
+- Nada de crédito ou link pra Midvash no site público ligado por padrão (guideline 10 do wp.org): logo do tooltip e link do selo ficam atrás de `show_branding`, desligado. O link da referência e o "Ler mais" são a função do plugin.
+- Text domain: `bible-by-midvash`, com `Domain Path: /languages` no cabeçalho do plugin. Sem ele o WordPress procura o `.mo` na raiz do plugin, e como o widget traduz antes do `init` o caminho errado fica gravado e nada é traduzido (0.9.1). **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
 - Nada de `echo` direto sem `esc_html` / `esc_attr` / `wp_kses`. Sanitizar input com `sanitize_text_field`, `absint`, etc.
 - Nonces em qualquer form de admin. Capabilities corretas (`manage_options` pra settings).
 - Prefixo `bbmv_` / `BBMV_` em funções, classes e constantes (wp.org exige ≥4 chars). **Exceção intencional**: nomes já persistidos ou user-facing continuam `bbm` — options no banco (`bbm_options`), nonces/ajax actions (`bbm_nonce`, `wp_ajax_bbm_*`), shortcode `[bbm_votd]`, classes CSS `.bbm-` e handles de assets. Não renomear esses sem migração.
@@ -127,10 +128,21 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 
 - **PHPCS + WordPress Coding Standards + PHPCompatibilityWP** — config em [phpcs.xml.dist](phpcs.xml.dist). Rodar: `~/.composer/vendor/bin/phpcs -q --report=summary .`
 - **PHPStan (level 5) + extensão WordPress** — config em [phpstan.neon.dist](phpstan.neon.dist). Rodar: `~/.composer/vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções de uso no `$comment` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.6.0 passa sem erros.
+- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.10.2 passa sem erros em PHP 7.4 e 8.3, WP 7.1.3.
+- **Teste de fumaça no WordPress** — [scripts/smoke-blueprint.json](scripts/smoke-blueprint.json) + [scripts/smoke.php](scripts/smoke.php): ativa o plugin, renderiza um post, abre configurações, widget e bloco, e acusa qualquer aviso de PHP do plugin.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 
-Erro novo de PHPCS/PHPStan bloqueia release.
+- **Testes do parser** em [tests/test-parser.php](tests/test-parser.php), sem WordPress nem PHPUnit: `php tests/test-parser.php`. Mudou regex, livro ou URL? Rode e acrescente o caso.
+
+Erro novo de PHPCS/PHPStan ou teste vermelho bloqueia release.
+
+## Pendências pra submeter ao wordpress.org
+
+Só o dono resolve:
+
+- **Chave do plugin.** `BBMV_PLUGIN_KEY` em [bible-by-midvash.php](bible-by-midvash.php) está vazia: sem ela a API só serve as versões livres. Colar o valor (contrato em midvash/bible-api#27) na linha `define( 'BBMV_PLUGIN_KEY', '' );`. Agente não cola a chave (o filtro de segurança bloqueia escrever credencial no código).
+- **Conta no wordpress.org:** `midvash` (`Contributors: midvash` no [readme.txt](readme.txt)).
+- **Imagens da página do plugin** (ficam no SVN do wp.org em `/assets`, não no ZIP): `banner-772x250.png` e `banner-1544x500.png`, `icon-128x128.png` e `icon-256x256.png` (ou `icon.svg`), e `screenshot-1.png` … `screenshot-4.png` na ordem da seção `== Screenshots ==` (1 configurações, 2 tooltip num post, 3 bloco no editor, 4 widget do versículo do dia).
 
 ## Áreas de melhoria conhecidas (backlog informal)
 
@@ -143,7 +155,7 @@ Use como inspiração quando o usuário pedir "o que dá pra melhorar". Não imp
 - **Schema.org** (`BibleVerse` / `Quotation`) injetado nos links — bom pra SEO dos sites que usam o plugin **e** pra SEO de Midvash via citações.
 - **Testes**: nem PHPUnit nem Playwright hoje. Considerar testes mínimos de parser (regex de referências).
 - **Submissão ao wordpress.org**: o `readme.txt` já está em formato compatível. Quando estabilizar 1.0.0, vale o esforço de submeter — multiplica alcance e SEO drasticamente.
-- **Sitemap/feed de releases** linkado em `wordpress.midvash.com` pra ajudar indexação.
+- **Sitemap/feed de releases** linkado em `midvash.com/wordpress-plugin` pra ajudar indexação.
 
 ## Convenções com o agente
 

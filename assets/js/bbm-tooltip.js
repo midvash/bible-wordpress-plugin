@@ -13,14 +13,15 @@
     // Configuration from WordPress (passed via wp_localize_script)
     const config = window.bbm_config || {
         ajax_url: '/wp-admin/admin-ajax.php',
-        nonce: '',
         version: 'onbv',
+        version_label: 'ONBV',
         show_version: true,
         fallback_message: 'Verse currently unavailable',
         read_more: 'Read more',
         locale: 'pt-br',
         site_url: 'https://midvash.com',
         icon_url: '',
+        link_version: false,
         version_copyright: ''
     };
 
@@ -43,6 +44,51 @@
     }
 
     /**
+     * Version page on midvash.com. site_url already carries the locale
+     * segment (none for English).
+     */
+    function versionPageUrl(version) {
+        return config.site_url + '/' + String(version).toLowerCase();
+    }
+
+    /**
+     * Points the version badge at the version page on midvash.com, or leaves
+     * it as plain text when the site did not opt in to the link.
+     */
+    function setVersionLink(versionLink, version) {
+        if (config.link_version) {
+            versionLink.href = versionPageUrl(version);
+            versionLink.setAttribute('target', '_blank');
+            versionLink.setAttribute('rel', 'noopener noreferrer');
+        } else {
+            versionLink.removeAttribute('href');
+            versionLink.removeAttribute('target');
+        }
+    }
+
+    /**
+     * Badge text for a version: the short name from the catalogue ("BL"),
+     * or the uppercased slug for a version we have no label for.
+     */
+    function versionLabel(version) {
+        if (String(version).toLowerCase() === String(config.version).toLowerCase() && config.version_label) {
+            return config.version_label;
+        }
+        return String(version).toUpperCase();
+    }
+
+    /**
+     * Closest reference link around an event target (the "Bible" word link
+     * has no verse, so no tooltip). Events also fire on text nodes and on
+     * document/window, which have no closest().
+     */
+    function linkFromEvent(e) {
+        let node = e.target;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        return node && typeof node.closest === 'function' ? node.closest('.bbm-link[data-midvash-ref]') : null;
+    }
+
+    /**
      * Create tooltip element
      */
     function createTooltip() {
@@ -60,7 +106,7 @@
         tooltipElement.innerHTML = `
             <div class="bbm-tooltip__header">
                 <span class="bbm-tooltip__reference"></span>
-                <a class="bbm-tooltip__version-link" target="_blank" rel="noopener noreferrer">
+                <a class="bbm-tooltip__version-link">
                     <span class="bbm-tooltip__version"></span>
                 </a>
             </div>
@@ -146,6 +192,11 @@
 
         tooltipElement.style.top = top + 'px';
         tooltipElement.style.left = left + 'px';
+
+        // Point the arrow at the link even when the tooltip was pushed back
+        // inside the viewport.
+        const arrowLeft = Math.min(Math.max(linkRect.left + scrollLeft - left + 12, 12), tooltipRect.width - 24);
+        tooltipElement.style.setProperty('--bbm-arrow-left', arrowLeft + 'px');
     }
 
     /**
@@ -176,9 +227,8 @@
         const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version) {
-            versionSpan.textContent = config.version.toUpperCase();
-            const versionUrl = config.site_url + '/' + config.locale + '/' + config.version.toLowerCase();
-            versionLink.href = versionUrl;
+            versionSpan.textContent = versionLabel(config.version);
+            setVersionLink(versionLink, config.version);
             versionLink.style.display = '';
         } else {
             versionLink.style.display = 'none';
@@ -203,12 +253,8 @@
         const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version && data.version) {
-            const version = data.version.toUpperCase();
-            versionSpan.textContent = version;
-            
-            // Build version URL: site_url/locale/version
-            const versionUrl = config.site_url + '/' + config.locale + '/' + config.version.toLowerCase();
-            versionLink.href = versionUrl;
+            versionSpan.textContent = versionLabel(data.version);
+            setVersionLink(versionLink, data.version);
             versionLink.style.display = '';
             versionSpan.style.display = '';
         } else {
@@ -274,7 +320,7 @@
 
         activeLink = link;
         
-        const reference = link.getAttribute('data-midvash-ref') || link.textContent;
+        const reference = link.getAttribute('data-midvash-ref');
         const url = link.href;
         const cacheKey = reference + '_' + config.version;
 
@@ -320,7 +366,6 @@
     function fetchVerse(reference, url, cacheKey) {
         const params = new URLSearchParams({
             action: 'bbm_get_verse',
-            nonce: config.nonce,
             reference: reference,
             version: config.version
         });
@@ -385,7 +430,6 @@
 
         const body = new URLSearchParams({
             action: 'bbm_get_verses',
-            nonce: config.nonce,
             refs: refs.slice(0, 60).join('|'),
             version: config.version
         });
@@ -423,14 +467,14 @@
     function init() {
         // Use event delegation for efficiency
         document.addEventListener('mouseenter', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 showTooltip(link);
             }
         }, true);
 
         document.addEventListener('mouseleave', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 hideTooltip();
             }
@@ -438,14 +482,14 @@
 
         // Handle focus for accessibility
         document.addEventListener('focusin', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 showTooltip(link);
             }
         });
 
         document.addEventListener('focusout', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 hideTooltip();
             }

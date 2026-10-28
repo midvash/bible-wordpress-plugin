@@ -34,6 +34,15 @@
     let hideTimeout = null;
     let showTimeout = null;
 
+    // Time to travel from the link to the tooltip (or back) before it hides.
+    const HIDE_DELAY = 350;
+
+    // Touch: whether the tooltip was already open for the tapped link when
+    // the finger went down (second tap follows the link, first one opens).
+    let lastPointerType = '';
+    let tapLink = null;
+    let tapWasOpen = false;
+
     /**
      * Escape HTML to prevent XSS
      */
@@ -144,7 +153,8 @@
             clearTimeout(hideTimeout);
         });
 
-        tooltipElement.addEventListener('mouseleave', function() {
+        tooltipElement.addEventListener('mouseleave', function(e) {
+            if (isInsideTooltipOrLink(e.relatedTarget)) return;
             hideTooltip();
         });
 
@@ -312,12 +322,41 @@
     }
 
     /**
+     * Whether a node is the tooltip, the active link, or inside either: moving
+     * between them must not hide the tooltip.
+     */
+    function isInsideTooltipOrLink(node) {
+        if (!node || node.nodeType !== 1) return false;
+        if (tooltipElement && tooltipElement.contains(node)) return true;
+        return !!(activeLink && activeLink.contains(node));
+    }
+
+    function isTooltipVisible() {
+        return !!(tooltipElement && tooltipElement.classList.contains('bbm-tooltip--visible'));
+    }
+
+    /**
+     * Moves the native title to aria-label: the browser's own tooltip would
+     * open on top of ours. Done once per link.
+     */
+    function stashTitle(link) {
+        const title = link.getAttribute('title');
+        if (title === null) return;
+        link.setAttribute('data-bbm-title', title);
+        if (!link.hasAttribute('aria-label')) {
+            link.setAttribute('aria-label', title);
+        }
+        link.removeAttribute('title');
+    }
+
+    /**
      * Show tooltip
      */
     function showTooltip(link) {
         clearTimeout(hideTimeout);
         clearTimeout(showTimeout);
 
+        stashTitle(link);
         activeLink = link;
         
         const reference = link.getAttribute('data-midvash-ref');
@@ -352,12 +391,17 @@
         clearTimeout(showTimeout);
         
         hideTimeout = setTimeout(function() {
+            // Still under the mouse (e.g. the link lost focus because the
+            // reader clicked inside the tooltip): keep it open.
+            if (tooltipElement && (tooltipElement.matches(':hover') || (activeLink && activeLink.matches(':hover')))) {
+                return;
+            }
             if (tooltipElement) {
                 tooltipElement.classList.remove('bbm-tooltip--visible');
                 tooltipElement.setAttribute('aria-hidden', 'true');
             }
             activeLink = null;
-        }, 150);
+        }, HIDE_DELAY);
     }
 
     /**
@@ -475,10 +519,32 @@
 
         document.addEventListener('mouseleave', function(e) {
             const link = linkFromEvent(e);
-            if (link) {
+            if (link && !isInsideTooltipOrLink(e.relatedTarget)) {
                 hideTooltip();
             }
         }, true);
+
+        // Touch: the first tap on a reference opens the tooltip instead of
+        // following the link, a second tap follows it, a tap elsewhere closes.
+        document.addEventListener('pointerdown', function(e) {
+            lastPointerType = e.pointerType || '';
+            tapLink = linkFromEvent(e);
+            tapWasOpen = !!(tapLink && tapLink === activeLink && isTooltipVisible());
+            if (lastPointerType !== 'mouse' && !tapLink && isTooltipVisible() && !isInsideTooltipOrLink(e.target)) {
+                hideTooltip();
+            }
+        }, true);
+
+        document.addEventListener('click', function(e) {
+            if (lastPointerType === 'mouse' || lastPointerType === '') return;
+            const link = linkFromEvent(e);
+            if (link && link === tapLink && !tapWasOpen) {
+                e.preventDefault();
+                showTooltip(link);
+            }
+        }, true);
+
+        document.querySelectorAll('.bbm-link[data-midvash-ref]').forEach(stashTitle);
 
         // Handle focus for accessibility
         document.addEventListener('focusin', function(e) {

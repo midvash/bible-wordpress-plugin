@@ -317,6 +317,25 @@
     transform: rotate(-135deg);
 }
 
+/* Invisible bridge over the gap between the link and the tooltip, so the
+   mouse never leaves both on its way to "Read more". */
+.bbm-tooltip.bbm-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: transparent !important;
+}
+
+.bbm-tooltip.bbm-tooltip--below::after {
+    top: -14px;
+}
+
+.bbm-tooltip.bbm-tooltip--above::after {
+    bottom: -14px;
+}
+
 /* Dark: the reader's "ink" theme. The accent is lifted so a dark link
    colour (navy, brown) stays readable on the dark paper. */
 @media (prefers-color-scheme: dark) {

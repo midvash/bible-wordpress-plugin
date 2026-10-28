@@ -40,7 +40,7 @@ try {
 	$out['version_label'] = wp_scripts()->get_data( 'bbm-tooltip', 'data' );
 	// Midvash logo and the badge link stay off unless the site opts in.
 	$cfg_data             = (string) wp_scripts()->get_data( 'bbm-tooltip', 'data' );
-	$out['branding_off']  = false !== strpos( $cfg_data, '"icon_url":""' ) && false !== strpos( $cfg_data, '"link_version":false' );
+	$out['branding_off']  = false !== strpos( $cfg_data, '"icon_url":""' ) && false !== strpos( $cfg_data, '"link_version":""' );
 	$out['version_label'] = preg_match( '/"version_label":"([^"]*)"/', (string) $out['version_label'], $lm ) ? $lm[1] : null;
 	$label_api = new BBMV_API();
 	$label_api->get_versions();

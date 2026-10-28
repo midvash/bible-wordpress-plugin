@@ -69,10 +69,9 @@ class BBMV_API {
 
 	/**
 	 * Resolves the version slug to request: the explicit one, else the saved
-	 * setting, else the locale default — always mapped away from versions the
-	 * API no longer distributes (BBMV_Books::RETIRED_VERSIONS), so widgets,
-	 * blocks and shortcodes that stored an old slug keep working and never
-	 * share cache keys with the retired text.
+	 * setting, else the locale default, mapped away from a version the API
+	 * does not serve (see BBMV_Books::resolve_version()), so widgets, blocks
+	 * and shortcodes that stored an old slug keep working.
 	 *
 	 * @param string|null $version Requested version slug, if any.
 	 * @return string Lowercased slug.
@@ -296,6 +295,23 @@ class BBMV_API {
 	}
 
 	/**
+	 * Headers for every API request. The plugin key (BBMV_PLUGIN_KEY) only
+	 * travels here, server to server.
+	 *
+	 * @return array
+	 */
+	private function request_headers() {
+		$headers = array(
+			'Accept'     => 'application/json',
+			'User-Agent' => 'Midvash-WP-Plugin/' . BBMV_VERSION,
+		);
+		if ( '' !== BBMV_PLUGIN_KEY ) {
+			$headers['X-Midvash-Plugin-Key'] = BBMV_PLUGIN_KEY;
+		}
+		return $headers;
+	}
+
+	/**
 	 * Makes a GET request to the Midvash API.
 	 *
 	 * Retry policy is deliberately *minimal* (1 retry, 1s backoff): this code
@@ -326,10 +342,7 @@ class BBMV_API {
 				'sslverify'           => true,
 				'reject_unsafe_urls'  => true, // Hard-blocks local/private redirects (SSRF defence).
 				'limit_response_size' => 256 * 1024, // 256 KB — verses are small JSON.
-				'headers'             => array(
-					'Accept'     => 'application/json',
-					'User-Agent' => 'Midvash-WP-Plugin/' . BBMV_VERSION,
-				),
+				'headers'             => $this->request_headers(),
 			)
 		);
 
@@ -422,8 +435,9 @@ class BBMV_API {
 	 * @return array|null List of version arrays or null on error.
 	 */
 	private function get_catalog( $allow_fetch = true ) {
-		// v2: refetch after the API dropped all-rights-reserved versions.
-		$cache_key = 'bbm_versions_v2';
+		// v3: refetch with the plugin key, which adds the versions with
+		// reserved rights (flagged `restricted`).
+		$cache_key = BBMV_Books::CATALOG_CACHE_KEY;
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;
@@ -452,7 +466,7 @@ class BBMV_API {
 	 * @return bool
 	 */
 	public function has_catalog_cache() {
-		return false !== get_transient( 'bbm_versions_v2' ) || false !== get_transient( 'bbm_versions_failed' );
+		return false !== get_transient( BBMV_Books::CATALOG_CACHE_KEY ) || false !== get_transient( 'bbm_versions_failed' );
 	}
 
 	/**
@@ -476,10 +490,6 @@ class BBMV_API {
 		$filtered = array_filter(
 			$catalog,
 			function ( $v ) use ( $locale ) {
-				// Never offer a retired version, even from a stale catalogue.
-				if ( isset( $v['slug'] ) && isset( BBMV_Books::RETIRED_VERSIONS[ strtolower( $v['slug'] ) ] ) ) {
-					return false;
-				}
 				$version_locale = isset( $v['language'] ) ? $v['language'] : '';
 				// pt-pt groups with pt-br, matching the API's legacy locale rule.
 				if ( 'pt-br' === $version_locale || 'pt' === $version_locale || 'pt-pt' === $version_locale ) {

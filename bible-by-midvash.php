@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.9.2
+ * Version: 0.10.0
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -20,11 +20,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.9.2' );
+define( 'BBMV_VERSION', '0.10.0' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
 define( 'BBMV_SITE_URL', 'https://midvash.com' );
+// Identifies the plugin to the Midvash API, which then serves every version
+// of midvash.com, including the ones with reserved rights. Sent only from PHP
+// (wp_remote_get), never to the visitor's browser. It is public in this open
+// source code: it identifies the plugin, it is not a secret. A site can
+// define its own in wp-config.php. Empty = no header, free versions only.
+if ( ! defined( 'BBMV_PLUGIN_KEY' ) ) {
+	define( 'BBMV_PLUGIN_KEY', '' );
+}
 
 // Include classes.
 require_once BBMV_PLUGIN_DIR . 'includes/class-bbmv-books.php';
@@ -333,29 +341,6 @@ function bbmv_ajax_get_versions() {
 	}
 }
 add_action( 'wp_ajax_bbm_get_versions', 'bbmv_ajax_get_versions' );
-
-/**
- * Swaps a retired Bible version saved in the settings for its openly licensed
- * replacement (see BBMV_Books::RETIRED_VERSIONS).
- *
- * The public API stopped distributing all-rights-reserved versions without a
- * licence; it aliases them server-side, but the saved slug would still drive
- * the tooltip badge, the midvash.com links and the attribution lookup. Runs on
- * every load because it costs one array lookup on an autoloaded option and
- * only writes when there is something to migrate.
- */
-function bbmv_migrate_retired_version() {
-	$options = get_option( 'bbm_options' );
-	if ( ! is_array( $options ) || empty( $options['versao'] ) ) {
-		return;
-	}
-	$resolved = BBMV_Books::resolve_version( $options['versao'] );
-	if ( strtolower( $options['versao'] ) !== $resolved ) {
-		$options['versao'] = $resolved;
-		update_option( 'bbm_options', $options );
-	}
-}
-add_action( 'plugins_loaded', 'bbmv_migrate_retired_version' );
 
 /**
  * Plugin activation - set default options

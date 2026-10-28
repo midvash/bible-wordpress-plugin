@@ -40,6 +40,24 @@ try {
 	$label_api = new BBMV_API();
 	$label_api->get_versions();
 	$out['label_almeida'] = $label_api->get_version_label( 'almeida-livre' );
+	// Plugin key: sent as a header from PHP when set, absent when empty.
+	$sent = null;
+	add_filter( 'http_request_args', function ( $args, $url ) use ( &$sent ) {
+		if ( false !== strpos( $url, 'api.midvash.com' ) ) {
+			$sent = isset( $args['headers']['X-Midvash-Plugin-Key'] );
+		}
+		return $args;
+	}, 10, 2 );
+	delete_transient( BBMV_Books::CATALOG_CACHE_KEY );
+	( new BBMV_API() )->get_versions();
+	$out['key_header_ok'] = ( '' !== BBMV_PLUGIN_KEY ) === $sent;
+	// A version with reserved rights is kept only when the catalogue has it.
+	$catalog = get_transient( BBMV_Books::CATALOG_CACHE_KEY );
+	$has_nvi = is_array( $catalog ) && in_array( 'nvi', wp_list_pluck( $catalog, 'slug' ), true );
+	$out['nvi_resolves_to'] = BBMV_Books::resolve_version( 'nvi' ) . ( $has_nvi ? ' (catalogue lists nvi)' : ' (catalogue without nvi)' );
+	set_transient( BBMV_Books::CATALOG_CACHE_KEY, array_merge( (array) $catalog, array( array( 'slug' => 'nvi', 'language' => 'pt-br', 'restricted' => true ) ) ), HOUR_IN_SECONDS );
+	$out['nvi_with_key_catalogue'] = BBMV_Books::resolve_version( 'nvi' );
+	set_transient( BBMV_Books::CATALOG_CACHE_KEY, $catalog, HOUR_IN_SECONDS );
 	// Another post's content (a page builder's posts widget) is left alone.
 	$other = wp_insert_post( array( 'post_status' => 'publish', 'post_title' => 'Outro', 'post_content' => 'João 3:16' ) );
 	$GLOBALS['post'] = get_post( $other );

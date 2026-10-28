@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.9.2
+Stable tag: 0.10.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -41,7 +41,7 @@ Only the language chosen in Settings is matched, book names start with a capital
 
 = Available Bible versions =
 
-The version list below mirrors `api.midvash.com/versions` and may grow over time. The plugin's Settings → Bible by Midvash page always shows the current catalogue.
+The version list below mirrors `api.midvash.com/versions` and may grow over time. The plugin's Settings → Bible by Midvash page always shows the current catalogue, which also includes the versions of midvash.com with reserved rights (marked ©), served to the plugin by the Midvash API.
 
 **Portuguese (Brazil) — 7:** ALMEIDA-LIVRE, BPM, ONBV, NVA, BLPT, TFT, ALM1911
 **English — 14:** KJV, WEB, ASV, YLT, DRA, BBE, GENEVA1599, BSB, LSV, DARBY, RV1885, CPDV, WMB, FBV
@@ -98,7 +98,8 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.2`).
+* **Plugin key.** Every request carries an `X-Midvash-Plugin-Key` header that identifies this plugin to the Midvash API, which then also serves the versions of midvash.com with reserved rights (marked © in Settings). The key is sent only from your server (`wp_remote_get`), never to the visitor's browser, and it is the same for every site: it identifies the plugin, not you or your site.
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.10.0`).
 * **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
@@ -119,6 +120,10 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.10.0 =
+* **Every version of midvash.com.** The plugin now identifies itself to the Midvash API with a plugin key (sent only from your server), so the Settings list shows the full catalogue, including versions with reserved rights such as NVI or ARA, marked with ©. One chapter per reference, as before.
+* **Saved versions are kept.** A version saved in Settings, a widget, a block or a shortcode is no longer swapped for a free one when the API serves it. The swap only happens for a version the API does not list.
 
 = 0.9.2 =
 * **New tooltip look, safe from the theme.** The tooltip is isolated from the site's theme: link colours, fonts and underlines from the theme no longer leak in (before, a theme that paints every link red turned the version badge and "Read more" red). Calmer design in line with midvash.com: light header with the reference and a discreet version badge, the verse in a book serif, a small credit line and "Read more" in the plugin's Link Color. Dark mode and phones included.
@@ -196,8 +201,8 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Upgrade Notice ==
 
-= 0.9.2 =
-Fixes broken images on posts that mention "Bíblia", false links on everyday words, missing translations and slow pages when the Midvash API is down. Recommended for everyone.
+= 0.10.0 =
+Adds every version of midvash.com to Settings, including versions with reserved rights. Also includes the 0.9.x fixes: images that mention "Bíblia", false links, translations, the tooltip look and slow pages when the API is down.
 
 = 0.8.1 =
 Retired all-rights-reserved versions (NVT, NVI, ARA, NIV, ESV, NLT, NTV…) are replaced automatically by openly licensed ones (ONBV, Almeida Livre, BSB, KJV, RVR1909) and each verse now shows its licence attribution. No reconfiguration needed.

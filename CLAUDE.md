@@ -139,6 +139,7 @@ Erro novo de PHPCS/PHPStan ou teste vermelho bloqueia release.
 
 Só o dono resolve:
 
+- **Chave do plugin.** `BBMV_PLUGIN_KEY` em [bible-by-midvash.php](bible-by-midvash.php) está vazia: sem ela a API só serve as versões livres. Colar o valor (contrato em midvash/bible-api#27) na linha `define( 'BBMV_PLUGIN_KEY', '' );`. Agente não cola a chave (o filtro de segurança bloqueia escrever credencial no código).
 - **Conta no wordpress.org.** `Contributors: netogregorio` no [readme.txt](readme.txt) aponta pra um perfil que ainda não existe (profiles.wordpress.org/netogregorio dá 404). Criar a conta com esse usuário, ou trocar o campo pelo usuário criado.
 - **Imagens da página do plugin** (ficam no SVN do wp.org em `/assets`, não no ZIP): `banner-772x250.png` e `banner-1544x500.png`, `icon-128x128.png` e `icon-256x256.png` (ou `icon.svg`), e `screenshot-1.png` … `screenshot-4.png` na ordem da seção `== Screenshots ==` (1 configurações, 2 tooltip num post, 3 bloco no editor, 4 widget do versículo do dia).
 

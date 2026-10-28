@@ -4,6 +4,9 @@ parameters:
     level: 5
     # PHPDoc types are aspirational in WP land (callers can pass anything) — keep runtime guards meaningful.
     treatPhpDocTypesAsCertain: false
+    # A site may define its own BBMV_PLUGIN_KEY in wp-config.php.
+    dynamicConstantNames:
+        - BBMV_PLUGIN_KEY
     paths:
         - bible-by-midvash.php
         - uninstall.php

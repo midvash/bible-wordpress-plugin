@@ -472,7 +472,11 @@ class BBMV_Admin {
 						$name = $v['localizedNames'][ $locale ];
 					}
 					$display_name = $name ? ( $name . ' (' . $short_name . ')' ) : $short_name;
-					$copyright    = isset( $v['copyright'] ) ? $v['copyright'] : '';
+					// Versions with reserved rights carry a discreet mark.
+					if ( ! empty( $v['restricted'] ) ) {
+						$display_name .= ' ©';
+					}
+					$copyright = isset( $v['copyright'] ) ? $v['copyright'] : '';
 					?>
 					<option value="<?php echo esc_attr( strtolower( $slug ) ); ?>" title="<?php echo esc_attr( $copyright ); ?>" <?php selected( strtolower( $versao ), strtolower( $slug ) ); ?>>
 						<?php echo esc_html( $display_name ); ?>

@@ -43,10 +43,16 @@ class BBMV_Books {
 	);
 
 	/**
-	 * Versions the public API no longer distributes (all rights reserved, no
-	 * licence), mapped to the openly licensed version of the same language
-	 * that the API now serves in their place. Used to migrate saved settings
-	 * and to normalise slugs stored in widgets, blocks and shortcodes.
+	 * Transient holding the API's version catalogue (BBMV_API::get_catalog()).
+	 */
+	const CATALOG_CACHE_KEY = 'bbm_versions_v3';
+
+	/**
+	 * Versions with reserved rights, mapped to the openly licensed version of
+	 * the same language. The plugin key gets them from the API; this map is
+	 * only the fallback for a slug the cached catalogue does not list (an API
+	 * that ignores the key, or a version that really left), see
+	 * resolve_version().
 	 */
 	const RETIRED_VERSIONS = array(
 		// Portuguese (Brazil / Portugal).
@@ -250,62 +256,45 @@ class BBMV_Books {
 	}
 
 	/**
-	 * Maps a retired version slug to its openly licensed replacement.
+	 * Slug the API will actually serve for a version.
 	 *
-	 * Slugs that were never retired are returned lowercased and unchanged.
+	 * A slug in the cached catalogue is kept as is. One that is not, and that
+	 * has an openly licensed replacement in RETIRED_VERSIONS, is swapped for
+	 * it, so links, badges and attribution match the text the API returns.
+	 * With no catalogue cached yet the swap also applies, which is what the
+	 * API does on its side for a version it does not serve.
 	 *
 	 * @param string $slug Version slug (any case).
-	 * @return string Lowercased slug the API still distributes.
+	 * @return string Lowercased slug.
 	 */
 	public static function resolve_version( $slug ) {
 		$slug = strtolower( trim( (string) $slug ) );
-		return isset( self::RETIRED_VERSIONS[ $slug ] ) ? self::RETIRED_VERSIONS[ $slug ] : $slug;
+		if ( ! isset( self::RETIRED_VERSIONS[ $slug ] ) ) {
+			return $slug;
+		}
+		$available = self::catalog_slugs();
+		if ( isset( $available[ $slug ] ) ) {
+			return $slug;
+		}
+		return self::RETIRED_VERSIONS[ $slug ];
 	}
 
 	/**
-	 * Build pattern for regex matching (all names and abbreviations).
+	 * Slugs in the cached version catalogue, as array keys.
 	 *
-	 * Memoized per-locale: the pattern is built once per request, then served
-	 * from a static cache. With 66 books × 9 locales × 2 fields, the original
-	 * implementation rebuilt a ~1.2k-element string on every `the_content`
-	 * filter call — wasteful for pages that render multiple post bodies
-	 * (related posts, sticky posts, archives in custom themes…).
-	 *
-	 * @param string|null $locale Locale to restrict the pattern to, or null for all locales.
+	 * @return array<string, true>
 	 */
-	public static function get_matching_pattern( $locale = null ) {
-		static $cache = array();
-
-		$key = $locale ? self::normalize_locale( $locale ) : '__all__';
-		if ( isset( $cache[ $key ] ) ) {
-			return $cache[ $key ];
-		}
-
-		$books            = self::get_books();
-		$patterns         = array();
-		$locales_to_check = $locale ? array( self::normalize_locale( $locale ) ) : self::LOCALES;
-
-		foreach ( $books as $book ) {
-			foreach ( $locales_to_check as $loc ) {
-				if ( isset( $book['names'][ $loc ] ) ) {
-					$patterns[] = preg_quote( $book['names'][ $loc ], '/' );
-				}
-				if ( isset( $book['abbrev'][ $loc ] ) ) {
-					$patterns[] = preg_quote( $book['abbrev'][ $loc ], '/' );
+	private static function catalog_slugs() {
+		$slugs   = array();
+		$catalog = function_exists( 'get_transient' ) ? get_transient( self::CATALOG_CACHE_KEY ) : false;
+		if ( is_array( $catalog ) ) {
+			foreach ( $catalog as $v ) {
+				if ( isset( $v['slug'] ) ) {
+					$slugs[ strtolower( $v['slug'] ) ] = true;
 				}
 			}
 		}
-
-		// Sort by length descending to match longer names first.
-		usort(
-			$patterns,
-			function ( $a, $b ) {
-				return strlen( $b ) - strlen( $a );
-			}
-		);
-
-		$cache[ $key ] = implode( '|', array_unique( $patterns ) );
-		return $cache[ $key ];
+		return $slugs;
 	}
 
 	/**

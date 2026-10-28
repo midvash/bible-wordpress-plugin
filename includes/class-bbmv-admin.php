@@ -616,7 +616,7 @@ class BBMV_Admin {
 		?>
 		<label>
 			<input type="checkbox" name="bbm_options[show_branding]" value="1" <?php checked( $show_branding, true ); ?>>
-			<?php esc_html_e( 'Show the Midvash logo in the tooltip and link the version badge to midvash.com', 'bible-by-midvash' ); ?>
+			<?php esc_html_e( 'Show the Midvash logo in the tooltip, link the version badge to midvash.com and add a Midvash credit under the Verse of the Day', 'bible-by-midvash' ); ?>
 		</label>
 		<?php
 	}

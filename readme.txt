@@ -3,7 +3,7 @@ Contributors: midvash
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.10.2
+Stable tag: 0.10.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -106,7 +106,7 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`https://api.midvash.com`), a service operated by Midvash, to fetch Bible text and the list of available versions. All calls go from your WordPress server (`wp_remote_get`) over HTTPS; the visitor's browser only talks to your own site (`admin-ajax.php`), never to the API. Nothing is sent when the plugin is activated.
 
-Every call carries two headers: `User-Agent: Midvash-WP-Plugin/<version>` (e.g. `Midvash-WP-Plugin/0.10.2`) and `X-Midvash-Plugin-Key`, a key built into the plugin that is the same for every site. It identifies the plugin, not you or your site, and lets the API serve the versions of midvash.com with reserved rights (marked © in Settings).
+Every call carries two headers: `User-Agent: Midvash-WP-Plugin/<version>` (e.g. `Midvash-WP-Plugin/0.10.3`) and `X-Midvash-Plugin-Key`, a key built into the plugin that is the same for every site. It identifies the plugin, not you or your site, and lets the API serve the versions of midvash.com with reserved rights (marked © in Settings).
 
 The calls, what each one sends, and when:
 
@@ -135,6 +135,11 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day, from the `[bbm_votd]` shortcode (also available as a widget).
 
 == Changelog ==
+
+= 0.10.3 =
+* **The tooltip stays open on the way to "Read more".** An invisible bridge covers the gap between the reference and the tooltip, and the tooltip waits a moment before hiding, so moving the mouse slowly from the link to the tooltip no longer closes it.
+* **No double tooltip.** The browser's own tooltip (the link's `title`) no longer opens on top of the verse; its text moves to `aria-label` for screen readers.
+* **Phones and tablets.** The first tap on a reference opens the tooltip, a second tap follows the link, and a tap anywhere else closes it.
 
 = 0.10.2 =
 * **Midvash credits only on request.** The logo in the tooltip, the link from the version badge to midvash.com and the "Midvash" credit under the Verse of the Day are now off by default. Turn them on in Settings → "Midvash logo in tooltip".
@@ -224,7 +229,7 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Upgrade Notice ==
 
-= 0.10.2 =
+= 0.10.3 =
 Adds every version of midvash.com to Settings, including versions with reserved rights. Also includes the 0.9.x fixes: images that mention "Bíblia", false links, translations, the tooltip look and slow pages when the API is down.
 
 = 0.8.1 =

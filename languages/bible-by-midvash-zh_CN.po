@@ -234,8 +234,8 @@ msgid "Display Bible version in tooltip"
 msgstr "在提示框中显示圣经译本"
 
 #: includes/class-bbmv-admin.php:619
-msgid "Show the Midvash logo in the tooltip and link the version badge to midvash.com"
-msgstr "在提示框中显示 Midvash 标志，并将版本徽章链接到 midvash.com"
+msgid "Show the Midvash logo in the tooltip, link the version badge to midvash.com and add a Midvash credit under the Verse of the Day"
+msgstr "在提示框中显示 Midvash 标志，将版本徽章链接到 midvash.com，并在每日经文下方添加 Midvash 署名"
 
 #: includes/class-bbmv-admin.php:633
 msgid "Store verses in cache to improve performance"

@@ -54,9 +54,13 @@ jobs:
 
       - name: Build ZIP (default — with auto-updater, for R2 distribution)
         run: npx tsx scripts/build-zip.ts
+        env:
+          BBMV_PLUGIN_KEY: ${{ secrets.BBMV_PLUGIN_KEY }}
 
       - name: Build ZIP (wp.org — auto-updater stripped)
         run: npx tsx scripts/build-zip.ts --target=wp-org
+        env:
+          BBMV_PLUGIN_KEY: ${{ secrets.BBMV_PLUGIN_KEY }}
 
       - name: Generate update-info.json
         run: |

@@ -130,14 +130,15 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 == Screenshots ==
 
 1. Settings page — choose the display language, Bible version and link styling.
-2. A post showing automatically detected references with the verse tooltip on hover.
-3. Gutenberg "Bible Verse — Midvash" block with per-block version and language overrides.
-4. Verse of the Day widget in the sidebar.
+2. A post with references detected automatically, and the verse tooltip on hover.
+3. The "Bible Verse — Midvash" block on a post, with the version's attribution.
+4. Verse of the Day, from the `[bbm_votd]` shortcode (also available as a widget).
 
 == Changelog ==
 
 = 0.10.2 =
-* **Midvash logo only on request.** The logo in the tooltip and the link from the version badge to midvash.com are now off by default. Turn them on in Settings → "Midvash logo in tooltip".
+* **Midvash credits only on request.** The logo in the tooltip, the link from the version badge to midvash.com and the "Midvash" credit under the Verse of the Day are now off by default. Turn them on in Settings → "Midvash logo in tooltip".
+* The Verse of the Day widget and shortcode now load the plugin stylesheet.
 * The readme lists every call to the Midvash API, links the source code and explains how the minified files are built.
 
 = 0.10.1 =

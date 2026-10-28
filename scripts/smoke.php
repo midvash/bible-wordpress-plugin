@@ -1,0 +1,54 @@
+<?php
+// Roda dentro do WordPress do Playground (ver scripts/smoke-blueprint.json).
+$log = array();
+set_error_handler( function ( $no, $str, $file, $line ) use ( &$log ) {
+	if ( false !== strpos( $file, 'bible-by-midvash' ) ) {
+		$log[] = "PHP[$no] $str @ " . basename( $file ) . ":$line";
+	}
+	return false;
+} );
+$out = array( 'php' => PHP_VERSION, 'wp' => get_bloginfo( 'version' ), 'active' => is_plugin_active( 'bible-by-midvash/bible-by-midvash.php' ) );
+try {
+	$opts = get_option( 'bbm_options' );
+	$opts['link_biblia'] = true;
+	update_option( 'bbm_options', $opts );
+	$id = wp_insert_post( array(
+		'post_status'  => 'publish',
+		'post_title'   => 'Teste',
+		'post_content' => '<p><img src="/Bíblia-João-3-16.jpg" alt="Bíblia em João 3:16"></p><p>A Bíblia diz em João 3:16 e Os 6:6. Os 13 apóstolos. A Bíblia de novo.</p>',
+	) );
+	// Re-run init so the parser picks up the new options.
+	$parser = new BBMV_Parser();
+	$parser->init();
+	global $wp_query, $post;
+	$wp_query = new WP_Query( array( 'p' => $id ) );
+	$wp_query->the_post();
+	do_action( 'wp_enqueue_scripts' );
+	$out['tooltip_before'] = wp_script_is( 'bbm-tooltip', 'enqueued' );
+	$html = $parser->parse_content( get_the_content() );
+	$out['html'] = $html;
+	$out['tooltip_after'] = wp_script_is( 'bbm-tooltip', 'enqueued' );
+	$out['script_src'] = wp_scripts()->registered['bbm-tooltip']->src;
+	$out['img_ok'] = false !== strpos( $html, 'alt="Bíblia em João 3:16"' );
+	$out['bible_links'] = substr_count( $html, 'title="Online Bible"' );
+	$out['ref_links'] = substr_count( $html, 'data-midvash-ref' );
+	add_filter( 'locale', function () { return 'pt_BR'; } );
+	unload_textdomain( 'bible-by-midvash' );
+	bbmv_init();
+	$out['i18n_pt'] = __( 'Read more', 'bible-by-midvash' );
+	wp_set_current_user( 1 );
+	set_current_screen( 'settings_page_bbm' );
+	$admin = new BBMV_Admin();
+	$admin->init();
+	do_action( 'admin_init' );
+	ob_start();
+	$admin->options_page();
+	$out['admin_len'] = strlen( ob_get_clean() );
+	$out['votd'] = substr( wp_strip_all_tags( bbmv_votd_shortcode( array() ) ), 0, 80 );
+	$block = new BBMV_Block();
+	$out['block'] = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'João 3:16' ) ) ), 0, 80 );
+} catch ( Throwable $e ) {
+	$log[] = 'FATAL ' . get_class( $e ) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+}
+$out['errors'] = $log;
+file_put_contents( '/wordpress/smoke-out/result-' . PHP_MAJOR_VERSION . PHP_MINOR_VERSION . '.json', wp_json_encode( $out, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );

@@ -127,7 +127,8 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 
 - **PHPCS + WordPress Coding Standards + PHPCompatibilityWP** — config em [phpcs.xml.dist](phpcs.xml.dist). Rodar: `~/.composer/vendor/bin/phpcs -q --report=summary .`
 - **PHPStan (level 5) + extensão WordPress** — config em [phpstan.neon.dist](phpstan.neon.dist). Rodar: `~/.composer/vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções de uso no `$comment` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.6.0 passa sem erros.
+- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.9.0 passa sem erros em PHP 7.4 e 8.3, WP 7.1.3.
+- **Teste de fumaça no WordPress** — [scripts/smoke-blueprint.json](scripts/smoke-blueprint.json) + [scripts/smoke.php](scripts/smoke.php): ativa o plugin, renderiza um post, abre configurações, widget e bloco, e acusa qualquer aviso de PHP do plugin.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 
 - **Testes do parser** em [tests/test-parser.php](tests/test-parser.php), sem WordPress nem PHPUnit: `php tests/test-parser.php`. Mudou regex, livro ou URL? Rode e acrescente o caso.

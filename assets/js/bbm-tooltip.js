@@ -14,6 +14,7 @@
     const config = window.bbm_config || {
         ajax_url: '/wp-admin/admin-ajax.php',
         version: 'onbv',
+        version_label: 'ONBV',
         show_version: true,
         fallback_message: 'Verse currently unavailable',
         read_more: 'Read more',
@@ -47,6 +48,17 @@
      */
     function versionPageUrl(version) {
         return config.site_url + '/' + String(version).toLowerCase();
+    }
+
+    /**
+     * Badge text for a version: the short name from the catalogue ("BL"),
+     * or the uppercased slug for a version we have no label for.
+     */
+    function versionLabel(version) {
+        if (String(version).toLowerCase() === String(config.version).toLowerCase() && config.version_label) {
+            return config.version_label;
+        }
+        return String(version).toUpperCase();
     }
 
     /**
@@ -194,7 +206,7 @@
         const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version) {
-            versionSpan.textContent = config.version.toUpperCase();
+            versionSpan.textContent = versionLabel(config.version);
             const versionUrl = versionPageUrl(config.version);
             versionLink.href = versionUrl;
             versionLink.style.display = '';
@@ -221,8 +233,7 @@
         const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version && data.version) {
-            const version = data.version.toUpperCase();
-            versionSpan.textContent = version;
+            versionSpan.textContent = versionLabel(data.version);
             
             const versionUrl = versionPageUrl(data.version);
             versionLink.href = versionUrl;

@@ -94,6 +94,13 @@ class BBMV_Parser {
 			return $content;
 		}
 
+		// Only the post being viewed. Page builders run the_content on other
+		// posts too (an Elementor posts widget turns them into excerpts and
+		// strips the links), which would load the tooltip for nothing.
+		if ( (int) get_the_ID() !== (int) get_queried_object_id() ) {
+			return $content;
+		}
+
 		return $this->link_content( $content );
 	}
 

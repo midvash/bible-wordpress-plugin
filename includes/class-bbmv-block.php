@@ -122,7 +122,7 @@ class BBMV_Block {
 			$url = $this->build_url( $reference, $locale, $version );
 		}
 
-		$version_badge = '<span class="bbm-verse__version">' . esc_html( strtoupper( $version ) ) . '</span>';
+		$version_badge = '<span class="bbm-verse__version">' . esc_html( $api->get_version_label( $version ) ) . '</span>';
 		$ref_html      = '';
 		if ( $show_ref ) {
 			if ( $link && $url ) {

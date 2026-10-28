@@ -30,12 +30,22 @@ try {
 	$out['tooltip_after'] = wp_script_is( 'bbm-tooltip', 'enqueued' );
 	$out['script_src'] = wp_scripts()->registered['bbm-tooltip']->src;
 	$out['img_ok'] = false !== strpos( $html, 'alt="Bíblia em João 3:16"' );
-	$out['bible_links'] = substr_count( $html, 'title="Online Bible"' );
+	$out['bible_links'] = substr_count( $html, 'href="https://midvash.com/pt-br" ' );
 	$out['ref_links'] = substr_count( $html, 'data-midvash-ref' );
-	add_filter( 'locale', function () { return 'pt_BR'; } );
-	unload_textdomain( 'bible-by-midvash' );
-	bbmv_init();
-	$out['i18n_pt'] = __( 'Read more', 'bible-by-midvash' );
+	// The blueprint sets the site to pt_BR, so this goes through the same
+	// just-in-time loading as a real request (the widget translates early).
+	$out['i18n_pt'] = __( 'General Settings', 'bible-by-midvash' );
+	$out['version_label'] = wp_scripts()->get_data( 'bbm-tooltip', 'data' );
+	$out['version_label'] = preg_match( '/"version_label":"([^"]*)"/', (string) $out['version_label'], $lm ) ? $lm[1] : null;
+	$label_api = new BBMV_API();
+	$label_api->get_versions();
+	$out['label_almeida'] = $label_api->get_version_label( 'almeida-livre' );
+	// Another post's content (a page builder's posts widget) is left alone.
+	$other = wp_insert_post( array( 'post_status' => 'publish', 'post_title' => 'Outro', 'post_content' => 'João 3:16' ) );
+	$GLOBALS['post'] = get_post( $other );
+	setup_postdata( $GLOBALS['post'] );
+	$out['other_post_linked'] = false !== strpos( $parser->parse_content( 'João 3:16' ), 'data-midvash-ref' );
+	wp_reset_postdata();
 	wp_set_current_user( 1 );
 	set_current_screen( 'settings_page_bbm' );
 	$admin = new BBMV_Admin();

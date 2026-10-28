@@ -3,12 +3,13 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.9.0
+ * Version: 0.9.1
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: bible-by-midvash
+ * Domain Path: /languages
  *
  * @package Bible_By_Midvash
  */
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.9.0' );
+define( 'BBMV_VERSION', '0.9.1' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -168,6 +169,7 @@ function bbmv_register_assets() {
 		array(
 			'ajax_url'          => admin_url( 'admin-ajax.php' ),
 			'version'           => $version_slug,
+			'version_label'     => $api->get_version_label( $version_slug ),
 			'version_copyright' => ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? $version_meta['copyright'] : '',
 			'locale'            => $locale,
 			'show_version'      => isset( $options['show_version'] ) ? $options['show_version'] : true,

@@ -69,7 +69,7 @@ Conteúdo orgânico, regular e relevante > volume artificial.
 
 ### PHP / WordPress
 - Compatível com **WP 5.0+** e **PHP 7.4+** (declarado em `readme.txt`). Não usar features de PHP 8+ sem polyfill.
-- Text domain: `bible-by-midvash`. **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
+- Text domain: `bible-by-midvash`, com `Domain Path: /languages` no cabeçalho do plugin. Sem ele o WordPress procura o `.mo` na raiz do plugin, e como o widget traduz antes do `init` o caminho errado fica gravado e nada é traduzido (0.9.1). **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
 - Nada de `echo` direto sem `esc_html` / `esc_attr` / `wp_kses`. Sanitizar input com `sanitize_text_field`, `absint`, etc.
 - Nonces em qualquer form de admin. Capabilities corretas (`manage_options` pra settings).
 - Prefixo `bbmv_` / `BBMV_` em funções, classes e constantes (wp.org exige ≥4 chars). **Exceção intencional**: nomes já persistidos ou user-facing continuam `bbm` — options no banco (`bbm_options`), nonces/ajax actions (`bbm_nonce`, `wp_ajax_bbm_*`), shortcode `[bbm_votd]`, classes CSS `.bbm-` e handles de assets. Não renomear esses sem migração.
@@ -127,7 +127,7 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 
 - **PHPCS + WordPress Coding Standards + PHPCompatibilityWP** — config em [phpcs.xml.dist](phpcs.xml.dist). Rodar: `~/.composer/vendor/bin/phpcs -q --report=summary .`
 - **PHPStan (level 5) + extensão WordPress** — config em [phpstan.neon.dist](phpstan.neon.dist). Rodar: `~/.composer/vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.9.0 passa sem erros em PHP 7.4 e 8.3, WP 7.1.3.
+- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.9.1 passa sem erros em PHP 7.4 e 8.3, WP 7.1.3.
 - **Teste de fumaça no WordPress** — [scripts/smoke-blueprint.json](scripts/smoke-blueprint.json) + [scripts/smoke.php](scripts/smoke.php): ativa o plugin, renderiza um post, abre configurações, widget e bloco, e acusa qualquer aviso de PHP do plugin.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 

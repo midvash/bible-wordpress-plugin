@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.9.0
+Stable tag: 0.9.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -98,7 +98,7 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.0`).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.1`).
 * **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
@@ -120,18 +120,18 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
-= 0.9.0 =
+= 0.9.1 =
 * **Images are safe.** References and the word "Bíblia" are only linked in the text of a post, never inside HTML attributes. Before, an image whose `src`, `srcset` or `alt` contained "Bíblia" or a reference got a link injected into the attribute and broke.
 * **The word "Bíblia" is linked once per post** instead of on every mention.
 * **Fewer false links.** Only the language chosen in Settings is matched (before, the abbreviations of all nine languages were matched at once). Book names must start with a capital letter, abbreviations must be written exactly and need chapter and verse. "Os 13 apóstolos", "at 10:30", "is 5" and "Mar 5" are no longer linked. References are also skipped inside `code`, `pre` and `script`.
 * **Chinese and Korean.** References written without a space (约翰福音3:16) or followed by a particle (요한복음 3:16에서) are now detected.
-* **Translations load.** The bundled translations were never loaded, so the plugin stayed in English on every site.
+* **Translations load.** The plugin header had no `Domain Path`, so WordPress looked for the bundled translations in the wrong folder and the plugin stayed in English on every site.
 * **English links keep the verse.** Links on English sites pointed at `/en/…`, which redirects and lost the verse. Links now go straight to the verse anchor.
 * **Italian.** The default Italian version is now Riveduta; sites still set to NRI, which the API no longer serves, are switched automatically.
-* **Tooltip fixes.** Fixed the `e.target.closest is not a function` error, and the version badge now links to the version that actually answered.
+* **Tooltip fixes.** Fixed the `e.target.closest is not a function` error, the version badge now links to the version that actually answered, and it shows the version's short name ("BL" instead of "ALMEIDA-LIVRE"), as does the Bible Verse block.
 * **Works with page caches.** The public verse endpoints no longer require a nonce, which expired in cached pages and broke every tooltip after a day.
 * **No slow pages when the API is down.** The page render no longer calls the API: the version attribution comes from the cache, which is refreshed in the background, and a failed refresh waits 15 minutes before trying again.
-* **Lighter pages.** The tooltip script and stylesheet only load on posts that have a reference, and the release ZIP ships minified copies (the readable sources stay in the ZIP and on GitHub).
+* **Lighter pages.** The tooltip script and stylesheet only load on posts that have a reference (page builders that render other posts as excerpts, like an Elementor posts widget, no longer trigger them), and the release ZIP ships minified copies (the readable sources stay in the ZIP and on GitHub).
 * **Removed** four settings that did nothing (link version names, book names, dictionary terms and biblical characters).
 * Updated the version catalogue (119 versions in 69 languages; 48 in the plugin's nine languages) and the plugin site address (https://midvash.com/wordpress-plugin).
 
@@ -195,7 +195,7 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Upgrade Notice ==
 
-= 0.9.0 =
+= 0.9.1 =
 Fixes broken images on posts that mention "Bíblia", false links on everyday words, missing translations and slow pages when the Midvash API is down. Recommended for everyone.
 
 = 0.8.1 =

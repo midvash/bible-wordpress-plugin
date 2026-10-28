@@ -517,6 +517,21 @@ class BBMV_API {
 	}
 
 	/**
+	 * Short label of a version for badges ("BL" for almeida-livre), from the
+	 * cached catalogue only. Falls back to the uppercased slug.
+	 *
+	 * @param string $version_slug Version slug.
+	 * @return string
+	 */
+	public function get_version_label( $version_slug ) {
+		$meta = $this->get_version_meta( $version_slug, false );
+		if ( $meta && ! empty( $meta['shortName'] ) && is_string( $meta['shortName'] ) ) {
+			return $meta['shortName'];
+		}
+		return strtoupper( BBMV_Books::resolve_version( $version_slug ) );
+	}
+
+	/**
 	 * Fetches the verse of the day from the API
 	 *
 	 * @param string $locale  Content locale (pt-br, en, es…).

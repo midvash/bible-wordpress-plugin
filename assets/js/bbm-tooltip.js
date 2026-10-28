@@ -21,6 +21,7 @@
         locale: 'pt-br',
         site_url: 'https://midvash.com',
         icon_url: '',
+        link_version: false,
         version_copyright: ''
     };
 
@@ -48,6 +49,21 @@
      */
     function versionPageUrl(version) {
         return config.site_url + '/' + String(version).toLowerCase();
+    }
+
+    /**
+     * Points the version badge at the version page on midvash.com, or leaves
+     * it as plain text when the site did not opt in to the link.
+     */
+    function setVersionLink(versionLink, version) {
+        if (config.link_version) {
+            versionLink.href = versionPageUrl(version);
+            versionLink.setAttribute('target', '_blank');
+            versionLink.setAttribute('rel', 'noopener noreferrer');
+        } else {
+            versionLink.removeAttribute('href');
+            versionLink.removeAttribute('target');
+        }
     }
 
     /**
@@ -90,7 +106,7 @@
         tooltipElement.innerHTML = `
             <div class="bbm-tooltip__header">
                 <span class="bbm-tooltip__reference"></span>
-                <a class="bbm-tooltip__version-link" target="_blank" rel="noopener noreferrer">
+                <a class="bbm-tooltip__version-link">
                     <span class="bbm-tooltip__version"></span>
                 </a>
             </div>
@@ -212,8 +228,7 @@
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version) {
             versionSpan.textContent = versionLabel(config.version);
-            const versionUrl = versionPageUrl(config.version);
-            versionLink.href = versionUrl;
+            setVersionLink(versionLink, config.version);
             versionLink.style.display = '';
         } else {
             versionLink.style.display = 'none';
@@ -239,9 +254,7 @@
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version && data.version) {
             versionSpan.textContent = versionLabel(data.version);
-            
-            const versionUrl = versionPageUrl(data.version);
-            versionLink.href = versionUrl;
+            setVersionLink(versionLink, data.version);
             versionLink.style.display = '';
             versionSpan.style.display = '';
         } else {

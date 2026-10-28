@@ -38,6 +38,9 @@ try {
 	// just-in-time loading as a real request (the widget translates early).
 	$out['i18n_pt'] = __( 'General Settings', 'bible-by-midvash' );
 	$out['version_label'] = wp_scripts()->get_data( 'bbm-tooltip', 'data' );
+	// Midvash logo and the badge link stay off unless the site opts in.
+	$cfg_data             = (string) wp_scripts()->get_data( 'bbm-tooltip', 'data' );
+	$out['branding_off']  = false !== strpos( $cfg_data, '"icon_url":""' ) && false !== strpos( $cfg_data, '"link_version":false' );
 	$out['version_label'] = preg_match( '/"version_label":"([^"]*)"/', (string) $out['version_label'], $lm ) ? $lm[1] : null;
 	$label_api = new BBMV_API();
 	$label_api->get_versions();

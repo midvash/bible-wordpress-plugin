@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.10.1
+ * Version: 0.10.2
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.10.1' );
+define( 'BBMV_VERSION', '0.10.2' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -193,7 +193,10 @@ function bbmv_register_assets() {
 			'fallback_message'  => __( 'Verse currently unavailable', 'bible-by-midvash' ),
 			'read_more'         => __( 'Read more', 'bible-by-midvash' ),
 			'site_url'          => BBMV_Books::site_url( $locale ),
-			'icon_url'          => BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
+			// Midvash logo and the version badge's link only with the site
+			// owner's opt-in (WordPress.org guideline 10).
+			'icon_url'          => empty( $options['show_branding'] ) ? '' : BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg',
+			'link_version'      => ! empty( $options['show_branding'] ),
 			'debug'             => defined( 'WP_DEBUG' ) && WP_DEBUG,
 		)
 	);
@@ -368,6 +371,7 @@ function bbmv_activate() {
 		'cache_ttl'        => 2592000, // 30 days
 		'timeout'          => 5,
 		'show_version'     => true,
+		'show_branding'    => false,
 		'link_biblia'      => false,
 	);
 

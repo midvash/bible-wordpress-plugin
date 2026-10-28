@@ -183,6 +183,16 @@ class BBMV_Admin {
 			'bbm_section_main'
 		);
 
+		// Field: Midvash logo in the tooltip (off by default: credits and links
+		// on the public site need the site owner's opt-in).
+		add_settings_field(
+			'show_branding',
+			esc_html__( 'Midvash logo in tooltip', 'bible-by-midvash' ),
+			array( $this, 'show_branding_render' ),
+			'bbm_general',
+			'bbm_section_main'
+		);
+
 		// Field: Cache enabled.
 		add_settings_field(
 			'cache_enabled',
@@ -300,6 +310,7 @@ class BBMV_Admin {
 		$this->read_checkbox( $input, 'underline_link', 'general', $sanitized );
 		$this->read_checkbox( $input, 'new_tab', 'general', $sanitized );
 		$this->read_checkbox( $input, 'show_version', 'general', $sanitized );
+		$this->read_checkbox( $input, 'show_branding', 'general', $sanitized );
 		$this->read_checkbox( $input, 'link_biblia', 'general', $sanitized );
 
 		// ----- Cache tab checkboxes -----
@@ -592,6 +603,20 @@ class BBMV_Admin {
 		<label>
 			<input type="checkbox" name="bbm_options[show_version]" value="1" <?php checked( $show_version, true ); ?>>
 			<?php esc_html_e( 'Display Bible version in tooltip', 'bible-by-midvash' ); ?>
+		</label>
+		<?php
+	}
+
+	/**
+	 * Render: Midvash logo in the tooltip
+	 */
+	public function show_branding_render() {
+		$options       = get_option( 'bbm_options' );
+		$show_branding = ! empty( $options['show_branding'] );
+		?>
+		<label>
+			<input type="checkbox" name="bbm_options[show_branding]" value="1" <?php checked( $show_branding, true ); ?>>
+			<?php esc_html_e( 'Show the Midvash logo in the tooltip and link the version badge to midvash.com', 'bible-by-midvash' ); ?>
 		</label>
 		<?php
 	}

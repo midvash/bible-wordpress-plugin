@@ -176,6 +176,11 @@
 
         tooltipElement.style.top = top + 'px';
         tooltipElement.style.left = left + 'px';
+
+        // Point the arrow at the link even when the tooltip was pushed back
+        // inside the viewport.
+        const arrowLeft = Math.min(Math.max(linkRect.left + scrollLeft - left + 12, 12), tooltipRect.width - 24);
+        tooltipElement.style.setProperty('--bbm-arrow-left', arrowLeft + 'px');
     }
 
     /**

@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.9.1
+ * Version: 0.9.2
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.9.1' );
+define( 'BBMV_VERSION', '0.9.2' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -147,7 +147,12 @@ function bbmv_register_assets() {
 		$css_styles[] = 'text-decoration: none;';
 	}
 
-	wp_add_inline_style( 'bbm-style', '.bbm-link { ' . implode( ' ', $css_styles ) . ' }' );
+	// The tooltip's accent ("Read more", verse numbers) follows the Link Color
+	// setting even when links keep the theme colour.
+	$accent = sanitize_hex_color( isset( $options['link_color'] ) ? $options['link_color'] : '' );
+	$accent = $accent ? $accent : '#B17027';
+
+	wp_add_inline_style( 'bbm-style', '.bbm-link { ' . implode( ' ', $css_styles ) . ' } .bbm-tooltip { --bbm-accent: ' . $accent . '; }' );
 
 	wp_register_script( 'bbm-tooltip', bbmv_asset_url( 'assets/js/bbm-tooltip.js' ), array(), BBMV_VERSION, true );
 

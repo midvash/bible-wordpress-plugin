@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.9.1
+Stable tag: 0.9.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -98,7 +98,7 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.1`).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.2`).
 * **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
@@ -120,7 +120,8 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
-= 0.9.1 =
+= 0.9.2 =
+* **New tooltip look, safe from the theme.** The tooltip is isolated from the site's theme: link colours, fonts and underlines from the theme no longer leak in (before, a theme that paints every link red turned the version badge and "Read more" red). Calmer design in line with midvash.com: light header with the reference and a discreet version badge, the verse in a book serif, a small credit line and "Read more" in the plugin's Link Color. Dark mode and phones included.
 * **Images are safe.** References and the word "Bíblia" are only linked in the text of a post, never inside HTML attributes. Before, an image whose `src`, `srcset` or `alt` contained "Bíblia" or a reference got a link injected into the attribute and broke.
 * **The word "Bíblia" is linked once per post** instead of on every mention.
 * **Fewer false links.** Only the language chosen in Settings is matched (before, the abbreviations of all nine languages were matched at once). Book names must start with a capital letter, abbreviations must be written exactly and need chapter and verse. "Os 13 apóstolos", "at 10:30", "is 5" and "Mar 5" are no longer linked. References are also skipped inside `code`, `pre` and `script`.
@@ -195,7 +196,7 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Upgrade Notice ==
 
-= 0.9.1 =
+= 0.9.2 =
 Fixes broken images on posts that mention "Bíblia", false links on everyday words, missing translations and slow pages when the Midvash API is down. Recommended for everyone.
 
 = 0.8.1 =

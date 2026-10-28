@@ -224,17 +224,25 @@ function bbmv_render_votd( $atts = array() ) {
 		? '<small class="bbm-votd__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
 		: '';
 
+	// A "Midvash" credit link only with the site owner's opt-in (the same
+	// setting as the tooltip logo; WordPress.org guideline 10).
+	$powered_html = ! empty( $options['show_branding'] )
+		? '<p class="bbm-votd__powered"><a href="' . esc_url( BBMV_Books::site_url( $locale ) ) . '" target="_blank" rel="noopener noreferrer">Midvash</a></p>'
+		: '';
+
+	wp_enqueue_style( 'bbm-style' );
+
 	return sprintf(
 		'<div class="bbm-votd" itemscope itemtype="https://schema.org/Quotation">'
 		. '<p class="bbm-votd__text" itemprop="text">%s</p>'
 		. '%s'
 		. '%s'
-		. '<p class="bbm-votd__powered"><a href="%s" target="_blank" rel="noopener noreferrer">Midvash</a></p>'
+		. '%s'
 		. '</div>',
 		esc_html( $text ),
 		$ref_html,
 		$copyright_html,
-		esc_url( BBMV_SITE_URL . '/' . $locale )
+		$powered_html
 	);
 }
 

@@ -140,9 +140,10 @@ Erro novo de PHPCS/PHPStan ou teste vermelho bloqueia release.
 
 Só o dono resolve:
 
-- **Chave do plugin.** `BBMV_PLUGIN_KEY` em [bible-by-midvash.php](bible-by-midvash.php) está vazia: sem ela a API só serve as versões livres. Colar o valor (contrato em midvash/bible-api#27) na linha `define( 'BBMV_PLUGIN_KEY', '' );`. Agente não cola a chave (o filtro de segurança bloqueia escrever credencial no código).
+- **Chave do plugin.** `BBMV_PLUGIN_KEY` em [bible-by-midvash.php](bible-by-midvash.php) fica vazia no repo (público). O CI preenche a partir do secret `BBMV_PLUGIN_KEY`; build local: `BBMV_PLUGIN_KEY=<chave> npx tsx scripts/build-zip.ts`. Sem ela a API só serve as versões livres.
 - **Conta no wordpress.org:** `midvash` (`Contributors: midvash` no [readme.txt](readme.txt)).
-- **Imagens da página do plugin** (ficam no SVN do wp.org em `/assets`, não no ZIP): `banner-772x250.png` e `banner-1544x500.png`, `icon-128x128.png` e `icon-256x256.png` (ou `icon.svg`), e `screenshot-1.png` … `screenshot-4.png` na ordem da seção `== Screenshots ==` (1 configurações, 2 tooltip num post, 3 bloco no editor, 4 widget do versículo do dia).
+- **Imagens da página do plugin** prontas em [.wordpress-org/](.wordpress-org/) (banner, ícone, 4 screenshots; fontes em `.wordpress-org/src/`). Vão pro `/assets` do SVN do wp.org depois da aprovação, não no ZIP.
+- **Secrets do GitHub Actions** (agente não grava secret): `BBMV_PLUGIN_KEY` (a chave, que o `build-zip.ts` injeta no ZIP), `CLOUDFLARE_ACCOUNT_ID` = `a8b844af381f476e9e3aec6b8ecc65cf` (nexttoo) e `CLOUDFLARE_API_TOKEN` com R2 edit na nexttoo. Hoje os dois da Cloudflare apontam pra conta antiga (Colmeia) e o auto-update fica parado.
 
 ## Áreas de melhoria conhecidas (backlog informal)
 

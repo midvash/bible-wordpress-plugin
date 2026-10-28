@@ -234,8 +234,8 @@ msgid "Display Bible version in tooltip"
 msgstr "Afficher la version de la Bible dans l'info-bulle"
 
 #: includes/class-bbmv-admin.php:619
-msgid "Show the Midvash logo in the tooltip and link the version badge to midvash.com"
-msgstr "Afficher le logo Midvash dans l’info-bulle et lier le badge de la version à midvash.com"
+msgid "Show the Midvash logo in the tooltip, link the version badge to midvash.com and add a Midvash credit under the Verse of the Day"
+msgstr "Afficher le logo Midvash dans l’info-bulle, lier le badge de la version à midvash.com et ajouter un crédit Midvash sous le verset du jour"
 
 #: includes/class-bbmv-admin.php:633
 msgid "Store verses in cache to improve performance"

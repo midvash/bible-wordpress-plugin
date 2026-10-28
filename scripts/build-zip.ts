@@ -102,6 +102,21 @@ function minifyAssets(pluginDir: string, version: string) {
   }
 }
 
+const KEY_LINE = /define\( 'BBMV_PLUGIN_KEY', '' \);/;
+
+/** Fills an empty BBMV_PLUGIN_KEY from the environment, if one is given. */
+function injectPluginKey(phpFile: string) {
+  const key = process.env.BBMV_PLUGIN_KEY ?? '';
+  if (!key) return;
+  if (!/^[A-Za-z0-9]+$/.test(key)) throw new Error('BBMV_PLUGIN_KEY must be alphanumeric');
+  const php = readFileSync(phpFile, 'utf8');
+  if (!KEY_LINE.test(php)) {
+    console.warn('[warn] BBMV_PLUGIN_KEY já preenchida no arquivo; env ignorada');
+    return;
+  }
+  writeFileSync(phpFile, php.replace(KEY_LINE, `define( 'BBMV_PLUGIN_KEY', '${key}' );`));
+}
+
 function main() {
   const target = parseTarget();
   const version = readVersion();
@@ -125,6 +140,10 @@ function main() {
   }
 
   minifyAssets(stagingPlugin, version);
+
+  // The plugin key is public in the shipped plugin but kept out of this
+  // public repo: CI passes it in BBMV_PLUGIN_KEY and it is filled in here.
+  injectPluginKey(join(stagingPlugin, 'bible-by-midvash.php'));
 
   // For wp-org build: strip the auto-update block from the staged entry-point.
   if (target === 'wp-org') {

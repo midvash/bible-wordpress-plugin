@@ -15,8 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class BBMV_Admin {
 
-
-
 	/**
 	 * Initializes the admin
 	 */
@@ -38,14 +36,14 @@ class BBMV_Admin {
 
 		wp_enqueue_style(
 			'bbm-admin-style',
-			BBMV_PLUGIN_URL . 'assets/css/bbm-admin.css',
+			bbmv_asset_url( 'assets/css/bbm-admin.css' ),
 			array(),
 			BBMV_VERSION
 		);
 
 		wp_enqueue_script(
 			'bbm-admin',
-			BBMV_PLUGIN_URL . 'assets/js/bbm-admin.js',
+			bbmv_asset_url( 'assets/js/bbm-admin.js' ),
 			array(),
 			BBMV_VERSION,
 			true
@@ -228,42 +226,6 @@ class BBMV_Admin {
 			'bbm_general',
 			'bbm_section_linking'
 		);
-
-		// Field: Link Versions.
-		add_settings_field(
-			'link_versions',
-			esc_html__( 'Link Bible version names', 'bible-by-midvash' ),
-			array( $this, 'link_versions_render' ),
-			'bbm_general',
-			'bbm_section_linking'
-		);
-
-		// Field: Link Books.
-		add_settings_field(
-			'link_books',
-			esc_html__( 'Link Bible book names', 'bible-by-midvash' ),
-			array( $this, 'link_books_render' ),
-			'bbm_general',
-			'bbm_section_linking'
-		);
-
-		// Field: Link Dictionary Terms.
-		add_settings_field(
-			'link_terms',
-			esc_html__( 'Link dictionary terms', 'bible-by-midvash' ),
-			array( $this, 'link_terms_render' ),
-			'bbm_general',
-			'bbm_section_linking'
-		);
-
-		// Field: Link Biblical Characters.
-		add_settings_field(
-			'link_characters',
-			esc_html__( 'Link biblical characters', 'bible-by-midvash' ),
-			array( $this, 'link_characters_render' ),
-			'bbm_general',
-			'bbm_section_linking'
-		);
 	}
 
 	/**
@@ -339,10 +301,6 @@ class BBMV_Admin {
 		$this->read_checkbox( $input, 'new_tab', 'general', $sanitized );
 		$this->read_checkbox( $input, 'show_version', 'general', $sanitized );
 		$this->read_checkbox( $input, 'link_biblia', 'general', $sanitized );
-		$this->read_checkbox( $input, 'link_versions', 'general', $sanitized );
-		$this->read_checkbox( $input, 'link_books', 'general', $sanitized );
-		$this->read_checkbox( $input, 'link_terms', 'general', $sanitized );
-		$this->read_checkbox( $input, 'link_characters', 'general', $sanitized );
 
 		// ----- Cache tab checkboxes -----
 		$this->read_checkbox( $input, 'cache_enabled', 'cache', $sanitized );
@@ -692,69 +650,7 @@ class BBMV_Admin {
 			<input type="checkbox" name="bbm_options[link_biblia]" value="1" <?php checked( $val, true ); ?>>
 			<?php esc_html_e( 'Link the word "Bíblia"', 'bible-by-midvash' ); ?>
 		</label>
-		<p class="description"><?php esc_html_e( 'Auto-link the word "Bíblia" to Midvash', 'bible-by-midvash' ); ?></p>
-		<?php
-	}
-
-	/**
-	 * Render: Link Versions
-	 */
-	public function link_versions_render() {
-		$options = get_option( 'bbm_options' );
-		$val     = isset( $options['link_versions'] ) ? $options['link_versions'] : false;
-		?>
-		<label>
-			<input type="checkbox" name="bbm_options[link_versions]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Link version names', 'bible-by-midvash' ); ?>
-		</label>
-		<p class="description"><?php esc_html_e( 'Auto-link Bible version names mentioned in text', 'bible-by-midvash' ); ?></p>
-		<?php
-	}
-
-
-
-	/**
-	 * Render: Link Books
-	 */
-	public function link_books_render() {
-		$options = get_option( 'bbm_options' );
-		$val     = isset( $options['link_books'] ) ? $options['link_books'] : false;
-		?>
-		<label>
-			<input type="checkbox" name="bbm_options[link_books]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Link book names', 'bible-by-midvash' ); ?>
-		</label>
-		<p class="description"><?php esc_html_e( 'Auto-link Bible book names mentioned in text', 'bible-by-midvash' ); ?></p>
-		<?php
-	}
-
-	/**
-	 * Render: Link Dictionary Terms
-	 */
-	public function link_terms_render() {
-		$options = get_option( 'bbm_options' );
-		$val     = isset( $options['link_terms'] ) ? $options['link_terms'] : false;
-		?>
-		<label>
-			<input type="checkbox" name="bbm_options[link_terms]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Link dictionary terms', 'bible-by-midvash' ); ?>
-		</label>
-		<p class="description"><?php esc_html_e( 'Auto-link dictionary terms mentioned in text', 'bible-by-midvash' ); ?></p>
-		<?php
-	}
-
-	/**
-	 * Render: Link Biblical Characters
-	 */
-	public function link_characters_render() {
-		$options = get_option( 'bbm_options' );
-		$val     = isset( $options['link_characters'] ) ? $options['link_characters'] : false;
-		?>
-		<label>
-			<input type="checkbox" name="bbm_options[link_characters]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Link biblical characters', 'bible-by-midvash' ); ?>
-		</label>
-		<p class="description"><?php esc_html_e( 'Auto-link biblical characters mentioned in text', 'bible-by-midvash' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Links the first mention of the word "Bíblia" in each post to Midvash', 'bible-by-midvash' ); ?></p>
 		<?php
 	}
 
@@ -784,7 +680,7 @@ class BBMV_Admin {
 					</div>
 				</div>
 				<div class="bbm-hero__actions">
-					<a href="https://wordpress.midvash.com" target="_blank" rel="noopener noreferrer" class="bbm-btn">
+					<a href="https://midvash.com/wordpress-plugin" target="_blank" rel="noopener noreferrer" class="bbm-btn">
 						<?php esc_html_e( 'Plugin site', 'bible-by-midvash' ); ?> ↗
 					</a>
 					<a href="https://midvash.com" target="_blank" rel="noopener noreferrer" class="bbm-btn bbm-btn--primary">

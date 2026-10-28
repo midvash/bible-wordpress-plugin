@@ -34,7 +34,7 @@ class BBMV_Books {
 		'es'    => 'rvr1909',
 		'fr'    => 'lsg',
 		'de'    => 'luth1912',
-		'it'    => 'nri',
+		'it'    => 'riveduta',
 		'ru'    => 'synodal',
 		'ko'    => 'kor',
 		'zh'    => 'cuv',
@@ -76,6 +76,8 @@ class BBMV_Books {
 		'ntv'     => 'rvr1909',
 		'nvies'   => 'rvr1909',
 		'rvr1960' => 'rvr1909',
+		// Italian.
+		'nri'     => 'riveduta',
 		// Latin.
 		'nvl'     => 'vulg',
 		// Hebrew.
@@ -307,6 +309,99 @@ class BBMV_Books {
 	}
 
 	/**
+	 * Base midvash.com URL for a locale.
+	 *
+	 * English is the site's default locale and lives at the root: a `/en/`
+	 * prefix answers with a redirect that drops the verse anchor.
+	 *
+	 * @param string $locale Locale code (normalized internally).
+	 * @return string URL without trailing slash.
+	 */
+	public static function site_url( $locale ) {
+		$locale = self::normalize_locale( $locale );
+		return 'en' === $locale ? BBMV_SITE_URL : BBMV_SITE_URL . '/' . $locale;
+	}
+
+	/**
+	 * Regex that finds references written in one locale.
+	 *
+	 * Built from that locale's names and abbreviations only, so "Os 13" on an
+	 * English site or "at 10:30" on a Portuguese one never turn into links.
+	 * Names keep the case of their first letter ("João", not "joão") and are
+	 * also accepted without accents; abbreviations must match exactly
+	 * ("Os", not "os"). Abbreviations also need chapter and verse, which the
+	 * caller enforces through the `abbr` group: many are everyday words
+	 * ("Am", "Ex", "Is", "Mar", "Job").
+	 *
+	 * Groups: name|abbr, ch, v (optional), ve (optional, needs v).
+	 *
+	 * @param string $locale Locale code.
+	 * @return string PCRE pattern with the `u` flag.
+	 */
+	public static function get_reference_regex( $locale ) {
+		static $cache = array();
+
+		$locale = self::normalize_locale( $locale );
+		if ( isset( $cache[ $locale ] ) ) {
+			return $cache[ $locale ];
+		}
+
+		$names  = array();
+		$abbrev = array();
+		foreach ( self::get_books() as $book ) {
+			if ( isset( $book['names'][ $locale ] ) ) {
+				$name = $book['names'][ $locale ];
+				foreach ( array_unique( array( $name, self::strip_accents( $name ) ) ) as $variant ) {
+					$names[] = self::first_letter_cased( $variant );
+				}
+			}
+			if ( isset( $book['abbrev'][ $locale ] ) ) {
+				$abbrev[] = preg_quote( $book['abbrev'][ $locale ], '/' );
+			}
+		}
+
+		$by_length = function ( $a, $b ) {
+			return strlen( $b ) - strlen( $a );
+		};
+		$names     = array_unique( $names );
+		$abbrev    = array_unique( $abbrev );
+		usort( $names, $by_length );
+		usort( $abbrev, $by_length );
+
+		// Chinese runs words together, so there is no space or letter boundary
+		// around the book; Korean attaches particles right after the number.
+		$cjk    = in_array( $locale, array( 'zh', 'ko' ), true );
+		$before = 'zh' === $locale ? '' : '(?<![\\p{L}\\p{N}])';
+		$gap    = 'zh' === $locale ? '\\s*' : '\\s+';
+		$after  = $cjk ? '(?!\\p{N}|[:\\.]\\d)' : '(?![\\p{L}\\p{N}]|[:\\.]\\d)';
+
+		$cache[ $locale ] = '/' . $before
+			. '(?:(?<name>' . implode( '|', $names ) . ')|(?<abbr>' . implode( '|', $abbrev ) . '))'
+			. $gap . '(?<ch>\\d{1,3})'
+			. '(?:[:\\.](?<v>\\d{1,3})(?:\\s*[-–]\\s*(?<ve>\\d{1,3}))?)?'
+			. $after . '/u';
+
+		return $cache[ $locale ];
+	}
+
+	/**
+	 * Quotes a book name for a regex, keeping its first letter's case and
+	 * ignoring case on the rest.
+	 *
+	 * @param string $name Book name.
+	 * @return string Regex fragment.
+	 */
+	private static function first_letter_cased( $name ) {
+		$chars = preg_split( '//u', $name, 2, PREG_SPLIT_NO_EMPTY );
+		if ( ! $chars ) {
+			return preg_quote( $name, '/' );
+		}
+		$first = preg_quote( $chars[0], '/' );
+		$rest  = isset( $chars[1] ) ? preg_quote( $chars[1], '/' ) : '';
+		return '' === $rest ? $first : $first . '(?i:' . $rest . ')';
+	}
+
+	/**
 	 * Lowercase a string, preferring the multibyte function when available.
 	 * Some shared hosts ship PHP without `mbstring` enabled; we fall back to
 	 * `strtolower()` which still works for the ASCII portion of book names.
@@ -394,15 +489,18 @@ class BBMV_Books {
 	 * (with and without accents), or when the chapter number exceeds the
 	 * book's total chapters.
 	 *
-	 * @param string $reference Raw reference text.
+	 * @param string      $reference Raw reference text.
+	 * @param string|null $locale    Only accept book names of this locale, or null for all.
 	 * @return array|null {book_id, book, chapter, verse, verse_end}
 	 */
-	public static function parse_reference( $reference ) {
+	public static function parse_reference( $reference, $locale = null ) {
 		$reference = trim( $reference );
 		if ( '' === $reference ) {
 			return null;
 		}
-		if ( ! preg_match( '/^(.+?)\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m ) ) {
+		// The book ends in a non-digit, so "Salmos 119" never splits into
+		// "Salmos 1" + "19"; the space is optional because Chinese has none.
+		if ( ! preg_match( '/^(.*?\D)\s*(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m ) ) {
 			return null;
 		}
 
@@ -411,7 +509,7 @@ class BBMV_Books {
 		$verse      = ( isset( $m[3] ) && '' !== $m[3] ) ? intval( $m[3] ) : null;
 		$verse_end  = ( isset( $m[4] ) && '' !== $m[4] ) ? intval( $m[4] ) : null;
 
-		$lookup = self::get_lookup_table();
+		$lookup = self::get_lookup_table( $locale );
 		if ( isset( $lookup[ $book_input ] ) ) {
 			$book_id = $lookup[ $book_input ];
 		} else {

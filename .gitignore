@@ -4,3 +4,5 @@ node_modules/
 .vscode/
 *.log
 dist/
+assets/**/*.min.js
+assets/**/*.min.css

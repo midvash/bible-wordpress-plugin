@@ -55,10 +55,6 @@ class BBMV_Parser {
 				'css_class'        => 'bbm-link',
 				'show_version'     => true,
 				'link_biblia'      => false,
-				'link_versions'    => false,
-				'link_books'       => false,
-				'link_terms'       => false,
-				'link_characters'  => false,
 			)
 		);
 
@@ -68,6 +64,24 @@ class BBMV_Parser {
 		// Add filter to content.
 		add_filter( 'the_content', array( $this, 'parse_content' ), 20 );
 	}
+
+	/**
+	 * Tags whose text is never linked: existing links, headings, code and
+	 * anything that is not prose.
+	 */
+	const SKIP_TAGS = array( 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'script', 'style', 'code', 'pre', 'kbd', 'textarea', 'button', 'select', 'svg' );
+
+	/**
+	 * How many times the word "Bible" is linked in one post.
+	 */
+	const MAX_BIBLE_WORD_LINKS = 1;
+
+	/**
+	 * "Bible" links still allowed in the post being parsed.
+	 *
+	 * @var int
+	 */
+	private $bible_links_left = 0;
 
 	/**
 	 * Processes content and adds links
@@ -80,54 +94,44 @@ class BBMV_Parser {
 			return $content;
 		}
 
+		return $this->link_content( $content );
+	}
+
+	/**
+	 * Links references (and optionally the word "Bible") in an HTML string.
+	 *
+	 * Only text between tags is touched, so attributes such as `src`, `alt`
+	 * or `srcset` that happen to contain a book name or "Bíblia" stay intact.
+	 *
+	 * @param string $content HTML.
+	 * @return string HTML with links.
+	 */
+	public function link_content( $content ) {
 		$this->referenced_books = array();
 
-		// Build the regex pattern using book names and abbreviations.
-		$pattern = BBMV_Books::get_matching_pattern();
-
-		// Regex that skips content inside <a> tags and headers h1-h6.
-		$skip_tags = '<a\b[^>]*>.*?<\/a>|<h[1-6]\b[^>]*>.*?<\/h[1-6]>(*SKIP)(*F)';
-
-		// Pattern: BookName Chapter:Verse(-VerseEnd)?
-		// Supports both : and . as separators.
-		$pattern_verses = '/' . $skip_tags . '|\b(' . $pattern . ')\s+(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?\b/iu';
-
-		$content = preg_replace_callback(
-			$pattern_verses,
-			function ( $matches ) {
-				if ( empty( $matches[1] ) ) {
-					return $matches[0];
-				}
-				return $this->replace_reference( $matches );
-			},
-			$content
+		$regex   = BBMV_Books::get_reference_regex( $this->locale );
+		$content = $this->map_text_nodes(
+			$content,
+			function ( $text ) use ( $regex ) {
+				return preg_replace_callback( $regex, array( $this, 'replace_reference' ), $text );
+			}
 		);
 
-		// Link "Bíblia" word if enabled.
 		if ( ! empty( $this->options['link_biblia'] ) ) {
-			$content = preg_replace_callback(
-				'/' . $skip_tags . '|\b(Bíblia|Biblia|Bible)\b/iu',
-				function ( $matches ) {
-					if ( empty( $matches[1] ) ) {
-						return $matches[0];
+			$this->bible_links_left = self::MAX_BIBLE_WORD_LINKS;
+			$content                = $this->map_text_nodes(
+				$content,
+				function ( $text ) {
+					if ( $this->bible_links_left < 1 ) {
+						return $text;
 					}
-
-					$url = BBMV_SITE_URL . '/' . $this->locale;
-
-					$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
-					$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
-					$target    = $new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
-
-					return sprintf(
-						'<a href="%s" class="%s"%s title="%s">%s</a>',
-						esc_url( $url ),
-						esc_attr( $css_class ),
-						$target,
-						esc_attr__( 'Online Bible', 'bible-by-midvash' ),
-						esc_html( $matches[1] )
+					return preg_replace_callback(
+						'/(?<![\p{L}\p{N}])(Bíblia|Biblia|Bible)(?![\p{L}\p{N}])/iu',
+						array( $this, 'replace_bible_word' ),
+						$text,
+						$this->bible_links_left
 					);
-				},
-				$content
+				}
 			);
 		}
 
@@ -135,24 +139,97 @@ class BBMV_Parser {
 	}
 
 	/**
+	 * Runs a callback on every text node outside SKIP_TAGS.
+	 *
+	 * @param string   $html     HTML.
+	 * @param callable $callback Receives and returns a text fragment.
+	 * @return string
+	 */
+	private function map_text_nodes( $html, $callback ) {
+		$parts = preg_split( '/(<!--.*?-->|<[^>]*>)/s', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+		if ( false === $parts ) {
+			return $html;
+		}
+
+		$open = array();
+		foreach ( $parts as $i => $part ) {
+			if ( '' === $part ) {
+				continue;
+			}
+			if ( '<' === $part[0] ) {
+				if ( preg_match( '/^<(\/?)([a-z][a-z0-9]*)/i', $part, $tag ) ) {
+					$name = strtolower( $tag[2] );
+					if ( in_array( $name, self::SKIP_TAGS, true ) && '/>' !== substr( $part, -2 ) ) {
+						if ( '/' === $tag[1] ) {
+							$open[ $name ] = isset( $open[ $name ] ) ? max( 0, $open[ $name ] - 1 ) : 0;
+						} else {
+							$open[ $name ] = isset( $open[ $name ] ) ? $open[ $name ] + 1 : 1;
+						}
+					}
+				}
+				continue;
+			}
+			if ( array_sum( $open ) > 0 ) {
+				continue;
+			}
+			$parts[ $i ] = call_user_func( $callback, $part );
+		}
+
+		return implode( '', $parts );
+	}
+
+	/**
+	 * Replaces one occurrence of the word "Bible" with a link to Midvash.
+	 *
+	 * @param array $matches Regex matches; the word is at 1.
+	 * @return string
+	 */
+	public function replace_bible_word( $matches ) {
+		--$this->bible_links_left;
+		wp_enqueue_style( 'bbm-style' );
+
+		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
+		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
+		$target    = $new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
+
+		return sprintf(
+			'<a href="%s" class="%s"%s title="%s">%s</a>',
+			esc_url( BBMV_Books::site_url( $this->locale ) ),
+			esc_attr( $css_class ),
+			$target,
+			esc_attr__( 'Online Bible', 'bible-by-midvash' ),
+			esc_html( $matches[1] )
+		);
+	}
+
+	/**
 	 * Replaces the reference with a link and data attributes for tooltip
 	 *
-	 * @param array $matches Regex matches from parse_content: full match at 0, book name at 1, chapter at 2, verse at 3, optional verse range end at 4.
+	 * @param array $matches Matches of BBMV_Books::get_reference_regex(): full match at 0, `abbr` set when the book was abbreviated, `v` the verse.
 	 */
 	public function replace_reference( $matches ) {
 		$original = $matches[0];
+
+		// An abbreviation alone is too often a plain word ("Os 13", "Am 5"):
+		// only link it with chapter and verse.
+		if ( ! empty( $matches['abbr'] ) && empty( $matches['v'] ) ) {
+			return $original;
+		}
 
 		// Delegate to the centralized parser — it re-runs the (cheap) regex on
 		// the original substring and adds accent fallback + chapter validation
 		// against the book's known chapter count. Sharing this path with the
 		// API client and the Gutenberg block keeps behaviour aligned.
-		$parsed = BBMV_Books::parse_reference( $original );
+		$parsed = BBMV_Books::parse_reference( $original, $this->locale );
 		if ( ! $parsed ) {
 			return $original;
 		}
 
 		$book_id = $parsed['book_id'];
-		$book    = $parsed['book'];
+
+		// The tooltip assets only load on posts that have a reference.
+		wp_enqueue_style( 'bbm-style' );
+		wp_enqueue_script( 'bbm-tooltip' );
 
 		// Track this book as referenced.
 		if ( ! in_array( $book_id, $this->referenced_books, true ) ) {
@@ -167,15 +244,16 @@ class BBMV_Parser {
 		// Get slug for the current locale.
 		$book_slug = BBMV_Books::get_book_slug( $book_id, $this->locale );
 
-		// Build URL with locale prefix.
-		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}/{verse}.
-		$url = BBMV_SITE_URL . '/' . $this->locale . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
+		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}#v={verse}
+		// (no locale segment in English). The site anchors verses with #v=,
+		// so linking straight to it skips a redirect.
+		$url = BBMV_Books::site_url( $this->locale ) . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
-			if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
-				$url .= '/' . $parsed['verse'] . '-' . $parsed['verse_end'];
+			if ( $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
+				$url .= '#v=' . $parsed['verse'] . '-' . $parsed['verse_end'];
 			} else {
-				$url .= '/' . $parsed['verse'];
+				$url .= '#v=' . $parsed['verse'];
 			}
 		}
 

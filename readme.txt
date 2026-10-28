@@ -2,19 +2,19 @@
 Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
-Tested up to: 7.0
-Stable tag: 0.8.1
+Tested up to: 7.1
+Stable tag: 0.9.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Bible references in posts become hover-tooltip links with full verse text. 9 languages, 60+ versions, no setup, no API key.
+Bible references in posts become hover-tooltip links with full verse text. 9 languages, 48 versions, no setup, no API key.
 
 == Description ==
 
 **Bible by Midvash** finds Bible references in your content and quietly turns each one into a styled link with a hover-tooltip that shows the verse text — fetched live from the Midvash Bible API and cached locally for performance. No account, no API key, no configuration required for the default experience.
 
-It works on any post or page in any of nine languages, recognises both the full book name ("John 3:16") and abbreviations ("Jo 3:16", "Jn 3:16"), accepts the colon and dot separators, supports verse ranges ("John 3:16-18") and chapter-only references ("Psalms 23"), and links each reference to the matching verse on [midvash.com](https://midvash.com) using the locale-appropriate URL.
+It works on any post or page in any of nine languages, recognises both the full book name ("John 3:16") and the standard abbreviation of the site's language ("Jn 3:16" in English, "Jo 3:16" in Portuguese), accepts the colon and dot separators, supports verse ranges ("John 3:16-18") and chapter-only references ("Psalms 23"), and links each reference to the matching verse on [midvash.com](https://midvash.com) using the locale-appropriate URL.
 
 = What you get =
 
@@ -24,7 +24,7 @@ It works on any post or page in any of nine languages, recognises both the full 
 * **Verse of the Day** widget (Appearance → Widgets) and `[bbm_votd]` shortcode.
 * **Schema.org Quotation microdata** on every reference link, helping search engines surface rich results for verse pages.
 * **9 user-facing locales:** Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, Korean, Chinese (Simplified) — each with localised book names, slugs, abbreviations and URLs.
-* **60+ openly licensed Bible versions** across those locales, listed dynamically from the API as new translations are added.
+* **48 openly licensed Bible versions** across those locales, listed dynamically from the API as new translations are added.
 * **Dark mode** via `prefers-color-scheme` and matching opt-in body classes (`dark-mode`, `theme-dark`, `wp-dark-mode`).
 * **Accessibility:** keyboard focus, ARIA roles, reduced-motion support, print styles.
 * **Customisable link styling** — colour, underline (style + colour), open in new tab, show/hide version in tooltip.
@@ -34,32 +34,34 @@ It works on any post or page in any of nine languages, recognises both the full 
 * `John 3:16` / `João 3:16` / `Juan 3:16` / `Jean 3:16` / `Johannes 3:16` / `Giovanni 3:16` / `Иоанн 3:16` / `요한복음 3:16` / `约翰福音 3:16`
 * `John 3.16` (alternative separator)
 * `John 3:16-18` (verse ranges, up to 50 verses)
-* `Gn 1:1`, `Jn 3:16` (abbreviations in every locale)
-* `Psalms 23` / `Salmos 23` / `Psaumes 23` (chapter-only, no verse)
+* `Gn 1:1`, `Jn 3:16` (the abbreviations of the language chosen in Settings, written with chapter and verse)
+* `Psalms 23` / `Salmos 23` / `Psaumes 23` (chapter-only, full book name)
+
+Only the language chosen in Settings is matched, book names start with a capital letter and abbreviations must be written exactly, so everyday words are left alone: "Os 13 apóstolos", "at 10:30", "is 5" or "Mar 5" never become links. Text inside existing links, headings, code blocks and HTML attributes (image `alt`, `src`, `srcset`) is never touched.
 
 = Available Bible versions =
 
 The version list below mirrors `api.midvash.com/versions` and may grow over time. The plugin's Settings → Bible by Midvash page always shows the current catalogue.
 
-**Portuguese (Brazil) — 6:** ONBV, ALMEIDA-LIVRE, BPM, NVA, BLPT, TFT
-**English — 8:** BSB, KJV, WEB, ASV, YLT, DRA, BBE, GENEVA1599
-**Spanish — 3:** RVR1909, RVG, SEV
-**French — 5:** LSG, DARBY-FR, MARTIN1744, CRAMPON, FRASBL
-**German — 5:** LUTH1912, SCHL1951, ELB1905, MEN, LUTH1545
-**Italian — 3:** NRI, DIODATI, RIVEDUTA
+**Portuguese (Brazil) — 7:** ALMEIDA-LIVRE, BPM, ONBV, NVA, BLPT, TFT, ALM1911
+**English — 14:** KJV, WEB, ASV, YLT, DRA, BBE, GENEVA1599, BSB, LSV, DARBY, RV1885, CPDV, WMB, FBV
+**Spanish — 5:** RVR1909, RVG, SEV, ONBV-ES, PDT
+**French — 6:** LSG, DARBY-FR, MARTIN1744, CRAMPON, FRASBL, NCL
+**German — 7:** LUTH1912, SCHL1951, ELB1905, MEN, LUTH1545, ELB1871, TEXTBIBEL
+**Italian — 3:** DIODATI, RIVEDUTA, DIODATI1885
 **Russian — 1:** SYNODAL
 **Korean — 1:** KOR
-**Chinese (Simplified) — 2:** CUV, CUVS
+**Chinese (Simplified and Traditional) — 4:** CUV, CUVS, CCB, CCBT
 
-Default version per locale: ONBV (pt-br), BSB (en), RVR1909 (es), LSG (fr), LUTH1912 (de), NRI (it), SYNODAL (ru), KOR (ko), CUV (zh).
+Default version per locale: ONBV (pt-br), BSB (en), RVR1909 (es), LSG (fr), LUTH1912 (de), RIVEDUTA (it), SYNODAL (ru), KOR (ko), CUV (zh).
 
-Beyond the plugin's nine display locales, the full Midvash API catalogue spans **60+ public-domain and openly licensed Bible versions in 30+ languages** — including original-language texts such as the Hebrew Aleppo Codex and WLC, the Greek LXX and SBLGNT, and the Latin Vulgate. As new versions land in the API they appear in the plugin's settings automatically, no update required.
+Beyond the plugin's nine display locales, the full Midvash API catalogue spans **119 public-domain and openly licensed Bible versions in 69 languages** — including original-language texts such as the Hebrew Aleppo Codex and WLC, the Greek LXX and SBLGNT, and the Latin Vulgate. As new versions land in the API they appear in the plugin's settings automatically, no update required.
 
 == Installation ==
 
 1. Upload the `bible-by-midvash` folder to `/wp-content/plugins/`, **or** install via Plugins → Add New → search "Bible by Midvash".
 2. Activate the plugin through the Plugins screen.
-3. (Optional) Go to **Settings → Bible by Midvash** to pick the language, default Bible version, link styling, and which words (Bíblia, version names, book names) should be auto-linked.
+3. (Optional) Go to **Settings → Bible by Midvash** to pick the language, default Bible version, link styling, and whether the word "Bíblia" should be linked too.
 4. Write a post that mentions a verse like `John 3:16` — that's it. Hover the link to see the tooltip.
 
 == Frequently Asked Questions ==
@@ -96,7 +98,7 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.8.0`).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.9.0`).
 * **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
@@ -111,12 +113,27 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Screenshots ==
 
-1. Settings page — choose the display language, Bible version, link styling and which terms to auto-link.
+1. Settings page — choose the display language, Bible version and link styling.
 2. A post showing automatically detected references with the verse tooltip on hover.
 3. Gutenberg "Bible Verse — Midvash" block with per-block version and language overrides.
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.9.0 =
+* **Images are safe.** References and the word "Bíblia" are only linked in the text of a post, never inside HTML attributes. Before, an image whose `src`, `srcset` or `alt` contained "Bíblia" or a reference got a link injected into the attribute and broke.
+* **The word "Bíblia" is linked once per post** instead of on every mention.
+* **Fewer false links.** Only the language chosen in Settings is matched (before, the abbreviations of all nine languages were matched at once). Book names must start with a capital letter, abbreviations must be written exactly and need chapter and verse. "Os 13 apóstolos", "at 10:30", "is 5" and "Mar 5" are no longer linked. References are also skipped inside `code`, `pre` and `script`.
+* **Chinese and Korean.** References written without a space (约翰福音3:16) or followed by a particle (요한복음 3:16에서) are now detected.
+* **Translations load.** The bundled translations were never loaded, so the plugin stayed in English on every site.
+* **English links keep the verse.** Links on English sites pointed at `/en/…`, which redirects and lost the verse. Links now go straight to the verse anchor.
+* **Italian.** The default Italian version is now Riveduta; sites still set to NRI, which the API no longer serves, are switched automatically.
+* **Tooltip fixes.** Fixed the `e.target.closest is not a function` error, and the version badge now links to the version that actually answered.
+* **Works with page caches.** The public verse endpoints no longer require a nonce, which expired in cached pages and broke every tooltip after a day.
+* **No slow pages when the API is down.** The page render no longer calls the API: the version attribution comes from the cache, which is refreshed in the background, and a failed refresh waits 15 minutes before trying again.
+* **Lighter pages.** The tooltip script and stylesheet only load on posts that have a reference, and the release ZIP ships minified copies (the readable sources stay in the ZIP and on GitHub).
+* **Removed** four settings that did nothing (link version names, book names, dictionary terms and biblical characters).
+* Updated the version catalogue (119 versions in 69 languages; 48 in the plugin's nine languages) and the plugin site address (https://midvash.com/wordpress-plugin).
 
 = 0.8.1 =
 * **Openly licensed versions only.** The Midvash API no longer distributes all-rights-reserved Bible versions without a licence (e.g. NVT, NVI, ARA, NIV, ESV, NLT, NKJV, NTV). New defaults: ONBV (Open Nova Bíblia Viva) for Portuguese, BSB (Berean Standard Bible) for English and RVR1909 for Spanish.
@@ -174,9 +191,12 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Customizable link styling (color, underline style, open in new tab).
 * 30-day verse cache for tooltip performance.
 * Powered by the public Midvash API at api.midvash.com.
-* Distributed via https://wordpress.midvash.com.
+* Distributed via https://midvash.com/wordpress-plugin.
 
 == Upgrade Notice ==
+
+= 0.9.0 =
+Fixes broken images on posts that mention "Bíblia", false links on everyday words, missing translations and slow pages when the Midvash API is down. Recommended for everyone.
 
 = 0.8.1 =
 Retired all-rights-reserved versions (NVT, NVI, ARA, NIV, ESV, NLT, NTV…) are replaced automatically by openly licensed ones (ONBV, Almeida Livre, BSB, KJV, RVR1909) and each verse now shows its licence attribution. No reconfiguration needed.

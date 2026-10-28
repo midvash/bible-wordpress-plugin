@@ -71,6 +71,7 @@ class BBMV_Widget extends WP_Widget {
 	 * Admin form
 	 *
 	 * @param array $instance Previously saved settings for this widget instance.
+	 * @return string Empty string: the form keeps WordPress's Save button.
 	 */
 	public function form( $instance ) {
 		$title          = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Verse of the Day', 'bible-by-midvash' );
@@ -128,6 +129,7 @@ class BBMV_Widget extends WP_Widget {
 			</label>
 		</p>
 		<?php
+		return '';
 	}
 
 	/**

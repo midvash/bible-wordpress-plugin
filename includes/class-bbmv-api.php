@@ -418,14 +418,21 @@ class BBMV_API {
 	 * Fetches the full version catalogue from /v1/versions (enriched with
 	 * localizedNames and copyright), cached for 7 days.
 	 *
+	 * @param bool $allow_fetch False to read the cache only.
 	 * @return array|null List of version arrays or null on error.
 	 */
-	private function get_catalog() {
+	private function get_catalog( $allow_fetch = true ) {
 		// v2: refetch after the API dropped all-rights-reserved versions.
 		$cache_key = 'bbm_versions_v2';
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;
+		}
+
+		// A recent failure is remembered for a while, so an offline API costs
+		// one timeout per window instead of one per request.
+		if ( ! $allow_fetch || false !== get_transient( 'bbm_versions_failed' ) ) {
+			return null;
 		}
 
 		$result = $this->make_request( '/v1/versions' );
@@ -434,7 +441,18 @@ class BBMV_API {
 			return $result['data'];
 		}
 
+		set_transient( 'bbm_versions_failed', 1, 15 * MINUTE_IN_SECONDS );
 		return null;
+	}
+
+	/**
+	 * Whether the version catalogue is cached (or failed recently, which
+	 * counts as "do not try again yet").
+	 *
+	 * @return bool
+	 */
+	public function has_catalog_cache() {
+		return false !== get_transient( 'bbm_versions_v2' ) || false !== get_transient( 'bbm_versions_failed' );
 	}
 
 	/**
@@ -481,11 +499,12 @@ class BBMV_API {
 	 * in the admin and in the tooltip footer.
 	 *
 	 * @param string $version_slug Version slug (onbv, kjv…).
+	 * @param bool   $allow_fetch  False to read the cache only (page renders).
 	 * @return array|null Version array with localizedNames/copyright, or null.
 	 */
-	public function get_version_meta( $version_slug ) {
+	public function get_version_meta( $version_slug, $allow_fetch = true ) {
 		$version_slug = BBMV_Books::resolve_version( $version_slug );
-		$catalog      = $this->get_catalog();
+		$catalog      = $this->get_catalog( $allow_fetch );
 		if ( ! $catalog ) {
 			return null;
 		}

@@ -13,7 +13,6 @@
     // Configuration from WordPress (passed via wp_localize_script)
     const config = window.bbm_config || {
         ajax_url: '/wp-admin/admin-ajax.php',
-        nonce: '',
         version: 'onbv',
         show_version: true,
         fallback_message: 'Verse currently unavailable',
@@ -40,6 +39,25 @@
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    /**
+     * Version page on midvash.com. site_url already carries the locale
+     * segment (none for English).
+     */
+    function versionPageUrl(version) {
+        return config.site_url + '/' + String(version).toLowerCase();
+    }
+
+    /**
+     * Closest reference link around an event target (the "Bible" word link
+     * has no verse, so no tooltip). Events also fire on text nodes and on
+     * document/window, which have no closest().
+     */
+    function linkFromEvent(e) {
+        let node = e.target;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        return node && typeof node.closest === 'function' ? node.closest('.bbm-link[data-midvash-ref]') : null;
     }
 
     /**
@@ -177,7 +195,7 @@
         const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
         if (config.show_version) {
             versionSpan.textContent = config.version.toUpperCase();
-            const versionUrl = config.site_url + '/' + config.locale + '/' + config.version.toLowerCase();
+            const versionUrl = versionPageUrl(config.version);
             versionLink.href = versionUrl;
             versionLink.style.display = '';
         } else {
@@ -206,8 +224,7 @@
             const version = data.version.toUpperCase();
             versionSpan.textContent = version;
             
-            // Build version URL: site_url/locale/version
-            const versionUrl = config.site_url + '/' + config.locale + '/' + config.version.toLowerCase();
+            const versionUrl = versionPageUrl(data.version);
             versionLink.href = versionUrl;
             versionLink.style.display = '';
             versionSpan.style.display = '';
@@ -274,7 +291,7 @@
 
         activeLink = link;
         
-        const reference = link.getAttribute('data-midvash-ref') || link.textContent;
+        const reference = link.getAttribute('data-midvash-ref');
         const url = link.href;
         const cacheKey = reference + '_' + config.version;
 
@@ -320,7 +337,6 @@
     function fetchVerse(reference, url, cacheKey) {
         const params = new URLSearchParams({
             action: 'bbm_get_verse',
-            nonce: config.nonce,
             reference: reference,
             version: config.version
         });
@@ -385,7 +401,6 @@
 
         const body = new URLSearchParams({
             action: 'bbm_get_verses',
-            nonce: config.nonce,
             refs: refs.slice(0, 60).join('|'),
             version: config.version
         });
@@ -423,14 +438,14 @@
     function init() {
         // Use event delegation for efficiency
         document.addEventListener('mouseenter', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 showTooltip(link);
             }
         }, true);
 
         document.addEventListener('mouseleave', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 hideTooltip();
             }
@@ -438,14 +453,14 @@
 
         // Handle focus for accessibility
         document.addEventListener('focusin', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 showTooltip(link);
             }
         });
 
         document.addEventListener('focusout', function(e) {
-            const link = e.target.closest('.bbm-link');
+            const link = linkFromEvent(e);
             if (link) {
                 hideTooltip();
             }

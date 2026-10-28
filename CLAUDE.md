@@ -8,7 +8,7 @@ Plugin WordPress (`bible-by-midvash`) que detecta referências bíblicas em post
 
 **Distribuição**:
 - Repo público: https://github.com/midvash/bible-by-midvash
-- Download/docs: https://wordpress.midvash.com
+- Download/docs: https://midvash.com/wordpress-plugin
 - Auto-update via `vendor/plugin-update-checker` lendo `update-info.json` em R2
 
 ## Objetivos estratégicos
@@ -52,7 +52,7 @@ Tratar o repo como produto editorial. Em qualquer mudança, considere:
 
 - **Commits descritivos em inglês ou português natural** — não "fix stuff". Cada commit é uma página indexada.
 - **PR titles e descrições completas** com seções `## Summary` / `## Test plan`. Mencionar termos relevantes (Bible, WordPress, multilingual, tooltip, verse, biblia, versículo) quando naturais.
-- **Release notes ricas em markdown**, com `Added / Fixed / Changed`. Linkar pra `wordpress.midvash.com` e `midvash.com` quando fizer sentido. Mencionar locales suportados, versões de Bíblia novas, etc.
+- **Release notes ricas em markdown**, com `Added / Fixed / Changed`. Linkar pra `midvash.com/wordpress-plugin` e `midvash.com` quando fizer sentido. Mencionar locales suportados, versões de Bíblia novas, etc.
 - **README.md** mantém o pitch público com keywords naturais, badges e links pra docs. Não inchar — é página de entrada, não manual.
 - **readme.txt** segue rigorosamente o formato wordpress.org (mesmo não estando lá ainda) para preservar a opção de submeter. Tags, `Stable tag`, FAQ, Changelog, Upgrade Notice.
 - **Issues e Discussions abertos** — encorajar uso. Cada issue é uma página. Se o usuário abrir issue genuíno em outro canal, sugerir migrar pro GitHub.
@@ -130,7 +130,16 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 - **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções de uso no `$comment` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.6.0 passa sem erros.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 
-Erro novo de PHPCS/PHPStan bloqueia release.
+- **Testes do parser** em [tests/test-parser.php](tests/test-parser.php), sem WordPress nem PHPUnit: `php tests/test-parser.php`. Mudou regex, livro ou URL? Rode e acrescente o caso.
+
+Erro novo de PHPCS/PHPStan ou teste vermelho bloqueia release.
+
+## Pendências pra submeter ao wordpress.org
+
+Só o dono resolve:
+
+- **Conta no wordpress.org.** `Contributors: netogregorio` no [readme.txt](readme.txt) aponta pra um perfil que ainda não existe (profiles.wordpress.org/netogregorio dá 404). Criar a conta com esse usuário, ou trocar o campo pelo usuário criado.
+- **Imagens da página do plugin** (ficam no SVN do wp.org em `/assets`, não no ZIP): `banner-772x250.png` e `banner-1544x500.png`, `icon-128x128.png` e `icon-256x256.png` (ou `icon.svg`), e `screenshot-1.png` … `screenshot-4.png` na ordem da seção `== Screenshots ==` (1 configurações, 2 tooltip num post, 3 bloco no editor, 4 widget do versículo do dia).
 
 ## Áreas de melhoria conhecidas (backlog informal)
 
@@ -143,7 +152,7 @@ Use como inspiração quando o usuário pedir "o que dá pra melhorar". Não imp
 - **Schema.org** (`BibleVerse` / `Quotation`) injetado nos links — bom pra SEO dos sites que usam o plugin **e** pra SEO de Midvash via citações.
 - **Testes**: nem PHPUnit nem Playwright hoje. Considerar testes mínimos de parser (regex de referências).
 - **Submissão ao wordpress.org**: o `readme.txt` já está em formato compatível. Quando estabilizar 1.0.0, vale o esforço de submeter — multiplica alcance e SEO drasticamente.
-- **Sitemap/feed de releases** linkado em `wordpress.midvash.com` pra ajudar indexação.
+- **Sitemap/feed de releases** linkado em `midvash.com/wordpress-plugin` pra ajudar indexação.
 
 ## Convenções com o agente
 

@@ -69,7 +69,7 @@ class BBMV_Block {
 	public function enqueue_editor_assets() {
 		wp_enqueue_script(
 			'bbm-block',
-			BBMV_PLUGIN_URL . 'assets/js/bbm-block.js',
+			bbmv_asset_url( 'assets/js/bbm-block.js' ),
 			array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-i18n' ),
 			BBMV_VERSION,
 			true
@@ -110,6 +110,8 @@ class BBMV_Block {
 				. esc_html__( 'Verse currently unavailable.', 'bible-by-midvash' )
 				. '</p>';
 		}
+
+		wp_enqueue_style( 'bbm-style' );
 
 		$text    = $data['text'];
 		$ref_str = isset( $data['reference'] ) ? $data['reference'] : $reference;
@@ -170,11 +172,11 @@ class BBMV_Block {
 		}
 
 		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], $locale );
-		$url       = BBMV_SITE_URL . '/' . $locale . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
+		$url       = BBMV_Books::site_url( $locale ) . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
-			$url .= '/' . $parsed['verse'];
-			if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
+			$url .= '#v=' . $parsed['verse'];
+			if ( $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
 				$url .= '-' . $parsed['verse_end'];
 			}
 		}

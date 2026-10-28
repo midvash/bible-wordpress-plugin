@@ -3,7 +3,7 @@
  * Plugin Name: Bible by Midvash
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 0.10.0
+ * Version: 0.10.1
  * Author: Neto Gregório
  * Author URI: https://www.netogregorio.com.br
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BBMV_VERSION', '0.10.0' );
+define( 'BBMV_VERSION', '0.10.1' );
 define( 'BBMV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BBMV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BBMV_API_BASE_URL', 'https://api.midvash.com' );
@@ -106,14 +106,18 @@ bbmv_register_block();
 /**
  * URL of a bundled asset, preferring the minified copy built into the ZIP.
  *
- * The repository keeps only the readable sources; scripts/build-zip.ts adds a
- * `.min` file next to each one. SCRIPT_DEBUG serves the source.
+ * The repository keeps only the readable sources; scripts/build-zip.ts adds
+ * `name-<version>.min.ext` next to each one. The version lives in the file
+ * name, not only in `?ver=`, because caching plugins (WP Rocket's "remove
+ * query strings") strip the query and a CDN in front of the site then keeps
+ * serving the previous release's file for weeks. SCRIPT_DEBUG serves the
+ * source.
  *
  * @param string $path Path under the plugin directory (e.g. 'assets/js/bbm-tooltip.js').
  * @return string
  */
 function bbmv_asset_url( $path ) {
-	$min = preg_replace( '/\.(js|css)$/', '.min.$1', $path );
+	$min = preg_replace( '/\.(js|css)$/', '-' . BBMV_VERSION . '.min.$1', $path );
 	if ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) && file_exists( BBMV_PLUGIN_DIR . $min ) ) {
 		return BBMV_PLUGIN_URL . $min;
 	}

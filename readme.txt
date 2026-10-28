@@ -3,7 +3,7 @@ Contributors: netogregorio
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.10.0
+Stable tag: 0.10.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -99,7 +99,7 @@ Nine: Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, K
 This plugin relies on the **Midvash Bible API** (`api.midvash.com`), a third-party service operated by Midvash, to fetch verse content and the catalogue of available Bible versions.
 
 * **Plugin key.** Every request carries an `X-Midvash-Plugin-Key` header that identifies this plugin to the Midvash API, which then also serves the versions of midvash.com with reserved rights (marked © in Settings). The key is sent only from your server (`wp_remote_get`), never to the visitor's browser, and it is the same for every site: it identifies the plugin, not you or your site.
-* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.10.0`).
+* **What data is sent.** The plugin sends the Bible reference being looked up (e.g. "John 3:16") and the chosen version slug (e.g. "onbv"). No personal data is transmitted: no IP geolocation, no visitor ID, no analytics. The HTTP `User-Agent` header identifies the plugin and its version so the API team can debug compatibility issues (e.g. `Midvash-WP-Plugin/0.10.1`).
 * **When it is sent.** Shortly after a post renders, the references it contains are prefetched in one batched request (and a verse is also requested on hover if the prefetch hasn't finished, or when the Gutenberg block / VOTD widget renders). Subsequent loads for the same verse are served from a local cache for the configured TTL (default 30 days).
 * **Where it goes.** `https://api.midvash.com` over HTTPS, hosted on Cloudflare's edge.
 * **Service provider.** Midvash (https://midvash.com)
@@ -120,6 +120,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 4. Verse of the Day widget in the sidebar.
 
 == Changelog ==
+
+= 0.10.1 =
+* **New versions reach visitors behind a cache.** The minified script and stylesheet now carry the plugin version in the file name (`bbm-tooltip-0.10.1.min.js`). Caching plugins that strip `?ver=` from asset URLs (such as WP Rocket's "remove query strings") left a CDN serving the previous release's files, so the old tooltip stayed on the site after an update.
 
 = 0.10.0 =
 * **Every version of midvash.com.** The plugin now identifies itself to the Midvash API with a plugin key (sent only from your server), so the Settings list shows the full catalogue, including versions with reserved rights such as NVI or ARA, marked with ©. One chapter per reference, as before.
@@ -201,7 +204,7 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Upgrade Notice ==
 
-= 0.10.0 =
+= 0.10.1 =
 Adds every version of midvash.com to Settings, including versions with reserved rights. Also includes the 0.9.x fixes: images that mention "Bíblia", false links, translations, the tooltip look and slow pages when the API is down.
 
 = 0.8.1 =

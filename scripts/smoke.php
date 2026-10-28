@@ -29,6 +29,8 @@ try {
 	$out['html'] = $html;
 	$out['tooltip_after'] = wp_script_is( 'bbm-tooltip', 'enqueued' );
 	$out['script_src'] = wp_scripts()->registered['bbm-tooltip']->src;
+	// The version is in the file name, so a cache that strips ?ver= still sees a new URL.
+	$out['versioned_asset'] = false !== strpos( $out['script_src'], '-' . BBMV_VERSION . '.min.js' );
 	$out['img_ok'] = false !== strpos( $html, 'alt="Bíblia em João 3:16"' );
 	$out['bible_links'] = substr_count( $html, 'href="https://midvash.com/pt-br" ' );
 	$out['ref_links'] = substr_count( $html, 'data-midvash-ref' );

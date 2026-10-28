@@ -22,8 +22,10 @@
  *   - Saída padrão:    `dist/bible-by-midvash-{version}.zip`
  *   - Saída wp-org:    `dist/bible-by-midvash-{version}-wporg.zip`
  *
- * Minifica cada `assets/{js,css}/*` com esbuild e grava o `.min` ao lado do
- * original (o PHP serve o `.min`; com SCRIPT_DEBUG, o original). O código
+ * Minifica cada `assets/{js,css}/*` com esbuild e grava `nome-<versão>.min.ext`
+ * ao lado do original (o PHP serve o `.min`; com SCRIPT_DEBUG, o original). A
+ * versão vai no nome porque plugin de cache tira o `?ver=` e a CDN do site
+ * seguiria servindo o arquivo da release anterior. O código
  * legível fica no ZIP, como pede o wordpress.org.
  *
  * Usa o `zip` do macOS/linux e o esbuild via npx.
@@ -86,15 +88,15 @@ function stripWporgBlock(php: string): string {
 
 const ESBUILD = 'esbuild@0.24.2';
 
-/** Writes `name.min.ext` next to every .js/.css under assets/js and assets/css. */
-function minifyAssets(pluginDir: string) {
+/** Writes `name-<version>.min.ext` next to every .js/.css under assets/js and assets/css. */
+function minifyAssets(pluginDir: string, version: string) {
   for (const dir of ['assets/js', 'assets/css']) {
     const abs = join(pluginDir, dir);
     if (!existsSync(abs)) continue;
     for (const file of readdirSync(abs)) {
       if (!/\.(js|css)$/.test(file) || /\.min\.(js|css)$/.test(file)) continue;
       const src = join(abs, file);
-      const out = src.replace(/\.(js|css)$/, '.min.$1');
+      const out = src.replace(/\.(js|css)$/, `-${version}.min.$1`);
       execSync(`npx --yes ${ESBUILD} "${src}" --minify --log-level=warning --outfile="${out}"`, { stdio: 'inherit' });
     }
   }
@@ -122,7 +124,7 @@ function main() {
     cpSync(src, join(stagingPlugin, p), { recursive: true });
   }
 
-  minifyAssets(stagingPlugin);
+  minifyAssets(stagingPlugin, version);
 
   // For wp-org build: strip the auto-update block from the staged entry-point.
   if (target === 'wp-org') {

@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    name: Build ZIP, upload to R2, attach to release
+    name: Build ZIP, attach to release
     steps:
       - uses: actions/checkout@v5
 
@@ -22,25 +22,25 @@ jobs:
       - name: Install build deps
         run: npm install --no-save tsx
 
-      - name: Read version from bible-by-midvash.php
+      - name: Read version from midvash-bible-references.php
         id: version
         run: |
           set -euo pipefail
-          VERSION=$(grep -E "^\s*\*\s*Version:" bible-by-midvash.php | sed -E 's/.*Version:\s*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          VERSION=$(grep -E "^\s*\*\s*Version:" midvash-bible-references.php | sed -E 's/.*Version:\s*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
           echo "Plugin version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Verify version coherence (header / BBMV_VERSION / readme.txt)
+      - name: Verify version coherence (header / MVBR_VERSION / readme.txt)
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
-          BBM_CONST=$(grep -oE "BBMV_VERSION', '[^']+'" bible-by-midvash.php | sed -E "s/.*'([0-9.]+)'/\1/")
+          MVBR_CONST=$(grep -oE "MVBR_VERSION', '[^']+'" midvash-bible-references.php | sed -E "s/.*'([0-9.]+)'/\1/")
           STABLE_TAG=$(grep -E "^Stable tag:" readme.txt | sed -E 's/.*:\s*//')
           echo "Header:    $VERSION"
-          echo "Constant:  $BBM_CONST"
+          echo "Constant:  $MVBR_CONST"
           echo "Stable tag:$STABLE_TAG"
-          if [ "$VERSION" != "$BBM_CONST" ]; then
-            echo "::error::Header version ($VERSION) ≠ BBMV_VERSION constant ($BBM_CONST)"
+          if [ "$VERSION" != "$MVBR_CONST" ]; then
+            echo "::error::Header version ($VERSION) ≠ MVBR_VERSION constant ($MVBR_CONST)"
             exit 1
           fi
           if [ "$VERSION" != "$STABLE_TAG" ]; then
@@ -52,105 +52,21 @@ jobs:
             exit 1
           fi
 
-      - name: Build ZIP (default — with auto-updater, for R2 distribution)
+      # One ZIP for wordpress.org and the GitHub Release. The R2 channel
+      # (update-info.json + bible-by-midvash-*.zip, read by the old
+      # plugin-update-checker) stays frozen at 0.10.3: pushing this renamed
+      # plugin there would swap the main file under installs of the old
+      # bible-by-midvash folder and WordPress would deactivate them.
+      - name: Build ZIP
         run: npx tsx scripts/build-zip.ts
         env:
-          BBMV_PLUGIN_KEY: ${{ secrets.BBMV_PLUGIN_KEY }}
+          MVBR_PLUGIN_KEY: ${{ secrets.BBMV_PLUGIN_KEY }}
 
-      - name: Build ZIP (wp.org — auto-updater stripped)
-        run: npx tsx scripts/build-zip.ts --target=wp-org
-        env:
-          BBMV_PLUGIN_KEY: ${{ secrets.BBMV_PLUGIN_KEY }}
-
-      - name: Generate update-info.json
-        run: |
-          set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
-          README=readme.txt
-
-          REQUIRES=$(grep -E "^Requires at least:" "$README" | sed -E 's/.*:\s*//')
-          TESTED=$(grep -E "^Tested up to:" "$README" | sed -E 's/.*:\s*//')
-          REQUIRES_PHP=$(grep -E "^Requires PHP:" "$README" | sed -E 's/.*:\s*//')
-          NOW=$(date -u +"%Y-%m-%d %H:%M:%S")
-
-          jq -n \
-            --arg name "Bible by Midvash" \
-            --arg slug "bible-by-midvash" \
-            --arg version "$VERSION" \
-            --arg download "https://midvash.com/api/wordpress/download/$VERSION" \
-            --arg requires "$REQUIRES" \
-            --arg tested "$TESTED" \
-            --arg requires_php "$REQUIRES_PHP" \
-            --arg last_updated "$NOW" \
-            --arg homepage "https://midvash.com/wordpress-plugin" \
-            --arg author "Neto Gregório" \
-            --arg author_homepage "https://www.netogregorio.com.br" \
-            '{
-              name: $name,
-              slug: $slug,
-              version: $version,
-              download_url: $download,
-              homepage: $homepage,
-              author: $author,
-              author_homepage: $author_homepage,
-              requires: $requires,
-              tested: $tested,
-              requires_php: $requires_php,
-              last_updated: $last_updated,
-              sections: {
-                description: "Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips. Powered by the public Midvash API.",
-                installation: "Upload the ZIP via Plugins → Add New → Upload Plugin, activate, and you are done. Optional configuration in Settings → Bible by Midvash."
-              }
-            }' > dist/update-info.json
-
-          cat dist/update-info.json
-
-      - name: Upload versioned ZIP to R2
-        run: |
-          npx wrangler r2 object put \
-            "midvash-wordpress-plugin/bible-by-midvash-${{ steps.version.outputs.version }}.zip" \
-            --file "dist/bible-by-midvash-${{ steps.version.outputs.version }}.zip" \
-            --content-type "application/zip" \
-            --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Update "latest" alias on R2
-        run: |
-          npx wrangler r2 object put \
-            "midvash-wordpress-plugin/bible-by-midvash-latest.zip" \
-            --file "dist/bible-by-midvash-${{ steps.version.outputs.version }}.zip" \
-            --content-type "application/zip" \
-            --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Upload update-info.json to R2
-        run: |
-          npx wrangler r2 object put \
-            "midvash-wordpress-plugin/update-info.json" \
-            --file "dist/update-info.json" \
-            --content-type "application/json" \
-            --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Attach ZIPs to GitHub Release
+      - name: Attach ZIP to GitHub Release
         if: github.event_name == 'release'
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            "dist/bible-by-midvash-${{ steps.version.outputs.version }}.zip" \
-            "dist/bible-by-midvash-${{ steps.version.outputs.version }}-wporg.zip" \
+            "dist/midvash-bible-references-${{ steps.version.outputs.version }}.zip" \
             --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish info
-        run: |
-          echo "✅ Plugin v${{ steps.version.outputs.version }} published"
-          echo "   R2 (latest):    https://midvash.com/api/wordpress/download"
-          echo "   R2 (versioned): https://midvash.com/api/wordpress/download/${{ steps.version.outputs.version }}"
-          echo "   GitHub release: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name || steps.version.outputs.version }}"

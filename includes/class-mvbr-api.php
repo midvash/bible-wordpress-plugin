@@ -5,7 +5,7 @@
  * Responsible for making requests to the public API and managing cache.
  * Uses the new REST API format: /{version}/{book}/{chapter}/{verse}
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * HTTP client for the Midvash Bible API with transient/object caching.
  */
-class BBMV_API {
+class MVBR_API {
 
 	/**
 	 * API Base URL.
@@ -43,18 +43,18 @@ class BBMV_API {
 	 *
 	 * On sites with a persistent object cache (Redis, Memcached, MemCachier…),
 	 * lookups stay in-memory; on vanilla installs transients hit the options
-	 * table — still fine, just slower. Group names ending in "-bbm" keep
+	 * table — still fine, just slower. Group names ending in "-mvbr" keep
 	 * keys isolated from other plugins.
 	 */
-	const CACHE_GROUP = 'bbm';
+	const CACHE_GROUP = 'mvbr';
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->api_url = BBMV_API_BASE_URL;
+		$this->api_url = MVBR_API_BASE_URL;
 		$this->options = get_option(
-			'bbm_options',
+			'mvbr_options',
 			array(
 				'cache_enabled' => true,
 				'cache_ttl'     => 2592000,
@@ -64,13 +64,13 @@ class BBMV_API {
 			)
 		);
 		$this->locale  = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
-		$this->locale  = BBMV_Books::normalize_locale( $this->locale );
+		$this->locale  = MVBR_Books::normalize_locale( $this->locale );
 	}
 
 	/**
 	 * Resolves the version slug to request: the explicit one, else the saved
 	 * setting, else the locale default, mapped away from a version the API
-	 * does not serve (see BBMV_Books::resolve_version()), so widgets, blocks
+	 * does not serve (see MVBR_Books::resolve_version()), so widgets, blocks
 	 * and shortcodes that stored an old slug keep working.
 	 *
 	 * @param string|null $version Requested version slug, if any.
@@ -80,9 +80,9 @@ class BBMV_API {
 		if ( ! $version ) {
 			$version = ! empty( $this->options['versao'] )
 				? $this->options['versao']
-				: BBMV_Books::get_default_version( $this->locale );
+				: MVBR_Books::get_default_version( $this->locale );
 		}
-		return BBMV_Books::resolve_version( $version );
+		return MVBR_Books::resolve_version( $version );
 	}
 
 	/**
@@ -94,7 +94,7 @@ class BBMV_API {
 	 */
 	private function build_api_path( $parsed, $version ) {
 		// Get slug in English for API (API uses English slugs).
-		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], 'en' );
+		$book_slug = MVBR_Books::get_book_slug( $parsed['book_id'], 'en' );
 		$path      = '/' . strtolower( $version ) . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
@@ -151,8 +151,8 @@ class BBMV_API {
 			return null;
 		}
 
-		// Parse reference (centralized in BBMV_Books).
-		$parsed = BBMV_Books::parse_reference( $reference );
+		// Parse reference (centralized in MVBR_Books).
+		$parsed = MVBR_Books::parse_reference( $reference );
 		if ( ! $parsed ) {
 			return null;
 		}
@@ -223,7 +223,7 @@ class BBMV_API {
 			if ( '' === $reference || true !== $this->validate_reference( $reference ) ) {
 				continue;
 			}
-			$parsed = BBMV_Books::parse_reference( $reference );
+			$parsed = MVBR_Books::parse_reference( $reference );
 			if ( ! $parsed ) {
 				continue;
 			}
@@ -237,7 +237,7 @@ class BBMV_API {
 				}
 			}
 
-			$canonical = BBMV_Books::get_book_slug( $parsed['book_id'], 'en' ) . ' ' . $parsed['chapter'];
+			$canonical = MVBR_Books::get_book_slug( $parsed['book_id'], 'en' ) . ' ' . $parsed['chapter'];
 			if ( $parsed['verse'] ) {
 				$canonical .= ':' . $parsed['verse'];
 				if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
@@ -295,7 +295,7 @@ class BBMV_API {
 	}
 
 	/**
-	 * Headers for every API request. The plugin key (BBMV_PLUGIN_KEY) only
+	 * Headers for every API request. The plugin key (MVBR_PLUGIN_KEY) only
 	 * travels here, server to server.
 	 *
 	 * @return array
@@ -303,10 +303,10 @@ class BBMV_API {
 	private function request_headers() {
 		$headers = array(
 			'Accept'     => 'application/json',
-			'User-Agent' => 'Midvash-WP-Plugin/' . BBMV_VERSION,
+			'User-Agent' => 'Midvash-WP-Plugin/' . MVBR_VERSION,
 		);
-		if ( '' !== BBMV_PLUGIN_KEY ) {
-			$headers['X-Midvash-Plugin-Key'] = BBMV_PLUGIN_KEY;
+		if ( '' !== MVBR_PLUGIN_KEY ) {
+			$headers['X-Midvash-Plugin-Key'] = MVBR_PLUGIN_KEY;
 		}
 		return $headers;
 	}
@@ -386,7 +386,7 @@ class BBMV_API {
 	 * @param string $version Bible version slug.
 	 */
 	private function get_cache_key( $reference, $version ) {
-		return 'bbm_' . md5( $reference . '_' . $version );
+		return 'mvbr_' . md5( $reference . '_' . $version );
 	}
 
 	/**
@@ -437,7 +437,7 @@ class BBMV_API {
 	private function get_catalog( $allow_fetch = true ) {
 		// v3: refetch with the plugin key, which adds the versions with
 		// reserved rights (flagged `restricted`).
-		$cache_key = BBMV_Books::CATALOG_CACHE_KEY;
+		$cache_key = MVBR_Books::CATALOG_CACHE_KEY;
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;
@@ -445,7 +445,7 @@ class BBMV_API {
 
 		// A recent failure is remembered for a while, so an offline API costs
 		// one timeout per window instead of one per request.
-		if ( ! $allow_fetch || false !== get_transient( 'bbm_versions_failed' ) ) {
+		if ( ! $allow_fetch || false !== get_transient( 'mvbr_versions_failed' ) ) {
 			return null;
 		}
 
@@ -455,7 +455,7 @@ class BBMV_API {
 			return $result['data'];
 		}
 
-		set_transient( 'bbm_versions_failed', 1, 15 * MINUTE_IN_SECONDS );
+		set_transient( 'mvbr_versions_failed', 1, 15 * MINUTE_IN_SECONDS );
 		return null;
 	}
 
@@ -466,7 +466,7 @@ class BBMV_API {
 	 * @return bool
 	 */
 	public function has_catalog_cache() {
-		return false !== get_transient( BBMV_Books::CATALOG_CACHE_KEY ) || false !== get_transient( 'bbm_versions_failed' );
+		return false !== get_transient( MVBR_Books::CATALOG_CACHE_KEY ) || false !== get_transient( 'mvbr_versions_failed' );
 	}
 
 	/**
@@ -480,7 +480,7 @@ class BBMV_API {
 	 */
 	public function get_versions( $locale = null ) {
 		$locale = $locale ? $locale : $this->locale;
-		$locale = BBMV_Books::normalize_locale( $locale );
+		$locale = MVBR_Books::normalize_locale( $locale );
 
 		$catalog = $this->get_catalog();
 		if ( ! $catalog ) {
@@ -513,7 +513,7 @@ class BBMV_API {
 	 * @return array|null Version array with localizedNames/copyright, or null.
 	 */
 	public function get_version_meta( $version_slug, $allow_fetch = true ) {
-		$version_slug = BBMV_Books::resolve_version( $version_slug );
+		$version_slug = MVBR_Books::resolve_version( $version_slug );
 		$catalog      = $this->get_catalog( $allow_fetch );
 		if ( ! $catalog ) {
 			return null;
@@ -538,7 +538,7 @@ class BBMV_API {
 		if ( $meta && ! empty( $meta['shortName'] ) && is_string( $meta['shortName'] ) ) {
 			return $meta['shortName'];
 		}
-		return strtoupper( BBMV_Books::resolve_version( $version_slug ) );
+		return strtoupper( MVBR_Books::resolve_version( $version_slug ) );
 	}
 
 	/**
@@ -550,10 +550,10 @@ class BBMV_API {
 	 */
 	public function get_votd( $locale = null, $version = null ) {
 		$locale  = $locale ? $locale : $this->locale;
-		$locale  = BBMV_Books::normalize_locale( $locale );
-		$version = BBMV_Books::resolve_version( $version ? $version : BBMV_Books::get_default_version( $locale ) );
+		$locale  = MVBR_Books::normalize_locale( $locale );
+		$version = MVBR_Books::resolve_version( $version ? $version : MVBR_Books::get_default_version( $locale ) );
 
-		$cache_key = 'bbm_votd_' . $locale . '_' . $version . '_' . gmdate( 'Y-m-d' );
+		$cache_key = 'mvbr_votd_' . $locale . '_' . $version . '_' . gmdate( 'Y-m-d' );
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;
@@ -570,7 +570,7 @@ class BBMV_API {
 		if ( $result && isset( $result['text'] ) ) {
 			// Retry with locale default version if the chosen version returned an error.
 			if ( isset( $result['error'] ) ) {
-				$fallback = BBMV_Books::get_default_version( $locale );
+				$fallback = MVBR_Books::get_default_version( $locale );
 				if ( $fallback !== $version ) {
 					$result = $this->make_request(
 						'/votd',
@@ -596,6 +596,6 @@ class BBMV_API {
 
 	// Note: an HTTP-backed get_books() and a direct-SQL clear_cache() lived
 	// here in earlier versions but had zero callers (the parser uses the
-	// static BBMV_Books data, and cache wiping moved to uninstall.php). They
+	// static MVBR_Books data, and cache wiping moved to uninstall.php). They
 	// were removed to keep the API surface minimal.
 }

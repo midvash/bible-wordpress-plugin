@@ -1,0 +1,343 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Midvash Bible References package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Midvash Bible References 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 09:21-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: midvash-bible-references.php:213
+msgid "Verse currently unavailable"
+msgstr ""
+
+#: midvash-bible-references.php:214
+msgid "Read more"
+msgstr ""
+
+#: midvash-bible-references.php:285 midvash-bible-references.php:322
+msgid "Too many requests"
+msgstr ""
+
+#: midvash-bible-references.php:294 midvash-bible-references.php:332
+msgid "Reference not provided"
+msgstr ""
+
+#: midvash-bible-references.php:303
+msgid "Verse not found"
+msgstr ""
+
+#: midvash-bible-references.php:354
+msgid "Forbidden"
+msgstr ""
+
+#: midvash-bible-references.php:367
+msgid "Failed to fetch versions"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:62
+msgid "Loading…"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:63
+msgid "No versions available"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:64
+msgid "Error loading versions"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:75 includes/class-mvbr-admin.php:76
+#: includes/class-mvbr-admin.php:702
+msgid "Midvash Bible References"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:92
+msgid "General Settings"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:100
+msgid "Cache and Performance"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:108
+msgid "Language"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:117
+msgid "Bible Version"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:126
+msgid "Link Color"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:135
+msgid "Enable custom color"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:144
+msgid "Underline links"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:153
+msgid "Underline Color"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:162
+msgid "Underline Style"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:171
+msgid "Open in new tab"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:180
+msgid "Show version in tooltip"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:190
+msgid "Midvash logo in tooltip"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:199
+msgid "Enable cache"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:208
+msgid "Cache duration (seconds)"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:217
+msgid "API Timeout (seconds)"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:226
+msgid "Auto-linking Settings"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:234 includes/class-mvbr-admin.php:680
+msgid "Link the word \"Bíblia\""
+msgstr ""
+
+#: includes/class-mvbr-admin.php:375
+msgid "Configure how Bible references will be displayed."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:382
+msgid "Configure cache settings to improve tooltip performance."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:448
+msgid ""
+"Select the language for links and book names. This determines the URL "
+"structure on Midvash."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:499
+msgid ""
+"Select the Bible version for links and tooltips. Versions are fetched "
+"dynamically from Midvash."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:513
+msgid "Enable custom color for links"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:527
+msgid "Main color of the generated links."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:540
+msgid "Enable underline for links"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:554
+msgid "Color of the link underline."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:565
+msgid "Solid"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:566
+msgid "Double"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:567
+msgid "Dotted"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:568
+msgid "Dashed"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:569
+msgid "Wavy"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:578
+msgid "Style of the link underline."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:591
+msgid "Open links in a new browser tab"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:605
+msgid "Display Bible version in tooltip"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:619
+msgid ""
+"Show the Midvash logo in the tooltip, link the version badge to midvash.com "
+"and add a Midvash credit under the Verse of the Day"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:633
+msgid "Store verses in cache to improve performance"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:647
+msgid "Time in seconds (default: 2592000 = 30 days)."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:660
+msgid "Maximum wait time for the API."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:668
+msgid "Configure auto-linking for various elements in your content."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:682
+msgid "Links the first mention of the word \"Bíblia\" in each post to Midvash"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:704
+msgid ""
+"Auto-detect Bible references in your posts and turn them into beautiful "
+"links with verse tooltips."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:708
+msgid "Powered by Midvash API"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:713
+msgid "Plugin site"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:716
+msgid "Open Midvash"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:724
+msgid "General"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:728
+msgid "Cache & Performance"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:743
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:749
+msgid "How to use"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:750
+msgid ""
+"The plugin automatically detects Bible references in your posts. When "
+"hovering over a reference, a tooltip displays the verse text fetched from "
+"the Midvash API."
+msgstr ""
+
+#: includes/class-mvbr-admin.php:751
+msgid "Supported formats"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:753
+msgid "Single verse"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:754
+msgid "Alternative separator"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:755
+msgid "Verse range"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:756
+msgid "Abbreviation"
+msgstr ""
+
+#: includes/class-mvbr-admin.php:757
+msgid "Entire chapter"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:26
+msgid "Verse of the Day — Midvash"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:28
+msgid "Displays the daily Bible verse powered by the Midvash API."
+msgstr ""
+
+#: includes/class-mvbr-widget.php:77
+msgid "Verse of the Day"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:84
+msgid "Title:"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:90
+msgid "Language (leave empty to use plugin setting):"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:93
+msgid "— Use plugin setting —"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:113
+msgid "Version (leave empty for locale default):"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:117
+msgid "e.g. onbv, kjv, lsg"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:122
+msgid "Show reference (e.g. João 3:16)"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:128
+msgid "Link verse to Midvash"
+msgstr ""
+
+#: includes/class-mvbr-widget.php:192 includes/class-mvbr-block.php:110
+msgid "Verse currently unavailable."
+msgstr ""
+
+#: includes/class-mvbr-parser.php:207
+msgid "Online Bible"
+msgstr ""
+
+#: includes/class-mvbr-parser.php:280
+#, php-format
+msgid "Read %s on Midvash"
+msgstr ""

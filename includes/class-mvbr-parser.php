@@ -2,9 +2,9 @@
 /**
  * Class responsible for identifying and linking Bible references.
  *
- * Uses BBMV_Books for centralized book data with multilingual support.
+ * Uses MVBR_Books for centralized book data with multilingual support.
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Parses post content for Bible references and turns them into Midvash links.
  */
-class BBMV_Parser {
+class MVBR_Parser {
 
 	/**
 	 * Plugin options
@@ -42,7 +42,7 @@ class BBMV_Parser {
 	 */
 	public function init() {
 		$this->options = get_option(
-			'bbm_options',
+			'mvbr_options',
 			array(
 				'locale'           => 'pt-br',
 				'versao'           => 'onbv',
@@ -52,14 +52,14 @@ class BBMV_Parser {
 				'underline_color'  => '#B17027',
 				'underline_style'  => 'solid',
 				'new_tab'          => true,
-				'css_class'        => 'bbm-link',
+				'css_class'        => 'mvbr-link',
 				'show_version'     => true,
 				'link_biblia'      => false,
 			)
 		);
 
 		$this->locale = isset( $this->options['locale'] ) ? $this->options['locale'] : 'pt-br';
-		$this->locale = BBMV_Books::normalize_locale( $this->locale );
+		$this->locale = MVBR_Books::normalize_locale( $this->locale );
 
 		// Add filter to content.
 		add_filter( 'the_content', array( $this, 'parse_content' ), 20 );
@@ -116,7 +116,7 @@ class BBMV_Parser {
 	public function link_content( $content ) {
 		$this->referenced_books = array();
 
-		$regex   = BBMV_Books::get_reference_regex( $this->locale );
+		$regex   = MVBR_Books::get_reference_regex( $this->locale );
 		$content = $this->map_text_nodes(
 			$content,
 			function ( $text ) use ( $regex ) {
@@ -193,18 +193,18 @@ class BBMV_Parser {
 	 */
 	public function replace_bible_word( $matches ) {
 		--$this->bible_links_left;
-		wp_enqueue_style( 'bbm-style' );
+		wp_enqueue_style( 'mvbr-style' );
 
-		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
+		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'mvbr-link';
 		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
 		$target    = $new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
 
 		return sprintf(
 			'<a href="%s" class="%s"%s title="%s">%s</a>',
-			esc_url( BBMV_Books::site_url( $this->locale ) ),
+			esc_url( MVBR_Books::site_url( $this->locale ) ),
 			esc_attr( $css_class ),
 			$target,
-			esc_attr__( 'Online Bible', 'bible-by-midvash' ),
+			esc_attr__( 'Online Bible', 'midvash-bible-references' ),
 			esc_html( $matches[1] )
 		);
 	}
@@ -212,7 +212,7 @@ class BBMV_Parser {
 	/**
 	 * Replaces the reference with a link and data attributes for tooltip
 	 *
-	 * @param array $matches Matches of BBMV_Books::get_reference_regex(): full match at 0, `abbr` set when the book was abbreviated, `v` the verse.
+	 * @param array $matches Matches of MVBR_Books::get_reference_regex(): full match at 0, `abbr` set when the book was abbreviated, `v` the verse.
 	 */
 	public function replace_reference( $matches ) {
 		$original = $matches[0];
@@ -227,7 +227,7 @@ class BBMV_Parser {
 		// the original substring and adds accent fallback + chapter validation
 		// against the book's known chapter count. Sharing this path with the
 		// API client and the Gutenberg block keeps behaviour aligned.
-		$parsed = BBMV_Books::parse_reference( $original, $this->locale );
+		$parsed = MVBR_Books::parse_reference( $original, $this->locale );
 		if ( ! $parsed ) {
 			return $original;
 		}
@@ -235,8 +235,8 @@ class BBMV_Parser {
 		$book_id = $parsed['book_id'];
 
 		// The tooltip assets only load on posts that have a reference.
-		wp_enqueue_style( 'bbm-style' );
-		wp_enqueue_script( 'bbm-tooltip' );
+		wp_enqueue_style( 'mvbr-style' );
+		wp_enqueue_script( 'mvbr-tooltip' );
 
 		// Track this book as referenced.
 		if ( ! in_array( $book_id, $this->referenced_books, true ) ) {
@@ -244,17 +244,17 @@ class BBMV_Parser {
 		}
 
 		// Get settings.
-		$versao    = isset( $this->options['versao'] ) ? BBMV_Books::resolve_version( $this->options['versao'] ) : BBMV_Books::get_default_version( $this->locale );
-		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'bbm-link';
+		$versao    = isset( $this->options['versao'] ) ? MVBR_Books::resolve_version( $this->options['versao'] ) : MVBR_Books::get_default_version( $this->locale );
+		$css_class = isset( $this->options['css_class'] ) ? $this->options['css_class'] : 'mvbr-link';
 		$new_tab   = isset( $this->options['new_tab'] ) ? $this->options['new_tab'] : true;
 
 		// Get slug for the current locale.
-		$book_slug = BBMV_Books::get_book_slug( $book_id, $this->locale );
+		$book_slug = MVBR_Books::get_book_slug( $book_id, $this->locale );
 
 		// Format: https://midvash.com/{locale}/{version}/{book_slug}/{chapter}#v={verse}
 		// (no locale segment in English). The site anchors verses with #v=,
 		// so linking straight to it skips a redirect.
-		$url = BBMV_Books::site_url( $this->locale ) . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
+		$url = MVBR_Books::site_url( $this->locale ) . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
 			if ( $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
@@ -277,7 +277,7 @@ class BBMV_Parser {
 			esc_attr(
 				sprintf(
 				/* translators: %s: Bible reference */
-					__( 'Read %s on Midvash', 'bible-by-midvash' ),
+					__( 'Read %s on Midvash', 'midvash-bible-references' ),
 					$original
 				)
 			),

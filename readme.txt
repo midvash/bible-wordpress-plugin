@@ -1,9 +1,9 @@
-=== Bible by Midvash ===
+=== Midvash Bible References ===
 Contributors: midvash
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 0.10.3
+Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ Bible references in posts become hover-tooltip links with full verse text. 9 lan
 
 == Description ==
 
-**Bible by Midvash** finds Bible references in your content and quietly turns each one into a styled link with a hover-tooltip that shows the verse text — fetched live from the Midvash Bible API and cached locally for performance. No account and no configuration required for the default experience.
+**Midvash Bible References** finds Bible references in your content and quietly turns each one into a styled link with a hover-tooltip that shows the verse text — fetched live from the Midvash Bible API and cached locally for performance. No account and no configuration required for the default experience.
 
 It works on any post or page in any of nine languages, recognises both the full book name ("John 3:16") and the standard abbreviation of the site's language ("Jn 3:16" in English, "Jo 3:16" in Portuguese), accepts the colon and dot separators, supports verse ranges ("John 3:16-18") and chapter-only references ("Psalms 23"), and links each reference to the matching verse on [midvash.com](https://midvash.com) using the locale-appropriate URL.
 
@@ -21,7 +21,7 @@ It works on any post or page in any of nine languages, recognises both the full 
 * **Auto-detection of Bible references** in `the_content` (posts and pages) — including localised book names and abbreviations across 9 languages.
 * **Hover tooltip with the verse text**, fetched from the public Midvash API and cached for 30 days by default.
 * **Gutenberg block** "Bible Verse — Midvash" (category: Text) to insert any verse explicitly in the block editor with per-block version, language and style overrides.
-* **Verse of the Day** widget (Appearance → Widgets) and `[bbm_votd]` shortcode.
+* **Verse of the Day** widget (Appearance → Widgets) and `[mvbr_votd]` shortcode.
 * **Schema.org Quotation microdata** on every reference link, helping search engines surface rich results for verse pages.
 * **9 user-facing locales:** Portuguese (Brazil), English, Spanish, French, German, Italian, Russian, Korean, Chinese (Simplified) — each with localised book names, slugs, abbreviations and URLs.
 * **69 Bible versions** across those locales (October 2026), listed dynamically from the API as new translations are added.
@@ -41,7 +41,7 @@ Only the language chosen in Settings is matched, book names start with a capital
 
 = Available Bible versions =
 
-The list below mirrors the Midvash API catalogue in October 2026 and may grow over time. The plugin's Settings → Bible by Midvash page always shows the current catalogue.
+The list below mirrors the Midvash API catalogue in October 2026 and may grow over time. The plugin's Settings → Midvash Bible References page always shows the current catalogue.
 
 **Portuguese — 22:** AA ©, ACF ©, ARA ©, ARC ©, AS21 ©, BPT ©, JFAA ©, KJA ©, MSGPT ©, NAA ©, NBV ©, NTLH ©, NVI ©, NVT ©, ALMEIDA-LIVRE, BPM, ONBV, NVA, BLPT, TFT, OL ©, ALM1911
 **English — 18:** KJV, MSG ©, NIV ©, NLT ©, WEB, ASV, YLT, DRA, BBE, GENEVA1599, BSB, LSV, NET ©, DARBY, RV1885, CPDV, WMB, FBV
@@ -67,9 +67,9 @@ The readable JavaScript and CSS ship in the plugin next to the minified copies (
 
 == Installation ==
 
-1. Upload the `bible-by-midvash` folder to `/wp-content/plugins/`, **or** install via Plugins → Add New → search "Bible by Midvash".
+1. Upload the `midvash-bible-references` folder to `/wp-content/plugins/`, **or** install via Plugins → Add New → search "Midvash Bible References".
 2. Activate the plugin through the Plugins screen.
-3. (Optional) Go to **Settings → Bible by Midvash** to pick the language, default Bible version, link styling, and whether the word "Bíblia" should be linked too.
+3. (Optional) Go to **Settings → Midvash Bible References** to pick the language, default Bible version, link styling, and whether the word "Bíblia" should be linked too.
 4. Write a post that mentions a verse like `John 3:16` — that's it. Hover the link to see the tooltip.
 
 == Frequently Asked Questions ==
@@ -88,7 +88,7 @@ Yes — use the **Bible Verse — Midvash** Gutenberg block, available in the Te
 
 = How do I show a daily verse on the sidebar? =
 
-Add the **Verse of the Day — Midvash** widget via Appearance → Widgets, or drop `[bbm_votd]` anywhere in your content. Both accept `locale` and `version` overrides; the daily verse is cached for 24 hours.
+Add the **Verse of the Day — Midvash** widget via Appearance → Widgets, or drop `[mvbr_votd]` anywhere in your content. Both accept `locale` and `version` overrides; the daily verse is cached for 24 hours.
 
 = Which post types does auto-detection cover? =
 
@@ -96,7 +96,7 @@ Single posts and pages (`is_singular()` true). The Gutenberg block and the VOTD 
 
 = How do I change the link colour or underline style? =
 
-Settings → Bible by Midvash → General. Toggle "Enable custom color" and / or "Underline links", then pick the colour and style.
+Settings → Midvash Bible References → General. Toggle "Enable custom color" and / or "Underline links", then pick the colour and style.
 
 = What languages are supported? =
 
@@ -110,10 +110,10 @@ Every call carries two headers: `User-Agent: Midvash-WP-Plugin/<version>` (e.g. 
 
 The calls, what each one sends, and when:
 
-* **Version list** — `GET /v1/versions`. Sends nothing else. When you open Settings → Bible by Midvash, when you change the language there, and in a background task when the cached list is missing. Cached for 7 days.
+* **Version list** — `GET /v1/versions`. Sends nothing else. When you open Settings → Midvash Bible References, when you change the language there, and in a background task when the cached list is missing. Cached for 7 days.
 * **Verses of a post** — `GET /v1/passages`. Sends up to 20 references at a time (e.g. "John 3:16") and the version slug (e.g. "bsb"). Shortly after a visitor opens a post with references. Cached per verse for the configured time (30 days by default).
 * **One verse** — `GET /{version}/{book}/{chapter}/{verses}`. Sends the reference and the version slug in the path. When a visitor hovers a reference that is not cached yet, and when a Bible Verse block renders. Same cache.
-* **Verse of the day** — `GET /votd`. Sends the language (e.g. "pt-br") and the version slug. When the Verse of the Day widget or the `[bbm_votd]` shortcode renders. Cached for the day.
+* **Verse of the day** — `GET /votd`. Sends the language (e.g. "pt-br") and the version slug. When the Verse of the Day widget or the `[mvbr_votd]` shortcode renders. Cached for the day.
 
 No personal data is sent: no IP address, no visitor ID, no cookies, no analytics.
 
@@ -132,9 +132,16 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 1. Settings page — choose the display language, Bible version and link styling.
 2. A post with references detected automatically, and the verse tooltip on hover.
 3. The "Bible Verse — Midvash" block on a post, with the version's attribution.
-4. Verse of the Day, from the `[bbm_votd]` shortcode (also available as a widget).
+4. Verse of the Day, from the `[mvbr_votd]` shortcode (also available as a widget).
 
 == Changelog ==
+
+= 1.0.0 =
+* **New name: Midvash Bible References** (slug `midvash-bible-references`), published by Midvash. The plugin files, the text domain and every internal name now use the `mvbr` prefix.
+* **Settings and widgets carry over.** On the first load, the settings saved by 0.x and the Verse of the Day widgets are moved to the new names and the old rows are deleted.
+* **Changed:** the shortcode is now `[mvbr_votd]` and the block is `midvash-bible-references/verse`. Posts that used `[bbm_votd]` or the old block need to be edited once.
+* **Safer link styles.** Link and underline colours are validated as hex colours, and the underline style against its list, right before the CSS is written.
+* **Translations come from translate.wordpress.org.** The plugin no longer bundles `.po`/`.mo` files.
 
 = 0.10.3 =
 * **The tooltip stays open on the way to "Read more".** An invisible bridge covers the gap between the reference and the tooltip, and the tooltip waits a moment before hiding, so moving the mouse slowly from the link to the tooltip no longer closes it.
@@ -228,6 +235,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://midvash.com/wordpress-plugin.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+New name: Midvash Bible References. Settings and widgets move over on their own. The shortcode is now [mvbr_votd]: replace [bbm_votd] in your posts.
 
 = 0.10.3 =
 Adds every version of midvash.com to Settings, including versions with reserved rights. Also includes the 0.9.x fixes: images that mention "Bíblia", false links, translations, the tooltip look and slow pages when the API is down.

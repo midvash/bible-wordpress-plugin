@@ -1,22 +1,22 @@
 /**
- * Bible by Midvash — Admin (settings page)
+ * Midvash Bible References — Admin (settings page)
  *
  * Keeps the Bible Version <select> in sync with the chosen language by
  * fetching /versions from the Midvash API (cached server-side via transients).
  *
- * Data is passed in via window.bbmAdmin (wp_localize_script):
+ * Data is passed in via window.mvbrAdmin (wp_localize_script):
  *   { ajaxUrl, nonce, defaults, i18n }
  */
 (function () {
     'use strict';
 
-    if (!window.bbmAdmin) {
+    if (!window.mvbrAdmin) {
         return;
     }
 
-    var cfg            = window.bbmAdmin;
-    var localeSelect   = document.getElementById('bbm_locale');
-    var versionSelect  = document.getElementById('bbm_versao');
+    var cfg            = window.mvbrAdmin;
+    var localeSelect   = document.getElementById('mvbr_locale');
+    var versionSelect  = document.getElementById('mvbr_versao');
 
     if (!localeSelect || !versionSelect) {
         return;
@@ -72,7 +72,7 @@
         setLoading();
 
         var body = new FormData();
-        body.append('action', 'bbm_get_versions');
+        body.append('action', 'mvbr_get_versions');
         body.append('nonce', cfg.nonce);
         body.append('locale', locale);
 

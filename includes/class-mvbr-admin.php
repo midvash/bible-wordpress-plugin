@@ -2,7 +2,7 @@
 /**
  * Class responsible for the plugin settings page.
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin settings screen: registers the options page, sections, fields and
  * sanitization for the plugin's settings.
  */
-class BBMV_Admin {
+class MVBR_Admin {
 
 	/**
 	 * Initializes the admin
@@ -30,38 +30,38 @@ class BBMV_Admin {
 	 * @param string $hook Hook suffix of the current admin page.
 	 */
 	public function enqueue_admin_assets( $hook ) {
-		if ( 'settings_page_bbm' !== $hook ) {
+		if ( 'settings_page_mvbr' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'bbm-admin-style',
-			bbmv_asset_url( 'assets/css/bbm-admin.css' ),
+			'mvbr-admin-style',
+			mvbr_asset_url( 'assets/css/mvbr-admin.css' ),
 			array(),
-			BBMV_VERSION
+			MVBR_VERSION
 		);
 
 		wp_enqueue_script(
-			'bbm-admin',
-			bbmv_asset_url( 'assets/js/bbm-admin.js' ),
+			'mvbr-admin',
+			mvbr_asset_url( 'assets/js/mvbr-admin.js' ),
 			array(),
-			BBMV_VERSION,
+			MVBR_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'bbm-admin',
-			'bbmAdmin',
+			'mvbr-admin',
+			'mvbrAdmin',
 			array(
 				'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'bbm_nonce' ),
-				// Kept in sync with BBMV_Books::DEFAULT_VERSIONS — passed to JS so
+				'nonce'    => wp_create_nonce( 'mvbr_nonce' ),
+				// Kept in sync with MVBR_Books::DEFAULT_VERSIONS — passed to JS so
 				// the version select snaps to the preferred default per locale.
-				'defaults' => BBMV_Books::DEFAULT_VERSIONS,
+				'defaults' => MVBR_Books::DEFAULT_VERSIONS,
 				'i18n'     => array(
-					'loading' => __( 'Loading…', 'bible-by-midvash' ),
-					'empty'   => __( 'No versions available', 'bible-by-midvash' ),
-					'error'   => __( 'Error loading versions', 'bible-by-midvash' ),
+					'loading' => __( 'Loading…', 'midvash-bible-references' ),
+					'empty'   => __( 'No versions available', 'midvash-bible-references' ),
+					'error'   => __( 'Error loading versions', 'midvash-bible-references' ),
 				),
 			)
 		);
@@ -72,10 +72,10 @@ class BBMV_Admin {
 	 */
 	public function add_admin_menu() {
 		add_options_page(
-			__( 'Bible by Midvash', 'bible-by-midvash' ),
-			__( 'Bible by Midvash', 'bible-by-midvash' ),
+			__( 'Midvash Bible References', 'midvash-bible-references' ),
+			__( 'Midvash Bible References', 'midvash-bible-references' ),
 			'manage_options',
-			'bbm',
+			'mvbr',
 			array( $this, 'options_page' )
 		);
 	}
@@ -84,157 +84,157 @@ class BBMV_Admin {
 	 * Registers settings
 	 */
 	public function settings_init() {
-		register_setting( 'bbm', 'bbm_options', array( $this, 'sanitize_options' ) );
+		register_setting( 'mvbr', 'mvbr_options', array( $this, 'sanitize_options' ) );
 
 		// Main section.
 		add_settings_section(
-			'bbm_section_main',
-			esc_html__( 'General Settings', 'bible-by-midvash' ),
+			'mvbr_section_main',
+			esc_html__( 'General Settings', 'midvash-bible-references' ),
 			array( $this, 'section_main_callback' ),
-			'bbm_general'
+			'mvbr_general'
 		);
 
 		// Cache section.
 		add_settings_section(
-			'bbm_section_cache',
-			esc_html__( 'Cache and Performance', 'bible-by-midvash' ),
+			'mvbr_section_cache',
+			esc_html__( 'Cache and Performance', 'midvash-bible-references' ),
 			array( $this, 'section_cache_callback' ),
-			'bbm_cache'
+			'mvbr_cache'
 		);
 
 		// Field: Language/Locale.
 		add_settings_field(
 			'locale',
-			esc_html__( 'Language', 'bible-by-midvash' ),
+			esc_html__( 'Language', 'midvash-bible-references' ),
 			array( $this, 'locale_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Bible Version.
 		add_settings_field(
 			'versao',
-			esc_html__( 'Bible Version', 'bible-by-midvash' ),
+			esc_html__( 'Bible Version', 'midvash-bible-references' ),
 			array( $this, 'versao_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Link Color (sempre visível, aplicada quando use_custom_color estiver marcado).
 		add_settings_field(
 			'link_color',
-			esc_html__( 'Link Color', 'bible-by-midvash' ),
+			esc_html__( 'Link Color', 'midvash-bible-references' ),
 			array( $this, 'link_color_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Use Custom Color.
 		add_settings_field(
 			'use_custom_color',
-			esc_html__( 'Enable custom color', 'bible-by-midvash' ),
+			esc_html__( 'Enable custom color', 'midvash-bible-references' ),
 			array( $this, 'use_custom_color_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Underline Link.
 		add_settings_field(
 			'underline_link',
-			esc_html__( 'Underline links', 'bible-by-midvash' ),
+			esc_html__( 'Underline links', 'midvash-bible-references' ),
 			array( $this, 'underline_link_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Underline Color.
 		add_settings_field(
 			'underline_color',
-			esc_html__( 'Underline Color', 'bible-by-midvash' ),
+			esc_html__( 'Underline Color', 'midvash-bible-references' ),
 			array( $this, 'underline_color_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Underline Style.
 		add_settings_field(
 			'underline_style',
-			esc_html__( 'Underline Style', 'bible-by-midvash' ),
+			esc_html__( 'Underline Style', 'midvash-bible-references' ),
 			array( $this, 'underline_style_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Open in new tab.
 		add_settings_field(
 			'new_tab',
-			esc_html__( 'Open in new tab', 'bible-by-midvash' ),
+			esc_html__( 'Open in new tab', 'midvash-bible-references' ),
 			array( $this, 'new_tab_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Show version in tooltip.
 		add_settings_field(
 			'show_version',
-			esc_html__( 'Show version in tooltip', 'bible-by-midvash' ),
+			esc_html__( 'Show version in tooltip', 'midvash-bible-references' ),
 			array( $this, 'show_version_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Midvash logo in the tooltip (off by default: credits and links
 		// on the public site need the site owner's opt-in).
 		add_settings_field(
 			'show_branding',
-			esc_html__( 'Midvash logo in tooltip', 'bible-by-midvash' ),
+			esc_html__( 'Midvash logo in tooltip', 'midvash-bible-references' ),
 			array( $this, 'show_branding_render' ),
-			'bbm_general',
-			'bbm_section_main'
+			'mvbr_general',
+			'mvbr_section_main'
 		);
 
 		// Field: Cache enabled.
 		add_settings_field(
 			'cache_enabled',
-			esc_html__( 'Enable cache', 'bible-by-midvash' ),
+			esc_html__( 'Enable cache', 'midvash-bible-references' ),
 			array( $this, 'cache_enabled_render' ),
-			'bbm_cache',
-			'bbm_section_cache'
+			'mvbr_cache',
+			'mvbr_section_cache'
 		);
 
 		// Field: Cache TTL.
 		add_settings_field(
 			'cache_ttl',
-			esc_html__( 'Cache duration (seconds)', 'bible-by-midvash' ),
+			esc_html__( 'Cache duration (seconds)', 'midvash-bible-references' ),
 			array( $this, 'cache_ttl_render' ),
-			'bbm_cache',
-			'bbm_section_cache'
+			'mvbr_cache',
+			'mvbr_section_cache'
 		);
 
 		// Field: Timeout.
 		add_settings_field(
 			'timeout',
-			esc_html__( 'API Timeout (seconds)', 'bible-by-midvash' ),
+			esc_html__( 'API Timeout (seconds)', 'midvash-bible-references' ),
 			array( $this, 'timeout_render' ),
-			'bbm_cache',
-			'bbm_section_cache'
+			'mvbr_cache',
+			'mvbr_section_cache'
 		);
 
 		// Auto-linking section.
 		add_settings_section(
-			'bbm_section_linking',
-			esc_html__( 'Auto-linking Settings', 'bible-by-midvash' ),
+			'mvbr_section_linking',
+			esc_html__( 'Auto-linking Settings', 'midvash-bible-references' ),
 			array( $this, 'section_linking_callback' ),
-			'bbm_general'
+			'mvbr_general'
 		);
 
 		// Field: Link "Bíblia".
 		add_settings_field(
 			'link_biblia',
-			esc_html__( 'Link the word "Bíblia"', 'bible-by-midvash' ),
+			esc_html__( 'Link the word "Bíblia"', 'midvash-bible-references' ),
 			array( $this, 'link_biblia_render' ),
-			'bbm_general',
-			'bbm_section_linking'
+			'mvbr_general',
+			'mvbr_section_linking'
 		);
 	}
 
@@ -269,7 +269,7 @@ class BBMV_Admin {
 			return false;
 		}
         // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return sanitize_key( wp_unslash( $_POST['option_page'] ) ) === 'bbm';
+		return sanitize_key( wp_unslash( $_POST['option_page'] ) ) === 'mvbr';
 	}
 
 	/**
@@ -298,7 +298,7 @@ class BBMV_Admin {
 	 * @param array $input Raw options array submitted via the Settings API.
 	 */
 	public function sanitize_options( $input ) {
-		$existing  = get_option( 'bbm_options', array() );
+		$existing  = get_option( 'mvbr_options', array() );
 		$sanitized = is_array( $existing ) ? $existing : array();
 
 		if ( ! is_array( $input ) ) {
@@ -326,23 +326,23 @@ class BBMV_Admin {
 
 		// ----- Locale -----
 		if ( isset( $input['locale'] ) ) {
-			$valid_locales = BBMV_Books::LOCALES;
+			$valid_locales = MVBR_Books::LOCALES;
 			$new_locale    = sanitize_text_field( $input['locale'] );
 			$new_locale    = in_array( $new_locale, $valid_locales, true ) ? $new_locale : 'pt-br';
-			$new_locale    = BBMV_Books::normalize_locale( $new_locale );
+			$new_locale    = MVBR_Books::normalize_locale( $new_locale );
 
 			$old_locale          = isset( $sanitized['locale'] ) ? $sanitized['locale'] : 'pt-br';
 			$sanitized['locale'] = $new_locale;
 
 			// If locale changed, snap version to that locale's default (unless caller picked one).
 			if ( $new_locale !== $old_locale && ! isset( $input['versao'] ) ) {
-				$sanitized['versao'] = BBMV_Books::get_default_version( $new_locale );
+				$sanitized['versao'] = MVBR_Books::get_default_version( $new_locale );
 			}
 		}
 
 		// ----- Version -----
 		if ( isset( $input['versao'] ) ) {
-			$sanitized['versao'] = BBMV_Books::resolve_version( sanitize_text_field( $input['versao'] ) );
+			$sanitized['versao'] = MVBR_Books::resolve_version( sanitize_text_field( $input['versao'] ) );
 		}
 
 		// ----- Underline style (constrained list) -----
@@ -353,7 +353,7 @@ class BBMV_Admin {
 		}
 
 		// CSS class is fixed for now (kept here so consumers can rely on it).
-		$sanitized['css_class'] = 'bbm-link';
+		$sanitized['css_class'] = 'mvbr-link';
 
 		// ----- Cache numbers -----
 		if ( isset( $input['cache_ttl'] ) ) {
@@ -372,21 +372,21 @@ class BBMV_Admin {
 	 * Main section callback
 	 */
 	public function section_main_callback() {
-		echo '<p>' . esc_html__( 'Configure how Bible references will be displayed.', 'bible-by-midvash' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure how Bible references will be displayed.', 'midvash-bible-references' ) . '</p>';
 	}
 
 	/**
 	 * Cache section callback
 	 */
 	public function section_cache_callback() {
-		echo '<p>' . esc_html__( 'Configure cache settings to improve tooltip performance.', 'bible-by-midvash' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure cache settings to improve tooltip performance.', 'midvash-bible-references' ) . '</p>';
 	}
 
 	/**
 	 * Render: Language/Locale
 	 */
 	public function locale_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$locale  = isset( $options['locale'] ) ? $options['locale'] : 'pt-br';
 
 		$locales = array(
@@ -437,7 +437,7 @@ class BBMV_Admin {
 			),
 		);
 		?>
-		<select name="bbm_options[locale]" id="bbm_locale">
+		<select name="mvbr_options[locale]" id="mvbr_locale">
 			<?php foreach ( $locales as $code => $data ) : ?>
 				<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $locale, $code ); ?>>
 					<?php echo esc_html( $data['flag'] . ' ' . $data['name'] ); ?>
@@ -445,7 +445,7 @@ class BBMV_Admin {
 			<?php endforeach; ?>
 		</select>
 		<p class="description">
-			<?php esc_html_e( 'Select the language for links and book names. This determines the URL structure on Midvash.', 'bible-by-midvash' ); ?>
+			<?php esc_html_e( 'Select the language for links and book names. This determines the URL structure on Midvash.', 'midvash-bible-references' ); ?>
 		</p>
 		<?php
 	}
@@ -454,22 +454,22 @@ class BBMV_Admin {
 	 * Render: Bible Version
 	 */
 	public function versao_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$locale  = isset( $options['locale'] ) ? $options['locale'] : 'pt-br';
-		$locale  = BBMV_Books::normalize_locale( $locale );
+		$locale  = MVBR_Books::normalize_locale( $locale );
 
 		// Get default version for current locale.
-		$default_version = BBMV_Books::get_default_version( $locale );
-		$versao          = isset( $options['versao'] ) ? BBMV_Books::resolve_version( $options['versao'] ) : $default_version;
+		$default_version = MVBR_Books::get_default_version( $locale );
+		$versao          = isset( $options['versao'] ) ? MVBR_Books::resolve_version( $options['versao'] ) : $default_version;
 
-		$api = new BBMV_API();
+		$api = new MVBR_API();
 		// Get versions filtered by current locale from API.
 		$api_versions = $api->get_versions( $locale );
 
 		// If API fails, show empty state (will be loaded via AJAX).
 		$versions_to_show = $api_versions ? $api_versions : array();
 		?>
-		<select name="bbm_options[versao]" id="bbm_versao">
+		<select name="mvbr_options[versao]" id="mvbr_versao">
 			<?php if ( $versions_to_show ) : ?>
 				<?php foreach ( $versions_to_show as $v ) : ?>
 					<?php
@@ -496,7 +496,7 @@ class BBMV_Admin {
 			<?php endif; ?>
 		</select>
 		<p class="description">
-			<?php esc_html_e( 'Select the Bible version for links and tooltips. Versions are fetched dynamically from Midvash.', 'bible-by-midvash' ); ?>
+			<?php esc_html_e( 'Select the Bible version for links and tooltips. Versions are fetched dynamically from Midvash.', 'midvash-bible-references' ); ?>
 		</p>
 		<?php
 	}
@@ -505,12 +505,12 @@ class BBMV_Admin {
 	 * Render: Use Custom Color
 	 */
 	public function use_custom_color_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$val     = isset( $options['use_custom_color'] ) ? $options['use_custom_color'] : false;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[use_custom_color]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Enable custom color for links', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[use_custom_color]" value="1" <?php checked( $val, true ); ?>>
+			<?php esc_html_e( 'Enable custom color for links', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -519,12 +519,12 @@ class BBMV_Admin {
 	 * Render: Link Color
 	 */
 	public function link_color_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$color   = isset( $options['link_color'] ) ? $options['link_color'] : '#B17027';
 		?>
-		<input type="color" name="bbm_options[link_color]" value="<?php echo esc_attr( $color ); ?>">
+		<input type="color" name="mvbr_options[link_color]" value="<?php echo esc_attr( $color ); ?>">
 		<code><?php echo esc_html( $color ); ?></code>
-		<p class="description"><?php esc_html_e( 'Main color of the generated links.', 'bible-by-midvash' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Main color of the generated links.', 'midvash-bible-references' ); ?></p>
 		<?php
 	}
 
@@ -532,12 +532,12 @@ class BBMV_Admin {
 	 * Render: Underline Link
 	 */
 	public function underline_link_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$val     = isset( $options['underline_link'] ) ? $options['underline_link'] : false;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[underline_link]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Enable underline for links', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[underline_link]" value="1" <?php checked( $val, true ); ?>>
+			<?php esc_html_e( 'Enable underline for links', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -546,12 +546,12 @@ class BBMV_Admin {
 	 * Render: Underline Color
 	 */
 	public function underline_color_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$color   = isset( $options['underline_color'] ) ? $options['underline_color'] : '#B17027';
 		?>
-		<input type="color" name="bbm_options[underline_color]" value="<?php echo esc_attr( $color ); ?>">
+		<input type="color" name="mvbr_options[underline_color]" value="<?php echo esc_attr( $color ); ?>">
 		<code><?php echo esc_html( $color ); ?></code>
-		<p class="description"><?php esc_html_e( 'Color of the link underline.', 'bible-by-midvash' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Color of the link underline.', 'midvash-bible-references' ); ?></p>
 		<?php
 	}
 
@@ -559,23 +559,23 @@ class BBMV_Admin {
 	 * Render: Underline Style
 	 */
 	public function underline_style_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$style   = isset( $options['underline_style'] ) ? $options['underline_style'] : 'solid';
 		$styles  = array(
-			'solid'  => esc_html__( 'Solid', 'bible-by-midvash' ),
-			'double' => esc_html__( 'Double', 'bible-by-midvash' ),
-			'dotted' => esc_html__( 'Dotted', 'bible-by-midvash' ),
-			'dashed' => esc_html__( 'Dashed', 'bible-by-midvash' ),
-			'wavy'   => esc_html__( 'Wavy', 'bible-by-midvash' ),
+			'solid'  => esc_html__( 'Solid', 'midvash-bible-references' ),
+			'double' => esc_html__( 'Double', 'midvash-bible-references' ),
+			'dotted' => esc_html__( 'Dotted', 'midvash-bible-references' ),
+			'dashed' => esc_html__( 'Dashed', 'midvash-bible-references' ),
+			'wavy'   => esc_html__( 'Wavy', 'midvash-bible-references' ),
 		);
 		?>
-		<select name="bbm_options[underline_style]">
+		<select name="mvbr_options[underline_style]">
 			<?php foreach ( $styles as $value => $label ) : ?>
 				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $style, $value ); ?>><?php echo esc_html( $label ); ?>
 				</option>
 			<?php endforeach; ?>
 		</select>
-		<p class="description"><?php esc_html_e( 'Style of the link underline.', 'bible-by-midvash' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Style of the link underline.', 'midvash-bible-references' ); ?></p>
 		<?php
 	}
 
@@ -583,12 +583,12 @@ class BBMV_Admin {
 	 * Render: Open in new tab
 	 */
 	public function new_tab_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$new_tab = isset( $options['new_tab'] ) ? $options['new_tab'] : true;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[new_tab]" value="1" <?php checked( $new_tab, true ); ?>>
-			<?php esc_html_e( 'Open links in a new browser tab', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[new_tab]" value="1" <?php checked( $new_tab, true ); ?>>
+			<?php esc_html_e( 'Open links in a new browser tab', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -597,12 +597,12 @@ class BBMV_Admin {
 	 * Render: Show version in tooltip
 	 */
 	public function show_version_render() {
-		$options      = get_option( 'bbm_options' );
+		$options      = get_option( 'mvbr_options' );
 		$show_version = isset( $options['show_version'] ) ? $options['show_version'] : true;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[show_version]" value="1" <?php checked( $show_version, true ); ?>>
-			<?php esc_html_e( 'Display Bible version in tooltip', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[show_version]" value="1" <?php checked( $show_version, true ); ?>>
+			<?php esc_html_e( 'Display Bible version in tooltip', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -611,12 +611,12 @@ class BBMV_Admin {
 	 * Render: Midvash logo in the tooltip
 	 */
 	public function show_branding_render() {
-		$options       = get_option( 'bbm_options' );
+		$options       = get_option( 'mvbr_options' );
 		$show_branding = ! empty( $options['show_branding'] );
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[show_branding]" value="1" <?php checked( $show_branding, true ); ?>>
-			<?php esc_html_e( 'Show the Midvash logo in the tooltip, link the version badge to midvash.com and add a Midvash credit under the Verse of the Day', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[show_branding]" value="1" <?php checked( $show_branding, true ); ?>>
+			<?php esc_html_e( 'Show the Midvash logo in the tooltip, link the version badge to midvash.com and add a Midvash credit under the Verse of the Day', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -625,12 +625,12 @@ class BBMV_Admin {
 	 * Render: Cache enabled
 	 */
 	public function cache_enabled_render() {
-		$options       = get_option( 'bbm_options' );
+		$options       = get_option( 'mvbr_options' );
 		$cache_enabled = isset( $options['cache_enabled'] ) ? $options['cache_enabled'] : true;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[cache_enabled]" value="1" <?php checked( $cache_enabled, true ); ?>>
-			<?php esc_html_e( 'Store verses in cache to improve performance', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[cache_enabled]" value="1" <?php checked( $cache_enabled, true ); ?>>
+			<?php esc_html_e( 'Store verses in cache to improve performance', 'midvash-bible-references' ); ?>
 		</label>
 		<?php
 	}
@@ -639,12 +639,12 @@ class BBMV_Admin {
 	 * Render: Cache TTL
 	 */
 	public function cache_ttl_render() {
-		$options   = get_option( 'bbm_options' );
+		$options   = get_option( 'mvbr_options' );
 		$cache_ttl = isset( $options['cache_ttl'] ) ? $options['cache_ttl'] : 2592000;
 		?>
-		<input type="number" name="bbm_options[cache_ttl]" value="<?php echo esc_attr( $cache_ttl ); ?>" min="60" max="2592000"
+		<input type="number" name="mvbr_options[cache_ttl]" value="<?php echo esc_attr( $cache_ttl ); ?>" min="60" max="2592000"
 			step="60">
-		<p class="description"><?php esc_html_e( 'Time in seconds (default: 2592000 = 30 days).', 'bible-by-midvash' ); ?>
+		<p class="description"><?php esc_html_e( 'Time in seconds (default: 2592000 = 30 days).', 'midvash-bible-references' ); ?>
 		</p>
 		<?php
 	}
@@ -653,11 +653,11 @@ class BBMV_Admin {
 	 * Render: Timeout
 	 */
 	public function timeout_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$timeout = isset( $options['timeout'] ) ? $options['timeout'] : 5;
 		?>
-		<input type="number" name="bbm_options[timeout]" value="<?php echo esc_attr( $timeout ); ?>" min="1" max="30">
-		<p class="description"><?php esc_html_e( 'Maximum wait time for the API.', 'bible-by-midvash' ); ?></p>
+		<input type="number" name="mvbr_options[timeout]" value="<?php echo esc_attr( $timeout ); ?>" min="1" max="30">
+		<p class="description"><?php esc_html_e( 'Maximum wait time for the API.', 'midvash-bible-references' ); ?></p>
 		<?php
 	}
 
@@ -665,21 +665,21 @@ class BBMV_Admin {
 	 * Linking section callback
 	 */
 	public function section_linking_callback() {
-		echo '<p>' . esc_html__( 'Configure auto-linking for various elements in your content.', 'bible-by-midvash' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure auto-linking for various elements in your content.', 'midvash-bible-references' ) . '</p>';
 	}
 
 	/**
 	 * Render: Link Biblia
 	 */
 	public function link_biblia_render() {
-		$options = get_option( 'bbm_options' );
+		$options = get_option( 'mvbr_options' );
 		$val     = isset( $options['link_biblia'] ) ? $options['link_biblia'] : false;
 		?>
 		<label>
-			<input type="checkbox" name="bbm_options[link_biblia]" value="1" <?php checked( $val, true ); ?>>
-			<?php esc_html_e( 'Link the word "Bíblia"', 'bible-by-midvash' ); ?>
+			<input type="checkbox" name="mvbr_options[link_biblia]" value="1" <?php checked( $val, true ); ?>>
+			<?php esc_html_e( 'Link the word "Bíblia"', 'midvash-bible-references' ); ?>
 		</label>
-		<p class="description"><?php esc_html_e( 'Links the first mention of the word "Bíblia" in each post to Midvash', 'bible-by-midvash' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Links the first mention of the word "Bíblia" in each post to Midvash', 'midvash-bible-references' ); ?></p>
 		<?php
 	}
 
@@ -688,73 +688,73 @@ class BBMV_Admin {
 	 */
 	public function options_page() {
 		$active_tab = $this->get_active_tab();
-		// Cache-buster com BBMV_VERSION pra que o browser não sirva ícone antigo
+		// Cache-buster com MVBR_VERSION pra que o browser não sirva ícone antigo
 		// após upgrade (img tag não tem o equivalente de wp_enqueue_style/_script).
-		$icon_url = BBMV_PLUGIN_URL . 'assets/images/icon-bbm.svg?v=' . BBMV_VERSION;
+		$icon_url = MVBR_PLUGIN_URL . 'assets/images/icon-mvbr.svg?v=' . MVBR_VERSION;
 		?>
-		<div class="wrap bbm-wrap">
+		<div class="wrap mvbr-wrap">
 
-			<div class="bbm-hero">
-				<div class="bbm-hero__logo">
+			<div class="mvbr-hero">
+				<div class="mvbr-hero__logo">
 					<img src="<?php echo esc_url( $icon_url ); ?>" alt="Midvash">
 				</div>
-				<div class="bbm-hero__content">
-					<h1 class="bbm-hero__title"><?php esc_html_e( 'Bible by Midvash', 'bible-by-midvash' ); ?></h1>
-					<p class="bbm-hero__subtitle">
-						<?php esc_html_e( 'Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips.', 'bible-by-midvash' ); ?>
+				<div class="mvbr-hero__content">
+					<h1 class="mvbr-hero__title"><?php esc_html_e( 'Midvash Bible References', 'midvash-bible-references' ); ?></h1>
+					<p class="mvbr-hero__subtitle">
+						<?php esc_html_e( 'Auto-detect Bible references in your posts and turn them into beautiful links with verse tooltips.', 'midvash-bible-references' ); ?>
 					</p>
-					<div class="bbm-hero__meta">
-						<span class="bbm-badge">v<?php echo esc_html( BBMV_VERSION ); ?></span>
-						<span class="bbm-badge"><?php esc_html_e( 'Powered by Midvash API', 'bible-by-midvash' ); ?></span>
+					<div class="mvbr-hero__meta">
+						<span class="mvbr-badge">v<?php echo esc_html( MVBR_VERSION ); ?></span>
+						<span class="mvbr-badge"><?php esc_html_e( 'Powered by Midvash API', 'midvash-bible-references' ); ?></span>
 					</div>
 				</div>
-				<div class="bbm-hero__actions">
-					<a href="https://midvash.com/wordpress-plugin" target="_blank" rel="noopener noreferrer" class="bbm-btn">
-						<?php esc_html_e( 'Plugin site', 'bible-by-midvash' ); ?> ↗
+				<div class="mvbr-hero__actions">
+					<a href="https://midvash.com/wordpress-plugin" target="_blank" rel="noopener noreferrer" class="mvbr-btn">
+						<?php esc_html_e( 'Plugin site', 'midvash-bible-references' ); ?> ↗
 					</a>
-					<a href="https://midvash.com" target="_blank" rel="noopener noreferrer" class="bbm-btn bbm-btn--primary">
-						<?php esc_html_e( 'Open Midvash', 'bible-by-midvash' ); ?> ↗
+					<a href="https://midvash.com" target="_blank" rel="noopener noreferrer" class="mvbr-btn mvbr-btn--primary">
+						<?php esc_html_e( 'Open Midvash', 'midvash-bible-references' ); ?> ↗
 					</a>
 				</div>
 			</div>
 
 			<h2 class="nav-tab-wrapper">
-				<a href="?page=bbm&tab=general"
+				<a href="?page=mvbr&tab=general"
 					class="nav-tab <?php echo esc_attr( 'general' === $active_tab ? 'nav-tab-active' : '' ); ?>">
-					<?php esc_html_e( 'General', 'bible-by-midvash' ); ?>
+					<?php esc_html_e( 'General', 'midvash-bible-references' ); ?>
 				</a>
-				<a href="?page=bbm&tab=cache"
+				<a href="?page=mvbr&tab=cache"
 					class="nav-tab <?php echo esc_attr( 'cache' === $active_tab ? 'nav-tab-active' : '' ); ?>">
-					<?php esc_html_e( 'Cache & Performance', 'bible-by-midvash' ); ?>
+					<?php esc_html_e( 'Cache & Performance', 'midvash-bible-references' ); ?>
 				</a>
 			</h2>
 
-			<div class="bbm-panel">
-				<form action="options.php" method="post" id="bbm-settings-form">
+			<div class="mvbr-panel">
+				<form action="options.php" method="post" id="mvbr-settings-form">
 					<?php
-					settings_fields( 'bbm' );
+					settings_fields( 'mvbr' );
 
 					if ( 'general' === $active_tab ) {
-						do_settings_sections( 'bbm_general' );
+						do_settings_sections( 'mvbr_general' );
 					} else {
-						do_settings_sections( 'bbm_cache' );
+						do_settings_sections( 'mvbr_cache' );
 					}
 
-					submit_button( esc_html__( 'Save Settings', 'bible-by-midvash' ) );
+					submit_button( esc_html__( 'Save Settings', 'midvash-bible-references' ) );
 					?>
 				</form>
 			</div>
 			<?php if ( 'general' === $active_tab ) : ?>
-				<div class="bbm-help">
-					<h2><?php esc_html_e( 'How to use', 'bible-by-midvash' ); ?></h2>
-					<p><?php esc_html_e( 'The plugin automatically detects Bible references in your posts. When hovering over a reference, a tooltip displays the verse text fetched from the Midvash API.', 'bible-by-midvash' ); ?></p>
-					<h3><?php esc_html_e( 'Supported formats', 'bible-by-midvash' ); ?></h3>
-					<ul class="bbm-formats">
-						<li><code>John 3:16</code><span class="bbm-formats__label"><?php esc_html_e( 'Single verse', 'bible-by-midvash' ); ?></span></li>
-						<li><code>John 3.16</code><span class="bbm-formats__label"><?php esc_html_e( 'Alternative separator', 'bible-by-midvash' ); ?></span></li>
-						<li><code>John 3:16-18</code><span class="bbm-formats__label"><?php esc_html_e( 'Verse range', 'bible-by-midvash' ); ?></span></li>
-						<li><code>Gn 1:1</code><span class="bbm-formats__label"><?php esc_html_e( 'Abbreviation', 'bible-by-midvash' ); ?></span></li>
-						<li><code>Psalms 23</code><span class="bbm-formats__label"><?php esc_html_e( 'Entire chapter', 'bible-by-midvash' ); ?></span></li>
+				<div class="mvbr-help">
+					<h2><?php esc_html_e( 'How to use', 'midvash-bible-references' ); ?></h2>
+					<p><?php esc_html_e( 'The plugin automatically detects Bible references in your posts. When hovering over a reference, a tooltip displays the verse text fetched from the Midvash API.', 'midvash-bible-references' ); ?></p>
+					<h3><?php esc_html_e( 'Supported formats', 'midvash-bible-references' ); ?></h3>
+					<ul class="mvbr-formats">
+						<li><code>John 3:16</code><span class="mvbr-formats__label"><?php esc_html_e( 'Single verse', 'midvash-bible-references' ); ?></span></li>
+						<li><code>John 3.16</code><span class="mvbr-formats__label"><?php esc_html_e( 'Alternative separator', 'midvash-bible-references' ); ?></span></li>
+						<li><code>John 3:16-18</code><span class="mvbr-formats__label"><?php esc_html_e( 'Verse range', 'midvash-bible-references' ); ?></span></li>
+						<li><code>Gn 1:1</code><span class="mvbr-formats__label"><?php esc_html_e( 'Abbreviation', 'midvash-bible-references' ); ?></span></li>
+						<li><code>Psalms 23</code><span class="mvbr-formats__label"><?php esc_html_e( 'Entire chapter', 'midvash-bible-references' ); ?></span></li>
 					</ul>
 				</div>
 			<?php endif; ?>

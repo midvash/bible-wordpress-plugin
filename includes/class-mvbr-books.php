@@ -5,7 +5,7 @@
  * Centralized book definitions with multilingual support.
  * Based on api-publica/src/books.ts
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Static catalog of Bible books with multilingual names, slugs and abbreviations.
  */
-class BBMV_Books {
+class MVBR_Books {
 
 	/**
 	 * Supported locales
@@ -43,9 +43,9 @@ class BBMV_Books {
 	);
 
 	/**
-	 * Transient holding the API's version catalogue (BBMV_API::get_catalog()).
+	 * Transient holding the API's version catalogue (MVBR_API::get_catalog()).
 	 */
-	const CATALOG_CACHE_KEY = 'bbm_versions_v3';
+	const CATALOG_CACHE_KEY = 'mvbr_versions_v3';
 
 	/**
 	 * Versions with reserved rights, mapped to the openly licensed version of
@@ -308,7 +308,7 @@ class BBMV_Books {
 	 */
 	public static function site_url( $locale ) {
 		$locale = self::normalize_locale( $locale );
-		return 'en' === $locale ? BBMV_SITE_URL : BBMV_SITE_URL . '/' . $locale;
+		return 'en' === $locale ? MVBR_SITE_URL : MVBR_SITE_URL . '/' . $locale;
 	}
 
 	/**
@@ -466,7 +466,7 @@ class BBMV_Books {
 	}
 
 	/**
-	 * Centralized reference parser used by BBMV_Parser, BBMV_API and BBMV_Block.
+	 * Centralized reference parser used by MVBR_Parser, MVBR_API and MVBR_Block.
 	 *
 	 * Accepts shapes like:
 	 *   "John 3"            → entire chapter

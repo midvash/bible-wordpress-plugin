@@ -1,11 +1,11 @@
 <?php
 /**
- * Gutenberg block: bible-by-midvash/verse
+ * Gutenberg block: midvash-bible-references/verse
  *
  * Lets post authors insert a specific Bible verse inline in the block editor.
  * Renders server-side via PHP so the verse is always fetched fresh (with caching).
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers and renders the bible-by-midvash/verse Gutenberg block.
+ * Registers and renders the midvash-bible-references/verse Gutenberg block.
  */
-class BBMV_Block {
+class MVBR_Block {
 
 	/**
 	 * Hook block registration and editor assets into WordPress.
@@ -34,7 +34,7 @@ class BBMV_Block {
 		}
 
 		register_block_type(
-			'bible-by-midvash/verse',
+			'midvash-bible-references/verse',
 			array(
 				'render_callback' => array( $this, 'render' ),
 				'attributes'      => array(
@@ -68,14 +68,14 @@ class BBMV_Block {
 	 */
 	public function enqueue_editor_assets() {
 		wp_enqueue_script(
-			'bbm-block',
-			bbmv_asset_url( 'assets/js/bbm-block.js' ),
+			'mvbr-block',
+			mvbr_asset_url( 'assets/js/mvbr-block.js' ),
 			array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-i18n' ),
-			BBMV_VERSION,
+			MVBR_VERSION,
 			true
 		);
 
-		wp_set_script_translations( 'bbm-block', 'bible-by-midvash' );
+		wp_set_script_translations( 'mvbr-block', 'midvash-bible-references' );
 	}
 
 	/**
@@ -90,28 +90,28 @@ class BBMV_Block {
 			return '';
 		}
 
-		$options  = get_option( 'bbm_options', array() );
+		$options  = get_option( 'mvbr_options', array() );
 		$locale   = ! empty( $atts['locale'] )
-			? BBMV_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
+			? MVBR_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
 			: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-		$version  = BBMV_Books::resolve_version(
+		$version  = MVBR_Books::resolve_version(
 			! empty( $atts['version'] )
 				? sanitize_text_field( $atts['version'] )
-				: ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) )
+				: ( isset( $options['versao'] ) ? $options['versao'] : MVBR_Books::get_default_version( $locale ) )
 		);
 		$show_ref = isset( $atts['show_reference'] ) ? (bool) $atts['show_reference'] : true;
 		$link     = isset( $atts['link_verse'] ) ? (bool) $atts['link_verse'] : true;
 
-		$api  = new BBMV_API();
+		$api  = new MVBR_API();
 		$data = $api->get_verse( $reference, $version );
 
 		if ( ! $data || empty( $data['text'] ) ) {
-			return '<p class="bbm-verse bbm-verse--error">'
-				. esc_html__( 'Verse currently unavailable.', 'bible-by-midvash' )
+			return '<p class="mvbr-verse mvbr-verse--error">'
+				. esc_html__( 'Verse currently unavailable.', 'midvash-bible-references' )
 				. '</p>';
 		}
 
-		wp_enqueue_style( 'bbm-style' );
+		wp_enqueue_style( 'mvbr-style' );
 
 		$text    = $data['text'];
 		$ref_str = isset( $data['reference'] ) ? $data['reference'] : $reference;
@@ -122,16 +122,16 @@ class BBMV_Block {
 			$url = $this->build_url( $reference, $locale, $version );
 		}
 
-		$version_badge = '<span class="bbm-verse__version">' . esc_html( $api->get_version_label( $version ) ) . '</span>';
+		$version_badge = '<span class="mvbr-verse__version">' . esc_html( $api->get_version_label( $version ) ) . '</span>';
 		$ref_html      = '';
 		if ( $show_ref ) {
 			if ( $link && $url ) {
-				$ref_html = '<cite class="bbm-verse__reference">'
-							. '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer" class="bbm-verse__link" itemprop="url">'
+				$ref_html = '<cite class="mvbr-verse__reference">'
+							. '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer" class="mvbr-verse__link" itemprop="url">'
 							. esc_html( $ref_str ) . '</a> ' . $version_badge
 							. '</cite>';
 			} else {
-				$ref_html = '<cite class="bbm-verse__reference">' . esc_html( $ref_str ) . ' ' . $version_badge . '</cite>';
+				$ref_html = '<cite class="mvbr-verse__reference">' . esc_html( $ref_str ) . ' ' . $version_badge . '</cite>';
 			}
 		}
 
@@ -143,11 +143,11 @@ class BBMV_Block {
 			$copyright    = ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? (string) $version_meta['copyright'] : '';
 		}
 		$copyright_html = '' !== trim( $copyright )
-			? '<small class="bbm-verse__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
+			? '<small class="mvbr-verse__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
 			: '';
 
-		return '<blockquote class="bbm-verse wp-block-bible-by-midvash-verse" itemscope itemtype="https://schema.org/Quotation">'
-			. '<p class="bbm-verse__text" itemprop="text">' . esc_html( $text ) . '</p>'
+		return '<blockquote class="mvbr-verse wp-block-midvash-bible-references-verse" itemscope itemtype="https://schema.org/Quotation">'
+			. '<p class="mvbr-verse__text" itemprop="text">' . esc_html( $text ) . '</p>'
 			. $ref_html
 			. $copyright_html
 			. '</blockquote>';
@@ -156,7 +156,7 @@ class BBMV_Block {
 	/**
 	 * Builds the Midvash URL for a given reference + locale + version.
 	 *
-	 * Delegates parsing to BBMV_Books::parse_reference() so book-name lookup,
+	 * Delegates parsing to MVBR_Books::parse_reference() so book-name lookup,
 	 * accent tolerance and chapter validation stay consistent across the
 	 * parser, the API client and this block.
 	 *
@@ -166,13 +166,13 @@ class BBMV_Block {
 	 * @return string URL or empty string if reference cannot be parsed.
 	 */
 	private function build_url( $reference, $locale, $version ) {
-		$parsed = BBMV_Books::parse_reference( $reference );
+		$parsed = MVBR_Books::parse_reference( $reference );
 		if ( ! $parsed ) {
 			return '';
 		}
 
-		$book_slug = BBMV_Books::get_book_slug( $parsed['book_id'], $locale );
-		$url       = BBMV_Books::site_url( $locale ) . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
+		$book_slug = MVBR_Books::get_book_slug( $parsed['book_id'], $locale );
+		$url       = MVBR_Books::site_url( $locale ) . '/' . $version . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
 			$url .= '#v=' . $parsed['verse'];

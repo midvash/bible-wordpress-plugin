@@ -1,5 +1,5 @@
 /**
- * Bible by Midvash - Styles
+ * Midvash Bible References - Styles
  * 
  * Estilos para links de referências bíblicas e tooltips
  * 
@@ -11,17 +11,17 @@
    Base Link Styles
    =========================== */
 
-.bbm-link {
+.mvbr-link {
     cursor: pointer;
     position: relative;
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-.bbm-link:hover {
+.mvbr-link:hover {
     opacity: 0.85;
 }
 
-.bbm-link:focus {
+.mvbr-link:focus {
     outline: 2px solid currentColor;
     outline-offset: 2px;
 }
@@ -34,17 +34,17 @@
    is scoped with a doubled class and set with !important on the properties
    themes touch, so no theme colour, font or underline leaks in. Colours
    follow the Midvash reader (DESIGN.md): warm neutrals, honey only on the
-   accent, which comes from the "Link Color" setting (--bbm-accent). */
+   accent, which comes from the "Link Color" setting (--mvbr-accent). */
 
-.bbm-tooltip.bbm-tooltip {
-    --bbm-paper: #fdfbf7;
-    --bbm-head: #f6f1e7;
-    --bbm-ink: #2b241b;
-    --bbm-muted: #75695a;
-    --bbm-border: #e6dfd0;
-    --bbm-accent-ink: var(--bbm-accent, #b17027);
-    --bbm-serif: Literata, "Iowan Old Style", Charter, Georgia, "Times New Roman", serif;
-    --bbm-sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+.mvbr-tooltip.mvbr-tooltip {
+    --mvbr-paper: #fdfbf7;
+    --mvbr-head: #f6f1e7;
+    --mvbr-ink: #2b241b;
+    --mvbr-muted: #75695a;
+    --mvbr-border: #e6dfd0;
+    --mvbr-accent-ink: var(--mvbr-accent, #b17027);
+    --mvbr-serif: Literata, "Iowan Old Style", Charter, Georgia, "Times New Roman", serif;
+    --mvbr-sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
     position: absolute;
     z-index: 999999;
@@ -54,12 +54,12 @@
     min-width: min(280px, calc(100vw - 40px));
     margin: 0;
     padding: 0;
-    background: var(--bbm-paper) !important;
-    color: var(--bbm-ink) !important;
-    border: 1px solid var(--bbm-border) !important;
+    background: var(--mvbr-paper) !important;
+    color: var(--mvbr-ink) !important;
+    border: 1px solid var(--mvbr-border) !important;
     border-radius: 8px;
     box-shadow: 0 12px 32px rgba(43, 36, 27, 0.14), 0 2px 6px rgba(43, 36, 27, 0.06) !important;
-    font-family: var(--bbm-sans) !important;
+    font-family: var(--mvbr-sans) !important;
     font-size: 14px !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
@@ -74,9 +74,9 @@
 }
 
 /* Reset for every child: themes style p, span, sup, a, img and svg. */
-.bbm-tooltip.bbm-tooltip *,
-.bbm-tooltip.bbm-tooltip *::before,
-.bbm-tooltip.bbm-tooltip *::after {
+.mvbr-tooltip.mvbr-tooltip *,
+.mvbr-tooltip.mvbr-tooltip *::before,
+.mvbr-tooltip.mvbr-tooltip *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -98,58 +98,58 @@
     float: none;
 }
 
-.bbm-tooltip.bbm-tooltip--visible {
+.mvbr-tooltip.mvbr-tooltip--visible {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     pointer-events: auto;
 }
 
-.bbm-tooltip.bbm-tooltip--above {
+.mvbr-tooltip.mvbr-tooltip--above {
     transform: translateY(-6px);
 }
 
-.bbm-tooltip.bbm-tooltip--above.bbm-tooltip--visible {
+.mvbr-tooltip.mvbr-tooltip--above.mvbr-tooltip--visible {
     transform: translateY(0);
 }
 
 /* Header: reference, small version badge. */
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__header {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__header {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: var(--bbm-head) !important;
-    border-bottom: 1px solid var(--bbm-border);
+    background: var(--mvbr-head) !important;
+    border-bottom: 1px solid var(--mvbr-border);
     border-radius: 7px 7px 0 0;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__logo {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__logo {
     display: block;
     width: 18px !important;
     height: 18px !important;
     flex: 0 0 18px;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__reference {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__reference {
     flex: 1 1 auto;
-    color: var(--bbm-ink) !important;
+    color: var(--mvbr-ink) !important;
     font-size: 14px !important;
     font-weight: 600 !important;
 }
 
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__version-link,
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__version-link:visited,
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__version-link:hover {
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__version-link,
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__version-link:visited,
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__version-link:hover {
     display: inline-flex;
     flex: 0 0 auto;
-    color: var(--bbm-muted) !important;
+    color: var(--mvbr-muted) !important;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__version {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__version {
     display: inline-block;
     padding: 1px 6px;
-    border: 1px solid var(--bbm-border);
+    border: 1px solid var(--mvbr-border);
     border-radius: 4px;
     font-size: 11px !important;
     font-weight: 600 !important;
@@ -157,38 +157,38 @@
     line-height: 1.5 !important;
 }
 
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__version-link:hover .bbm-tooltip__version,
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__version-link:focus-visible .bbm-tooltip__version {
-    color: var(--bbm-ink) !important;
-    border-color: var(--bbm-muted);
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__version-link:hover .mvbr-tooltip__version,
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__version-link:focus-visible .mvbr-tooltip__version {
+    color: var(--mvbr-ink) !important;
+    border-color: var(--mvbr-muted);
 }
 
 /* Body: the verse, in the reader's serif. */
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__content {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__content {
     max-height: 260px;
     overflow-y: auto;
     padding: 12px 14px 14px;
     overscroll-behavior: contain;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__text {
-    color: var(--bbm-ink) !important;
-    font-family: var(--bbm-serif) !important;
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__text {
+    color: var(--mvbr-ink) !important;
+    font-family: var(--mvbr-serif) !important;
     font-size: 15px !important;
     line-height: 1.6 !important;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__text em,
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__text i {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__text em,
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__text i {
     font-style: italic !important;
 }
 
-.bbm-tooltip.bbm-tooltip sup.bbm-tooltip__verse-number {
+.mvbr-tooltip.mvbr-tooltip sup.mvbr-tooltip__verse-number {
     position: relative;
     top: -0.45em;
     margin-right: 2px;
-    color: var(--bbm-accent-ink) !important;
-    font-family: var(--bbm-sans) !important;
+    color: var(--mvbr-accent-ink) !important;
+    font-family: var(--mvbr-sans) !important;
     font-size: 10px !important;
     font-weight: 700 !important;
     line-height: 0 !important;
@@ -196,47 +196,47 @@
 }
 
 /* Footer: small credit on the left, "Read more" in the accent colour. */
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__footer {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     padding: 8px 14px;
-    border-top: 1px solid var(--bbm-border);
+    border-top: 1px solid var(--mvbr-border);
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__copyright {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__copyright {
     order: -1;
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
-    color: var(--bbm-muted) !important;
+    color: var(--mvbr-muted) !important;
     font-size: 11px !important;
     line-height: 1.3 !important;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__read-more,
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__read-more:visited {
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__read-more,
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__read-more:visited {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     gap: 4px;
-    color: var(--bbm-accent-ink) !important;
+    color: var(--mvbr-accent-ink) !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     white-space: nowrap;
 }
 
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__read-more:hover,
-.bbm-tooltip.bbm-tooltip a.bbm-tooltip__read-more:focus-visible {
-    color: var(--bbm-accent-ink) !important;
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__read-more:hover,
+.mvbr-tooltip.mvbr-tooltip a.mvbr-tooltip__read-more:focus-visible {
+    color: var(--mvbr-accent-ink) !important;
     text-decoration: underline !important;
     text-underline-offset: 2px;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__read-more-icon {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__read-more-icon {
     display: block;
     width: 13px !important;
     height: 13px !important;
@@ -245,81 +245,81 @@
     stroke: currentColor !important;
 }
 
-.bbm-tooltip.bbm-tooltip a:focus-visible {
-    outline: 2px solid var(--bbm-accent-ink) !important;
+.mvbr-tooltip.mvbr-tooltip a:focus-visible {
+    outline: 2px solid var(--mvbr-accent-ink) !important;
     outline-offset: 2px;
     border-radius: 3px;
 }
 
 /* Loading */
-.bbm-tooltip.bbm-tooltip--loading .bbm-tooltip__content {
+.mvbr-tooltip.mvbr-tooltip--loading .mvbr-tooltip__content {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 64px;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__loader {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__loader {
     display: inline-block;
     width: 22px;
     height: 22px;
-    border: 2px solid var(--bbm-border);
-    border-top-color: var(--bbm-accent-ink);
+    border: 2px solid var(--mvbr-border);
+    border-top-color: var(--mvbr-accent-ink);
     border-radius: 50%;
-    animation: bbm-spin 0.8s linear infinite;
+    animation: mvbr-spin 0.8s linear infinite;
 }
 
-@keyframes bbm-spin {
+@keyframes mvbr-spin {
     to {
         transform: rotate(360deg);
     }
 }
 
 /* Error */
-.bbm-tooltip.bbm-tooltip--error .bbm-tooltip__content {
+.mvbr-tooltip.mvbr-tooltip--error .mvbr-tooltip__content {
     text-align: center !important;
-    color: var(--bbm-muted) !important;
+    color: var(--mvbr-muted) !important;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__error-icon {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__error-icon {
     display: block;
     width: 28px !important;
     height: 28px !important;
     margin: 0 auto 6px;
-    fill: var(--bbm-muted) !important;
+    fill: var(--mvbr-muted) !important;
 }
 
-.bbm-tooltip.bbm-tooltip .bbm-tooltip__error-message {
+.mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__error-message {
     font-size: 13px !important;
 }
 
-/* Arrow, lined up with the link by the script (--bbm-arrow-left). */
-.bbm-tooltip.bbm-tooltip::before {
+/* Arrow, lined up with the link by the script (--mvbr-arrow-left). */
+.mvbr-tooltip.mvbr-tooltip::before {
     content: '';
     position: absolute;
-    left: var(--bbm-arrow-left, 20px);
+    left: var(--mvbr-arrow-left, 20px);
     width: 10px;
     height: 10px;
-    background: var(--bbm-head) !important;
-    border: 1px solid var(--bbm-border);
+    background: var(--mvbr-head) !important;
+    border: 1px solid var(--mvbr-border);
     border-right: 0;
     border-bottom: 0;
     transform: rotate(45deg);
 }
 
-.bbm-tooltip.bbm-tooltip--below::before {
+.mvbr-tooltip.mvbr-tooltip--below::before {
     top: -6px;
 }
 
-.bbm-tooltip.bbm-tooltip--above::before {
+.mvbr-tooltip.mvbr-tooltip--above::before {
     bottom: -6px;
-    background: var(--bbm-paper) !important;
+    background: var(--mvbr-paper) !important;
     transform: rotate(-135deg);
 }
 
 /* Invisible bridge over the gap between the link and the tooltip, so the
    mouse never leaves both on its way to "Read more". */
-.bbm-tooltip.bbm-tooltip::after {
+.mvbr-tooltip.mvbr-tooltip::after {
     content: '';
     position: absolute;
     left: 0;
@@ -328,57 +328,57 @@
     background: transparent !important;
 }
 
-.bbm-tooltip.bbm-tooltip--below::after {
+.mvbr-tooltip.mvbr-tooltip--below::after {
     top: -14px;
 }
 
-.bbm-tooltip.bbm-tooltip--above::after {
+.mvbr-tooltip.mvbr-tooltip--above::after {
     bottom: -14px;
 }
 
 /* Dark: the reader's "ink" theme. The accent is lifted so a dark link
    colour (navy, brown) stays readable on the dark paper. */
 @media (prefers-color-scheme: dark) {
-    .bbm-tooltip.bbm-tooltip {
-        --bbm-paper: #221d17;
-        --bbm-head: #2a241d;
-        --bbm-ink: #ede4d3;
-        --bbm-muted: #ab9f8c;
-        --bbm-border: #3d352b;
-        --bbm-accent-ink: #e9c477;
+    .mvbr-tooltip.mvbr-tooltip {
+        --mvbr-paper: #221d17;
+        --mvbr-head: #2a241d;
+        --mvbr-ink: #ede4d3;
+        --mvbr-muted: #ab9f8c;
+        --mvbr-border: #3d352b;
+        --mvbr-accent-ink: #e9c477;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
     }
 
     @supports (color: color-mix(in oklch, red, white)) {
-        .bbm-tooltip.bbm-tooltip {
-            --bbm-accent-ink: color-mix(in oklch, var(--bbm-accent, #b17027) 50%, #fff);
+        .mvbr-tooltip.mvbr-tooltip {
+            --mvbr-accent-ink: color-mix(in oklch, var(--mvbr-accent, #b17027) 50%, #fff);
         }
     }
 }
 
-body.dark-mode .bbm-tooltip.bbm-tooltip,
-body.theme-dark .bbm-tooltip.bbm-tooltip,
-.wp-dark-mode .bbm-tooltip.bbm-tooltip {
-    --bbm-paper: #221d17;
-    --bbm-head: #2a241d;
-    --bbm-ink: #ede4d3;
-    --bbm-muted: #ab9f8c;
-    --bbm-border: #3d352b;
-    --bbm-accent-ink: #e9c477;
+body.dark-mode .mvbr-tooltip.mvbr-tooltip,
+body.theme-dark .mvbr-tooltip.mvbr-tooltip,
+.wp-dark-mode .mvbr-tooltip.mvbr-tooltip {
+    --mvbr-paper: #221d17;
+    --mvbr-head: #2a241d;
+    --mvbr-ink: #ede4d3;
+    --mvbr-muted: #ab9f8c;
+    --mvbr-border: #3d352b;
+    --mvbr-accent-ink: #e9c477;
 }
 
 /* Phones */
 @media screen and (max-width: 480px) {
-    .bbm-tooltip.bbm-tooltip {
+    .mvbr-tooltip.mvbr-tooltip {
         max-width: calc(100vw - 40px);
         min-width: calc(100vw - 40px);
     }
 
-    .bbm-tooltip.bbm-tooltip .bbm-tooltip__content {
+    .mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__content {
         max-height: 45vh;
     }
 
-    .bbm-tooltip.bbm-tooltip .bbm-tooltip__text {
+    .mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__text {
         font-size: 16px !important;
     }
 }
@@ -387,7 +387,7 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
    Accessibility
    =========================== */
 
-.bbm-sr-only {
+.mvbr-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -401,15 +401,15 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    .bbm-tooltip.bbm-tooltip {
+    .mvbr-tooltip.mvbr-tooltip {
         transition: none;
     }
 
-    .bbm-tooltip.bbm-tooltip .bbm-tooltip__loader {
+    .mvbr-tooltip.mvbr-tooltip .mvbr-tooltip__loader {
         animation: none;
     }
 
-    .bbm-link {
+    .mvbr-link {
         transition: none;
     }
 }
@@ -418,7 +418,7 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
    Bible Verse Block (frontend)
    =========================== */
 
-.bbm-verse {
+.mvbr-verse {
     margin: 1.5em 0;
     padding: 20px 24px;
     border-left: 4px solid #B17027;
@@ -428,14 +428,14 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     line-height: 1.8;
 }
 
-.bbm-verse__text {
+.mvbr-verse__text {
     margin: 0 0 12px;
     font-size: 16px;
     font-style: italic;
     color: inherit;
 }
 
-.bbm-verse__reference {
+.mvbr-verse__reference {
     display: block;
     font-style: normal;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -444,16 +444,16 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     color: #B17027;
 }
 
-.bbm-verse__link {
+.mvbr-verse__link {
     color: inherit;
     text-decoration: none;
 }
 
-.bbm-verse__link:hover {
+.mvbr-verse__link:hover {
     text-decoration: underline;
 }
 
-.bbm-verse__version {
+.mvbr-verse__version {
     font-weight: 400;
     font-size: 11px;
     padding: 1px 6px;
@@ -465,8 +465,8 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
 }
 
 /* Version attribution under the verse — small and muted. */
-.bbm-verse__copyright,
-.bbm-votd__copyright {
+.mvbr-verse__copyright,
+.mvbr-votd__copyright {
     display: block;
     margin-top: 8px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -476,18 +476,18 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     color: rgba(0, 0, 0, 0.5);
 }
 
-.bbm-votd__copyright {
+.mvbr-votd__copyright {
     margin-bottom: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
-    .bbm-verse__copyright,
-    .bbm-votd__copyright {
+    .mvbr-verse__copyright,
+    .mvbr-votd__copyright {
         color: rgba(255, 255, 255, 0.45);
     }
 }
 
-.bbm-verse--error {
+.mvbr-verse--error {
     font-style: italic;
     color: #999;
     font-size: 13px;
@@ -496,27 +496,27 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
 }
 
 @media (prefers-color-scheme: dark) {
-    .bbm-verse {
+    .mvbr-verse {
         background: rgba(177, 112, 39, 0.08);
     }
-    .bbm-verse__reference {
+    .mvbr-verse__reference {
         color: #F0CE8A;
     }
-    .bbm-verse__version {
+    .mvbr-verse__version {
         background: rgba(240, 206, 138, 0.15);
     }
 }
 
 /* Block editor preview */
-.bbm-verse-editor {
+.mvbr-verse-editor {
     border: 1px dashed #B17027;
     border-radius: 6px;
     padding: 12px 16px;
     background: rgba(177, 112, 39, 0.04);
 }
 
-.bbm-verse-editor__preview,
-.bbm-verse-editor__empty {
+.mvbr-verse-editor__preview,
+.mvbr-verse-editor__empty {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -525,17 +525,17 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     flex-wrap: wrap;
 }
 
-.bbm-verse-editor__icon {
+.mvbr-verse-editor__icon {
     font-size: 18px;
     flex-shrink: 0;
 }
 
-.bbm-verse-editor__ref {
+.mvbr-verse-editor__ref {
     font-size: 15px;
     color: #333;
 }
 
-.bbm-verse-editor__version {
+.mvbr-verse-editor__version {
     font-size: 11px;
     padding: 2px 6px;
     background: rgba(177, 112, 39, 0.15);
@@ -545,7 +545,7 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     letter-spacing: 0.05em;
 }
 
-.bbm-verse-editor__note {
+.mvbr-verse-editor__note {
     font-size: 12px;
     color: #888;
     width: 100%;
@@ -556,7 +556,7 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
    Verse of the Day Widget
    =========================== */
 
-.bbm-votd {
+.mvbr-votd {
     padding: 16px;
     border-left: 4px solid #B17027;
     background: rgba(177, 112, 39, 0.05);
@@ -565,14 +565,14 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     line-height: 1.7;
 }
 
-.bbm-votd__text {
+.mvbr-votd__text {
     margin: 0 0 10px;
     font-size: 15px;
     color: inherit;
     font-style: italic;
 }
 
-.bbm-votd__reference {
+.mvbr-votd__reference {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -581,50 +581,50 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
     margin-bottom: 8px;
 }
 
-.bbm-votd__link {
+.mvbr-votd__link {
     color: inherit;
     text-decoration: none;
 }
 
-.bbm-votd__link:hover {
+.mvbr-votd__link:hover {
     text-decoration: underline;
 }
 
-.bbm-votd__powered {
+.mvbr-votd__powered {
     margin: 0;
     font-size: 11px;
     color: #999;
 }
 
-.bbm-votd__powered a {
+.mvbr-votd__powered a {
     color: inherit;
     text-decoration: none;
 }
 
-.bbm-votd__powered a:hover {
+.mvbr-votd__powered a:hover {
     text-decoration: underline;
 }
 
-.bbm-votd__title {
+.mvbr-votd__title {
     margin: 0 0 12px;
     font-size: 16px;
     font-weight: 600;
 }
 
-.bbm-votd--error .bbm-votd__text {
+.mvbr-votd--error .mvbr-votd__text {
     font-style: normal;
     color: #999;
     font-size: 13px;
 }
 
 @media (prefers-color-scheme: dark) {
-    .bbm-votd {
+    .mvbr-votd {
         background: rgba(177, 112, 39, 0.08);
     }
-    .bbm-votd__reference {
+    .mvbr-votd__reference {
         color: #F0CE8A;
     }
-    .bbm-votd__powered {
+    .mvbr-votd__powered {
         color: #666;
     }
 }
@@ -634,16 +634,16 @@ body.theme-dark .bbm-tooltip.bbm-tooltip,
    =========================== */
 
 @media print {
-    .bbm-tooltip {
+    .mvbr-tooltip {
         display: none !important;
     }
     
-    .bbm-link {
+    .mvbr-link {
         color: inherit !important;
         text-decoration: underline !important;
     }
     
-    .bbm-link::after {
+    .mvbr-link::after {
         content: " (" attr(href) ")";
         font-size: 0.8em;
         font-style: italic;

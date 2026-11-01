@@ -1,4 +1,4 @@
-# Bible by Midvash — WordPress plugin
+# Midvash Bible References — WordPress plugin
 
 > 🌐 **English** · [Português (BR)](./README.pt-BR.md) · [Español](./README.es.md)
 
@@ -23,30 +23,30 @@ Auto-detect Bible references in your WordPress posts and turn them into hover-to
 
 1. Download the latest `.zip` from [midvash.com/wordpress-plugin](https://midvash.com/wordpress-plugin)
 2. WordPress admin → Plugins → Add New → Upload Plugin → select the zip
-3. Activate, configure under **Settings → Bible by Midvash**
+3. Activate, configure under **Settings → Midvash Bible References**
 
 ### From source (this repo)
 
 ```bash
 cd wp-content/plugins/
-git clone https://github.com/midvash/bible-wordpress-plugin.git bible-by-midvash
+git clone https://github.com/midvash/bible-wordpress-plugin.git midvash-bible-references
 ```
 
 Then activate in the WordPress admin.
 
 ## Updates
 
-Auto-update is built in via [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker). The plugin checks `midvash.com/api/wordpress/update-info.json` every ~12 hours and surfaces a standard "Update available" banner in your WordPress admin, like plugins from the official directory.
+Once the plugin is listed in the WordPress.org directory, updates arrive through WordPress like any other directory plugin. Until then, new versions are attached to each [GitHub Release](https://github.com/midvash/bible-by-midvash/releases).
 
 ## Architecture
 
-- **`bible-by-midvash.php`** — main plugin file, hooks, AJAX endpoints, transient cache cleanup
-- **`includes/class-bbmv-parser.php`** — reference detection (regex + book-name dictionaries per locale)
-- **`includes/class-bbmv-api.php`** — calls the Midvash public API (read-only, no auth) with rate-limit handling and transient cache
-- **`includes/class-bbmv-admin.php`** — settings screen
-- **`includes/class-bbmv-books.php`** — book metadata (names, abbreviations, chapters) per language
-- **`assets/js/bbm-tooltip.js`** — frontend tooltip rendering
-- **`languages/`** — translation `.po`/`.mo` files
+- **`midvash-bible-references.php`** — main plugin file, hooks, AJAX endpoints, transient cache cleanup
+- **`includes/class-mvbr-parser.php`** — reference detection (regex + book-name dictionaries per locale)
+- **`includes/class-mvbr-api.php`** — calls the Midvash public API (read-only, no auth) with rate-limit handling and transient cache
+- **`includes/class-mvbr-admin.php`** — settings screen
+- **`includes/class-mvbr-books.php`** — book metadata (names, abbreviations, chapters) per language
+- **`assets/js/mvbr-tooltip.js`** — frontend tooltip rendering
+- **`translations/`** — `.po` files for import into translate.wordpress.org (not shipped in the ZIP)
 
 ## Security
 
@@ -66,15 +66,15 @@ The plugin only **reads** from the Midvash public API — it doesn't send any po
 
 PRs welcome — especially for:
 
-- New language support (book names + regex tweaks in `class-bbmv-books.php` and `class-bbmv-parser.php`)
-- Translation `.po` files in `languages/`
+- New language support (book names + regex tweaks in `class-mvbr-books.php` and `class-mvbr-parser.php`)
+- Translations — on translate.wordpress.org once the plugin is listed (source `.po` files in `translations/`)
 - Performance improvements
 
 Open an issue first for larger changes.
 
 ## License
 
-GPL v2 or later — see [LICENSE](LICENSE). Vendored libraries retain their original licenses (see `vendor/plugin-update-checker/license.txt`).
+GPL v2 or later — see [LICENSE](LICENSE).
 
 ## Related projects
 

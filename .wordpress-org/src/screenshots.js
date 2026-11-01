@@ -7,9 +7,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const page = await browser.newPage();
   await page.goto(B + '/wp-admin/', { waitUntil: 'networkidle0' });
   // Settings: link colour + underline so references read as links in the theme.
-  await page.goto(B + '/wp-admin/options-general.php?page=bbm', { waitUntil: 'networkidle0' });
+  await page.goto(B + '/wp-admin/options-general.php?page=mvbr', { waitUntil: 'networkidle0' });
   for (const name of ['use_custom_color', 'underline_link']) {
-    const box = await page.$(`input[name="bbm_options[${name}]"]`);
+    const box = await page.$(`input[name="mvbr_options[${name}]"]`);
     if (box && !(await box.evaluate((e) => e.checked))) await box.click();
   }
   await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('#submit')]);
@@ -20,9 +20,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Post with references, tooltip open on the first one.
   await page.goto(B + '/?p=10', { waitUntil: 'networkidle0' });
   await page.evaluate(() => { const b = document.getElementById('wpadminbar'); if (b) b.remove(); document.documentElement.style.setProperty('margin-top', '0', 'important'); });
-  const link = await page.$('.bbm-link[data-midvash-ref]');
+  const link = await page.$('.mvbr-link[data-midvash-ref]');
   await link.hover();
-  await page.waitForSelector('.bbm-tooltip--visible .bbm-tooltip__text', { timeout: 15000 });
+  await page.waitForSelector('.mvbr-tooltip--visible .mvbr-tooltip__text', { timeout: 15000 });
   await sleep(800);
   await page.screenshot({ path: OUT + '/screenshot-2.png' });
   for (const [id, n] of [[11, 3], [12, 4]]) {

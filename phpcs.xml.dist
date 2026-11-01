@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<ruleset name="Bible by Midvash">
-	<description>WordPress Coding Standards + PHP 7.4 compatibility for the Bible by Midvash plugin.</description>
+<ruleset name="Midvash Bible References">
+	<description>WordPress Coding Standards + PHP 7.4 compatibility for the Midvash Bible References plugin.</description>
 
-	<file>bible-by-midvash.php</file>
+	<file>midvash-bible-references.php</file>
 	<file>uninstall.php</file>
 	<file>includes</file>
 
@@ -18,13 +18,13 @@
 
 	<!-- WordPress Coding Standards -->
 	<rule ref="WordPress">
-		<!-- Filename convention conflicts with the existing class-bbm-*.php layout only if renamed; keep default. -->
+		<!-- Filename convention conflicts with the existing class-mvbr-*.php layout only if renamed; keep default. -->
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="bible-by-midvash"/>
+				<element value="midvash-bible-references"/>
 			</property>
 		</properties>
 	</rule>
@@ -32,9 +32,9 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="bbmv"/>
-				<element value="BBMV"/>
-				<element value="bible_by_midvash"/>
+				<element value="mvbr"/>
+				<element value="MVBR"/>
+				<element value="midvash_bible_references"/>
 			</property>
 		</properties>
 	</rule>

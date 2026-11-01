@@ -4,7 +4,7 @@
  *
  * - Busca https://api.midvash.com/books → reescreve init_books() entre os
  *   marcadores `// {{SYNCED_BOOKS_START}}` e `// {{SYNCED_BOOKS_END}}` em
- *   includes/class-bbmv-books.php.
+ *   includes/class-mvbr-books.php.
  * - Busca https://api.midvash.com/versions → reescreve o conteúdo de
  *   DEFAULT_VERSIONS entre `// {{SYNCED_VERSIONS_START}}` e
  *   `// {{SYNCED_VERSIONS_END}}`.
@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ROOT = resolve(__dirname, '..');
-const BOOKS_PHP = join(ROOT, 'includes', 'class-bbmv-books.php');
+const BOOKS_PHP = join(ROOT, 'includes', 'class-mvbr-books.php');
 
 const LOCALES = ['en', 'pt-br', 'es', 'fr', 'de', 'it', 'ru', 'ko', 'zh'] as const;
 type Locale = (typeof LOCALES)[number];
@@ -53,7 +53,7 @@ interface ApiVersion {
 }
 
 // Versões que a API pública deixou de distribuir (direitos reservados, sem
-// licença). Espelha BBMV_Books::RETIRED_VERSIONS; nunca viram padrão, mesmo
+// licença). Espelha MVBR_Books::RETIRED_VERSIONS; nunca viram padrão, mesmo
 // que a API ainda as liste durante a transição.
 const RETIRED_VERSIONS = new Set([
   'aa', 'jfaa', 'acf', 'ara', 'arc', 'as21', 'naa', 'kjf', 'bpt',

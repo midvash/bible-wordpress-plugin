@@ -1,15 +1,15 @@
-# CLAUDE.md — Bible by Midvash
+# CLAUDE.md — Midvash Bible References
 
 Guia operacional para qualquer agente Claude trabalhando neste repositório. Leia antes de propor mudanças.
 
 ## O que é este projeto
 
-Plugin WordPress (`bible-by-midvash`) que detecta referências bíblicas em posts/páginas e as transforma em links com tooltip de versículo, consumindo a API pública em `api.midvash.com`. Sem cadastro, sem chave de API, plug-and-play.
+Plugin WordPress "Midvash Bible References" (slug `midvash-bible-references`, autor Midvash; até 0.10.3 se chamava "Bible by Midvash", slug `bible-by-midvash`) que detecta referências bíblicas em posts/páginas e as transforma em links com tooltip de versículo, consumindo a API pública em `api.midvash.com`. Sem cadastro, sem chave de API, plug-and-play.
 
 **Distribuição**:
 - Repo público: https://github.com/midvash/bible-by-midvash
 - Download/docs: https://midvash.com/wordpress-plugin
-- Auto-update via `vendor/plugin-update-checker` lendo `update-info.json` em R2
+- Atualização: pelo diretório do wordpress.org (enviado em out/2026, slug `midvash-bible-references`). O canal antigo (R2 + `update-info.json` + `vendor/plugin-update-checker`) ficou congelado na 0.10.3: as instalações antigas, na pasta `bible-by-midvash`, seguem funcionando sem receber o plugin renomeado (trocar o arquivo principal desativaria o plugin). `vendor/` não entra mais no ZIP.
 
 ## Objetivos estratégicos
 
@@ -24,14 +24,13 @@ Quando os objetivos conflitarem, perguntar ao usuário. Não otimizar SEO ao pon
 
 Pipeline em [.github/workflows/release.yml](.github/workflows/release.yml), gatilho `release: created`:
 
-1. Lê `Version:` do header de [bible-by-midvash.php](bible-by-midvash.php)
-2. Roda [scripts/build-zip.ts](scripts/build-zip.ts) — inclui `php`, `includes/`, `assets/`, `languages/`, `vendor/`, `readme.txt`. Exclui `README.md`, `LICENSE`, `scripts/`, `.github/`, `CLAUDE.md`, qualquer coisa de metadata do repo
-3. Sobe ao R2: `bible-by-midvash-<v>.zip`, `bible-by-midvash-latest.zip`, `update-info.json`
-4. Anexa o ZIP ao GitHub Release
+1. Lê `Version:` do header de [midvash-bible-references.php](midvash-bible-references.php)
+2. Roda [scripts/build-zip.ts](scripts/build-zip.ts) — inclui o PHP principal, `uninstall.php`, `includes/`, `assets/`, `readme.txt`. Exclui `translations/`, `vendor/`, `README.md`, `LICENSE`, `scripts/`, `.github/`, `CLAUDE.md`, qualquer coisa de metadata do repo
+3. Anexa `midvash-bible-references-<v>.zip` ao GitHub Release (o mesmo ZIP vai pro wordpress.org)
 
 **Pra cortar um release**, 3 lugares precisam casar (verifique antes de abrir o PR):
-- [bible-by-midvash.php](bible-by-midvash.php) → `* Version: X.Y.Z`
-- [bible-by-midvash.php](bible-by-midvash.php) → `define('BBMV_VERSION', 'X.Y.Z')`
+- [midvash-bible-references.php](midvash-bible-references.php) → `* Version: X.Y.Z`
+- [midvash-bible-references.php](midvash-bible-references.php) → `define( 'MVBR_VERSION', 'X.Y.Z' )`
 - [readme.txt](readme.txt) → `Stable tag: X.Y.Z` + entrada em `== Changelog ==` + entrada em `== Upgrade Notice ==`
 
 **SemVer**:
@@ -70,50 +69,52 @@ Conteúdo orgânico, regular e relevante > volume artificial.
 ### PHP / WordPress
 - Compatível com **WP 5.0+** e **PHP 7.4+** (declarado em `readme.txt`). Não usar features de PHP 8+ sem polyfill.
 - Nada de crédito ou link pra Midvash no site público ligado por padrão (guideline 10 do wp.org): logo do tooltip e link do selo ficam atrás de `show_branding`, desligado. O link da referência e o "Ler mais" são a função do plugin.
-- Text domain: `bible-by-midvash`, com `Domain Path: /languages` no cabeçalho do plugin. Sem ele o WordPress procura o `.mo` na raiz do plugin, e como o widget traduz antes do `init` o caminho errado fica gravado e nada é traduzido (0.9.1). **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
+- Text domain: `midvash-bible-references` (igual ao slug). Sem `load_plugin_textdomain` e sem `Domain Path`: o wordpress.org entrega as traduções (translate.wordpress.org) e o WordPress as carrega sozinho. **Toda string user-facing** passa por `__()`, `_e()`, `esc_html__()`, etc.
 - Nada de `echo` direto sem `esc_html` / `esc_attr` / `wp_kses`. Sanitizar input com `sanitize_text_field`, `absint`, etc.
 - Nonces em qualquer form de admin. Capabilities corretas (`manage_options` pra settings).
-- Prefixo `bbmv_` / `BBMV_` em funções, classes e constantes (wp.org exige ≥4 chars). **Exceção intencional**: nomes já persistidos ou user-facing continuam `bbm` — options no banco (`bbm_options`), nonces/ajax actions (`bbm_nonce`, `wp_ajax_bbm_*`), shortcode `[bbm_votd]`, classes CSS `.bbm-` e handles de assets. Não renomear esses sem migração.
+- Prefixo único `mvbr_` / `MVBR_` / `mvbr-` em tudo: funções, classes, constantes, option (`mvbr_options`), transients, nonce e ajax (`mvbr_nonce`, `wp_ajax_mvbr_*`), shortcode `[mvbr_votd]`, widget `mvbr_votd_widget`, handles, classes CSS `.mvbr-` e variáveis `--mvbr-`. O bloco é `midvash-bible-references/verse`. A 1.0.0 trocou o antigo `bbm`/`bbmv` (a revisão do wp.org exige ≥4 letras em tudo); `mvbr_migrate_legacy_data()` copia `bbm_options` e os widgets `bbm_votd_widget` uma vez e apaga os antigos. Renomear de novo só com migração.
 - Cache de versículos via Transients API (já implementado). Default 30 dias.
 - API calls com `wp_remote_get` + timeout configurável + tratamento de erro silencioso (fallback amigável, não fatal).
 
 ### Frontend (assets/)
 - Vanilla JS, sem framework. Plugin tem que carregar leve.
-- CSS encapsulado por prefixo `.bbm-` pra não vazar.
+- CSS encapsulado por prefixo `.mvbr-` pra não vazar. Valor de opção que vai pro CSS inline é validado na hora (`mvbr_css_color()`, lista fixa pro estilo de sublinhado).
 - Suportar dark mode via `prefers-color-scheme`.
 
 ### i18n
 - 9 locales canônicos (alinhados à extensão Midvash): `pt_BR, en_US, es_ES, fr_FR, de_DE, it_IT, ru_RU, ko_KR, zh_CN`.
-- Source of truth: [languages/bible-by-midvash.pot](languages/bible-by-midvash.pot), gerado via `xgettext` da source PHP.
-- Ao adicionar/mudar strings: regenerar `.pot`, mesclar nos `.po` (`msgmerge`), traduzir, recompilar `.mo` com `msgfmt`.
+- Source of truth: [translations/midvash-bible-references.pot](translations/midvash-bible-references.pot), gerado via `xgettext` da source PHP. Os `.po` ficam em `translations/`, **fora do ZIP** (o wp.org recusa traduções no pacote): servem pra importar no translate.wordpress.org depois da aprovação. Não gerar `.mo`.
+- Ao adicionar/mudar strings: regenerar `.pot`, mesclar nos `.po` (`msgmerge`), traduzir, conferir com `msgfmt --statistics -o /dev/null`.
 - Comando pra regenerar POT:
   ```bash
   xgettext --from-code=UTF-8 -L PHP \
     --keyword=__ --keyword=_e --keyword=esc_html__ --keyword=esc_attr__ \
     --keyword=esc_html_e --keyword=esc_attr_e \
     --keyword=_x:1,2c --keyword=_n:1,2 --keyword=_nx:1,2,4c \
-    -o languages/bible-by-midvash.pot \
-    $(find includes bible-by-midvash.php -name '*.php')
+    -o translations/midvash-bible-references.pot \
+    $(find includes midvash-bible-references.php -name '*.php')
   ```
 
 ## Estrutura do repo
 
 ```
-bible-by-midvash.php        # entry point + header WP + autoload de includes/
+midvash-bible-references.php # entry point + header WP + autoload de includes/ + migração do 0.x
 includes/
-  class-bbmv-admin.php       # tela de settings, abas, rendering de campos
-  class-bbmv-api.php         # cliente HTTP pra api.midvash.com + cache
-  class-bbmv-books.php       # mapa de livros bíblicos (pt/en/es) + abreviações
-  class-bbmv-parser.php      # regex e substituição de referências por links
+  class-mvbr-admin.php       # tela de settings, abas, rendering de campos
+  class-mvbr-api.php         # cliente HTTP pra api.midvash.com + cache
+  class-mvbr-books.php       # mapa de livros bíblicos (pt/en/es) + abreviações
+  class-mvbr-parser.php      # regex e substituição de referências por links
+  class-mvbr-widget.php      # widget e shortcode do versículo do dia
+  class-mvbr-block.php       # bloco Gutenberg do versículo
 assets/
   css/, js/, images/        # estilos e scripts de frontend + admin
-languages/
-  *.po / *.mo               # 9 locales
-  bible-by-midvash.pot      # template canônico
+translations/               # fora do ZIP
+  *.po                      # 9 locales, pra importar no translate.wordpress.org
+  midvash-bible-references.pot # template canônico
 vendor/
-  plugin-update-checker/    # auto-update via update-info.json
+  plugin-update-checker/    # canal antigo (R2), não entra mais no ZIP
 scripts/
-  build-zip.ts              # builda o ZIP final que vai pro R2
+  build-zip.ts              # builda o ZIP (wp.org + GitHub Release)
 .github/workflows/
   release.yml               # CI de release
 readme.txt                  # readme estilo wordpress.org
@@ -128,7 +129,7 @@ Instaladas globalmente via `composer global` (não estão em `vendor/` de propó
 
 - **PHPCS + WordPress Coding Standards + PHPCompatibilityWP** — config em [phpcs.xml.dist](phpcs.xml.dist). Rodar: `~/.composer/vendor/bin/phpcs -q --report=summary .`
 - **PHPStan (level 5) + extensão WordPress** — config em [phpstan.neon.dist](phpstan.neon.dist). Rodar: `~/.composer/vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP `-wporg`, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP wporg 0.10.2 passa sem erros em PHP 7.4 e 8.3, WP 7.1.3.
+- **Plugin Check (PCP)** — roda via WordPress Playground (sem Docker, **Node 24**) com o blueprint versionado em [scripts/pcp-blueprint.json](scripts/pcp-blueprint.json) (instruções no `meta.description` do próprio arquivo). Rodar contra o conteúdo extraído do ZIP, não contra o repo (o repo acusa falsos positivos de arquivos de dev). Status: ZIP 1.0.0 passa sem erros em PHP 7.4 e 8.3, WP 7.1.4.
 - **Teste de fumaça no WordPress** — [scripts/smoke-blueprint.json](scripts/smoke-blueprint.json) + [scripts/smoke.php](scripts/smoke.php): ativa o plugin, renderiza um post, abre configurações, widget e bloco, e acusa qualquer aviso de PHP do plugin.
 - **Skill `/release-check`** em [.claude/skills/release-check/SKILL.md](.claude/skills/release-check/SKILL.md) — checklist pré-release (versões nos 3 lugares, changelog, i18n, lint, build).
 
@@ -140,10 +141,10 @@ Erro novo de PHPCS/PHPStan ou teste vermelho bloqueia release.
 
 Só o dono resolve:
 
-- **Chave do plugin.** `BBMV_PLUGIN_KEY` em [bible-by-midvash.php](bible-by-midvash.php) fica vazia no repo (público). O CI preenche a partir do secret `BBMV_PLUGIN_KEY`; build local: `BBMV_PLUGIN_KEY=<chave> npx tsx scripts/build-zip.ts`. Sem ela a API só serve as versões livres.
-- **Conta no wordpress.org:** `midvash` (`Contributors: midvash` no [readme.txt](readme.txt)).
+- **Chave do plugin.** `MVBR_PLUGIN_KEY` em [midvash-bible-references.php](midvash-bible-references.php) fica vazia no repo (público). O CI preenche a partir do secret `BBMV_PLUGIN_KEY` (nome antigo mantido); build local: `MVBR_PLUGIN_KEY=<chave> npx tsx scripts/build-zip.ts`. Sem ela a API só serve as versões livres.
+- **Conta no wordpress.org:** `midvash`, e-mail contact@midvash.com (`Contributors: midvash` no [readme.txt](readme.txt)). `Author: Midvash` / `https://midvash.com` no cabeçalho, pra bater com o domínio do e-mail.
 - **Imagens da página do plugin** prontas em [.wordpress-org/](.wordpress-org/) (banner, ícone, 4 screenshots; fontes em `.wordpress-org/src/`). Vão pro `/assets` do SVN do wp.org depois da aprovação, não no ZIP.
-- **Secrets do GitHub Actions** (agente não grava secret): `BBMV_PLUGIN_KEY` (a chave, que o `build-zip.ts` injeta no ZIP), `CLOUDFLARE_ACCOUNT_ID` = `a8b844af381f476e9e3aec6b8ecc65cf` (nexttoo) e `CLOUDFLARE_API_TOKEN` com R2 edit na nexttoo. Hoje os dois da Cloudflare apontam pra conta antiga (Colmeia) e o auto-update fica parado.
+- **Secrets do GitHub Actions** (agente não grava secret): `BBMV_PLUGIN_KEY` (a chave, que o `build-zip.ts` injeta no ZIP). Os da Cloudflare não são mais usados pelo workflow.
 
 ## Áreas de melhoria conhecidas (backlog informal)
 
@@ -162,6 +163,6 @@ Use como inspiração quando o usuário pedir "o que dá pra melhorar". Não imp
 
 - Sempre confirmar antes de: push em main, force-push, deletar branch remota, criar release, alterar workflow CI, mexer em `vendor/`.
 - Pode rodar livre: edits locais, branch novo, commit local, `xgettext`/`msgfmt`, build local do ZIP, leitura de R2 (não escrita).
-- Quando bumpar versão: lembrar dos 3 lugares (header, `BBMV_VERSION`, `readme.txt`). Esquecer um dos três quebra auto-update OU build OU display no admin.
-- Quando adicionar string nova traduzível: regenerar `.pot`, atualizar os 9 `.po`, recompilar `.mo`. Não deixar tradução faltando em release.
+- Quando bumpar versão: lembrar dos 3 lugares (header, `MVBR_VERSION`, `readme.txt`). Esquecer um dos três quebra o build OU o display no admin.
+- Quando adicionar string nova traduzível: regenerar `.pot`, atualizar os 9 `.po`. Não deixar tradução faltando em release.
 - Não inventar features sem pedido. Backlog acima é referência, não autorização.

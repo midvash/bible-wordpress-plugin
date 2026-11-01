@@ -2,10 +2,10 @@
 /**
  * Verse of the Day widget and shortcode.
  *
- * Registers a classic WordPress widget (WP_Widget) and a [bbm_votd] shortcode
+ * Registers a classic WordPress widget (WP_Widget) and a [mvbr_votd] shortcode
  * that display the daily Bible verse fetched from the Midvash API.
  *
- * @package Bible_By_Midvash
+ * @package Midvash_Bible_References
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,18 +15,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Verse of the Day widget backed by the Midvash API.
  */
-class BBMV_Widget extends WP_Widget {
+class MVBR_Widget extends WP_Widget {
 
 	/**
 	 * Registers the widget with its id, name and description.
 	 */
 	public function __construct() {
 		parent::__construct(
-			'bbm_votd_widget',
-			__( 'Verse of the Day — Midvash', 'bible-by-midvash' ),
+			'mvbr_votd_widget',
+			__( 'Verse of the Day — Midvash', 'midvash-bible-references' ),
 			array(
-				'description' => __( 'Displays the daily Bible verse powered by the Midvash API.', 'bible-by-midvash' ),
-				'classname'   => 'bbm-votd-widget',
+				'description' => __( 'Displays the daily Bible verse powered by the Midvash API.', 'midvash-bible-references' ),
+				'classname'   => 'mvbr-votd-widget',
 			)
 		);
 	}
@@ -50,18 +50,18 @@ class BBMV_Widget extends WP_Widget {
 			echo wp_kses_post( $args['before_title'] . esc_html( $title ) . $args['after_title'] );
 		}
 
-		// bbmv_render_votd() returns HTML assembled exclusively via esc_html()
-		// / esc_url() with a known-safe Schema.org microdata wrapper — using
-		// wp_kses_post() here would strip the itemscope / itemtype / itemprop
-		// attributes that power the structured data the widget exists to emit.
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo bbmv_render_votd(
-			array(
-				'locale'         => $locale,
-				'version'        => $version,
-				'show_reference' => $show_reference,
-				'link_verse'     => $link_verse,
-			)
+		// wp_kses_post() alone would strip the Schema.org microdata
+		// (itemscope / itemtype / itemprop) the widget exists to emit.
+		echo wp_kses(
+			mvbr_render_votd(
+				array(
+					'locale'         => $locale,
+					'version'        => $version,
+					'show_reference' => $show_reference,
+					'link_verse'     => $link_verse,
+				)
+			),
+			mvbr_votd_allowed_html()
 		);
 
 		echo wp_kses_post( $args['after_widget'] );
@@ -74,23 +74,23 @@ class BBMV_Widget extends WP_Widget {
 	 * @return string Empty string: the form keeps WordPress's Save button.
 	 */
 	public function form( $instance ) {
-		$title          = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Verse of the Day', 'bible-by-midvash' );
+		$title          = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Verse of the Day', 'midvash-bible-references' );
 		$locale         = ! empty( $instance['locale'] ) ? $instance['locale'] : '';
 		$version        = ! empty( $instance['version'] ) ? $instance['version'] : '';
 		$show_reference = isset( $instance['show_reference'] ) ? (bool) $instance['show_reference'] : true;
 		$link_verse     = isset( $instance['link_verse'] ) ? (bool) $instance['link_verse'] : true;
 		?>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'bible-by-midvash' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'midvash-bible-references' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"
 					name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>"
 					type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'locale' ) ); ?>"><?php esc_html_e( 'Language (leave empty to use plugin setting):', 'bible-by-midvash' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'locale' ) ); ?>"><?php esc_html_e( 'Language (leave empty to use plugin setting):', 'midvash-bible-references' ); ?></label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'locale' ) ); ?>"
 					name="<?php echo esc_attr( $this->get_field_name( 'locale' ) ); ?>">
-				<option value="" <?php selected( $locale, '' ); ?>><?php esc_html_e( '— Use plugin setting —', 'bible-by-midvash' ); ?></option>
+				<option value="" <?php selected( $locale, '' ); ?>><?php esc_html_e( '— Use plugin setting —', 'midvash-bible-references' ); ?></option>
 				<?php
 				$locales = array(
 					'pt-br' => '🇧🇷 Português (Brasil)',
@@ -110,22 +110,22 @@ class BBMV_Widget extends WP_Widget {
 			</select>
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'version' ) ); ?>"><?php esc_html_e( 'Version (leave empty for locale default):', 'bible-by-midvash' ); ?></label>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'version' ) ); ?>"><?php esc_html_e( 'Version (leave empty for locale default):', 'midvash-bible-references' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'version' ) ); ?>"
 					name="<?php echo esc_attr( $this->get_field_name( 'version' ) ); ?>"
 					type="text" value="<?php echo esc_attr( $version ); ?>"
-					placeholder="<?php esc_attr_e( 'e.g. onbv, kjv, lsg', 'bible-by-midvash' ); ?>">
+					placeholder="<?php esc_attr_e( 'e.g. onbv, kjv, lsg', 'midvash-bible-references' ); ?>">
 		</p>
 		<p>
 			<label>
 				<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'show_reference' ) ); ?>" value="1" <?php checked( $show_reference ); ?>>
-				<?php esc_html_e( 'Show reference (e.g. João 3:16)', 'bible-by-midvash' ); ?>
+				<?php esc_html_e( 'Show reference (e.g. João 3:16)', 'midvash-bible-references' ); ?>
 			</label>
 		</p>
 		<p>
 			<label>
 				<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'link_verse' ) ); ?>" value="1" <?php checked( $link_verse ); ?>>
-				<?php esc_html_e( 'Link verse to Midvash', 'bible-by-midvash' ); ?>
+				<?php esc_html_e( 'Link verse to Midvash', 'midvash-bible-references' ); ?>
 			</label>
 		</p>
 		<?php
@@ -150,8 +150,8 @@ class BBMV_Widget extends WP_Widget {
 	}
 }
 
-// Co-locating bbmv_render_votd() and the [bbm_votd] shortcode callback in
-// the same file as BBMV_Widget is intentional: all three share the rendering
+// Co-locating mvbr_render_votd() and the [mvbr_votd] shortcode callback in
+// the same file as MVBR_Widget is intentional: all three share the rendering
 // path and editing them apart would invite drift. WordPress core itself uses
 // the same pattern in widget files (cf. wp-includes/widgets/class-wp-widget-*).
 // phpcs:disable Universal.Files.SeparateFunctionsFromOO.Mixed
@@ -168,7 +168,7 @@ class BBMV_Widget extends WP_Widget {
  * }.
  * @return string HTML output.
  */
-function bbmv_render_votd( $atts = array() ) {
+function mvbr_render_votd( $atts = array() ) {
 	$atts = wp_parse_args(
 		$atts,
 		array(
@@ -179,17 +179,17 @@ function bbmv_render_votd( $atts = array() ) {
 		)
 	);
 
-	$options = get_option( 'bbm_options', array() );
-	$locale  = $atts['locale'] ? BBMV_Books::normalize_locale( $atts['locale'] )
+	$options = get_option( 'mvbr_options', array() );
+	$locale  = $atts['locale'] ? MVBR_Books::normalize_locale( $atts['locale'] )
 								: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-	$version = BBMV_Books::resolve_version( $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : BBMV_Books::get_default_version( $locale ) ) );
+	$version = MVBR_Books::resolve_version( $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : MVBR_Books::get_default_version( $locale ) ) );
 
-	$api  = new BBMV_API();
+	$api  = new MVBR_API();
 	$data = $api->get_votd( $locale, $version );
 
 	if ( ! $data ) {
-		return '<div class="bbm-votd bbm-votd--error">'
-			. '<p class="bbm-votd__text">' . esc_html__( 'Verse currently unavailable.', 'bible-by-midvash' ) . '</p>'
+		return '<div class="mvbr-votd mvbr-votd--error">'
+			. '<p class="mvbr-votd__text">' . esc_html__( 'Verse currently unavailable.', 'midvash-bible-references' ) . '</p>'
 			. '</div>';
 	}
 
@@ -204,12 +204,12 @@ function bbmv_render_votd( $atts = array() ) {
 	if ( $show_ref && $reference ) {
 		if ( $link && $url ) {
 			$ref_html = sprintf(
-				'<cite class="bbm-votd__reference"><a href="%s" target="_blank" rel="noopener noreferrer" class="bbm-votd__link">%s</a></cite>',
+				'<cite class="mvbr-votd__reference"><a href="%s" target="_blank" rel="noopener noreferrer" class="mvbr-votd__link">%s</a></cite>',
 				esc_url( $url ),
 				esc_html( $reference )
 			);
 		} else {
-			$ref_html = '<cite class="bbm-votd__reference">' . esc_html( $reference ) . '</cite>';
+			$ref_html = '<cite class="mvbr-votd__reference">' . esc_html( $reference ) . '</cite>';
 		}
 	}
 
@@ -221,20 +221,20 @@ function bbmv_render_votd( $atts = array() ) {
 		$copyright    = ( $version_meta && ! empty( $version_meta['copyright'] ) ) ? (string) $version_meta['copyright'] : '';
 	}
 	$copyright_html = '' !== trim( $copyright )
-		? '<small class="bbm-votd__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
+		? '<small class="mvbr-votd__copyright">' . nl2br( esc_html( trim( $copyright ) ) ) . '</small>'
 		: '';
 
 	// A "Midvash" credit link only with the site owner's opt-in (the same
 	// setting as the tooltip logo; WordPress.org guideline 10).
 	$powered_html = ! empty( $options['show_branding'] )
-		? '<p class="bbm-votd__powered"><a href="' . esc_url( BBMV_Books::site_url( $locale ) ) . '" target="_blank" rel="noopener noreferrer">Midvash</a></p>'
+		? '<p class="mvbr-votd__powered"><a href="' . esc_url( MVBR_Books::site_url( $locale ) ) . '" target="_blank" rel="noopener noreferrer">Midvash</a></p>'
 		: '';
 
-	wp_enqueue_style( 'bbm-style' );
+	wp_enqueue_style( 'mvbr-style' );
 
 	return sprintf(
-		'<div class="bbm-votd" itemscope itemtype="https://schema.org/Quotation">'
-		. '<p class="bbm-votd__text" itemprop="text">%s</p>'
+		'<div class="mvbr-votd" itemscope itemtype="https://schema.org/Quotation">'
+		. '<p class="mvbr-votd__text" itemprop="text">%s</p>'
 		. '%s'
 		. '%s'
 		. '%s'
@@ -247,7 +247,28 @@ function bbmv_render_votd( $atts = array() ) {
 }
 
 /**
- * [bbm_votd] shortcode
+ * Tags allowed in the Verse of the Day HTML: the post tags plus the Schema.org
+ * microdata attributes.
+ *
+ * @return array
+ */
+function mvbr_votd_allowed_html() {
+	$allowed = wp_kses_allowed_html( 'post' );
+	foreach ( array( 'div', 'p', 'cite', 'a', 'small' ) as $tag ) {
+		$allowed[ $tag ] = array_merge(
+			isset( $allowed[ $tag ] ) ? $allowed[ $tag ] : array(),
+			array(
+				'itemscope' => true,
+				'itemtype'  => true,
+				'itemprop'  => true,
+			)
+		);
+	}
+	return $allowed;
+}
+
+/**
+ * [mvbr_votd] shortcode
  *
  * Attributes (all optional):
  *   locale          — pt-br | en | es | fr | de | it | ru | ko | zh
@@ -259,7 +280,7 @@ function bbmv_render_votd( $atts = array() ) {
  * @param array $atts Shortcode attributes as listed above.
  * @return string HTML
  */
-function bbmv_votd_shortcode( $atts ) {
+function mvbr_votd_shortcode( $atts ) {
 	$atts = shortcode_atts(
 		array(
 			'locale'         => '',
@@ -269,16 +290,16 @@ function bbmv_votd_shortcode( $atts ) {
 			'title'          => '',
 		),
 		$atts,
-		'bbm_votd'
+		'mvbr_votd'
 	);
 
 	$html = '';
 
 	if ( ! empty( $atts['title'] ) ) {
-		$html .= '<h3 class="bbm-votd__title">' . esc_html( $atts['title'] ) . '</h3>';
+		$html .= '<h3 class="mvbr-votd__title">' . esc_html( $atts['title'] ) . '</h3>';
 	}
 
-	$html .= bbmv_render_votd(
+	$html .= mvbr_render_votd(
 		array(
 			'locale'         => sanitize_text_field( $atts['locale'] ),
 			'version'        => sanitize_text_field( $atts['version'] ),

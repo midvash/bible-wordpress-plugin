@@ -1,26 +1,17 @@
 #!/usr/bin/env tsx
 /**
- * Empacota o plugin "Bible by Midvash" num ZIP pronto pra distribuir.
+ * Empacota o plugin "Midvash Bible References" num ZIP pronto pra distribuir.
  *
- * Modos:
- *   `npx tsx scripts/build-zip.ts`                  → ZIP completo (default; com
- *                                                     plugin-update-checker, para
- *                                                     distribuição via R2).
- *   `npx tsx scripts/build-zip.ts --target=wp-org`  → ZIP “limpo”: remove
- *                                                     vendor/plugin-update-checker
- *                                                     e o bloco WPORG_STRIP_*
- *                                                     do bible-by-midvash.php.
- *                                                     Esse é o ZIP que vai pra
- *                                                     submissão no diretório
- *                                                     oficial WordPress.org —
- *                                                     o updater externo é vedado
- *                                                     pelas Plugin Review Guidelines.
+ *   `npx tsx scripts/build-zip.ts` → `dist/midvash-bible-references-{version}.zip`
+ *
+ * É o mesmo ZIP pro diretório do WordPress.org e pro GitHub Release: sem
+ * updater próprio (as Plugin Review Guidelines vedam) e sem `.po`/`.mo` (o
+ * translate.wordpress.org entrega as traduções). Os `.po` ficam em
+ * `translations/`, fora do ZIP.
  *
  * Entrada/saída:
- *   - Versão lida do header `Version:` em `bible-by-midvash.php`.
- *   - Estrutura interna do zip: `bible-by-midvash/` (slug oficial — WP exige).
- *   - Saída padrão:    `dist/bible-by-midvash-{version}.zip`
- *   - Saída wp-org:    `dist/bible-by-midvash-{version}-wporg.zip`
+ *   - Versão lida do header `Version:` em `midvash-bible-references.php`.
+ *   - Estrutura interna do zip: `midvash-bible-references/` (slug oficial — WP exige).
  *
  * Minifica cada `assets/{js,css}/*` com esbuild e grava `nome-<versão>.min.ext`
  * ao lado do original (o PHP serve o `.min`; com SCRIPT_DEBUG, o original). A
@@ -37,23 +28,9 @@ import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const ROOT = resolve(__dirname, '..');
-const PLUGIN_PHP = join(ROOT, 'bible-by-midvash.php');
+const PLUGIN_PHP = join(ROOT, 'midvash-bible-references.php');
 const DIST_DIR = join(ROOT, 'dist');
-const SLUG = 'bible-by-midvash';
-
-const WPORG_STRIP_START = '// {{WPORG_STRIP_START}}';
-const WPORG_STRIP_END = '// {{WPORG_STRIP_END}}';
-
-type Target = 'default' | 'wp-org';
-
-function parseTarget(): Target {
-  const arg = process.argv.find((a) => a.startsWith('--target='));
-  if (!arg) return 'default';
-  const value = arg.split('=')[1];
-  if (value === 'wp-org') return 'wp-org';
-  if (value === 'default') return 'default';
-  throw new Error(`Unknown --target value: ${value} (expected 'default' or 'wp-org')`);
-}
+const SLUG = 'midvash-bible-references';
 
 function readVersion(): string {
   if (!existsSync(PLUGIN_PHP)) {
@@ -62,28 +39,9 @@ function readVersion(): string {
   const content = readFileSync(PLUGIN_PHP, 'utf8');
   const match = content.match(/^\s*\*\s*Version:\s*([0-9]+\.[0-9]+\.[0-9]+)/m);
   if (!match) {
-    throw new Error('Could not parse `Version:` header in bible-by-midvash.php');
+    throw new Error('Could not parse `Version:` header in midvash-bible-references.php');
   }
   return match[1];
-}
-
-/**
- * Removes everything between WPORG_STRIP_START and WPORG_STRIP_END markers
- * (inclusive) from the plugin entry-point. Used for wp.org builds.
- */
-function stripWporgBlock(php: string): string {
-  const start = php.indexOf(WPORG_STRIP_START);
-  if (start === -1) {
-    // Already stripped or markers were removed manually — nothing to do.
-    return php;
-  }
-  const end = php.indexOf(WPORG_STRIP_END);
-  if (end === -1) {
-    throw new Error(`Found ${WPORG_STRIP_START} but no matching ${WPORG_STRIP_END}`);
-  }
-  // Include the end marker line + trailing newline so we don't leave blank padding.
-  const after = php.indexOf('\n', end) + 1;
-  return php.slice(0, start) + php.slice(after > 0 ? after : end + WPORG_STRIP_END.length);
 }
 
 const ESBUILD = 'esbuild@0.24.2';
@@ -102,37 +60,32 @@ function minifyAssets(pluginDir: string, version: string) {
   }
 }
 
-const KEY_LINE = /define\( 'BBMV_PLUGIN_KEY', '' \);/;
+const KEY_LINE = /define\( 'MVBR_PLUGIN_KEY', '' \);/;
 
-/** Fills an empty BBMV_PLUGIN_KEY from the environment, if one is given. */
+/** Fills an empty MVBR_PLUGIN_KEY from the environment, if one is given. */
 function injectPluginKey(phpFile: string) {
-  const key = process.env.BBMV_PLUGIN_KEY ?? '';
+  const key = process.env.MVBR_PLUGIN_KEY ?? '';
   if (!key) return;
-  if (!/^[A-Za-z0-9]+$/.test(key)) throw new Error('BBMV_PLUGIN_KEY must be alphanumeric');
+  if (!/^[A-Za-z0-9]+$/.test(key)) throw new Error('MVBR_PLUGIN_KEY must be alphanumeric');
   const php = readFileSync(phpFile, 'utf8');
   if (!KEY_LINE.test(php)) {
-    console.warn('[warn] BBMV_PLUGIN_KEY já preenchida no arquivo; env ignorada');
+    console.warn('[warn] MVBR_PLUGIN_KEY já preenchida no arquivo; env ignorada');
     return;
   }
-  writeFileSync(phpFile, php.replace(KEY_LINE, `define( 'BBMV_PLUGIN_KEY', '${key}' );`));
+  writeFileSync(phpFile, php.replace(KEY_LINE, `define( 'MVBR_PLUGIN_KEY', '${key}' );`));
 }
 
 function main() {
-  const target = parseTarget();
   const version = readVersion();
-  const suffix = target === 'wp-org' ? '-wporg' : '';
-  const stagingRoot = join(tmpdir(), `midvash-wp-build-${target}-${Date.now()}`);
+  const stagingRoot = join(tmpdir(), `midvash-wp-build-${Date.now()}`);
   const stagingPlugin = join(stagingRoot, SLUG);
-  const outFile = join(DIST_DIR, `${SLUG}-${version}${suffix}.zip`);
+  const outFile = join(DIST_DIR, `${SLUG}-${version}.zip`);
 
   mkdirSync(DIST_DIR, { recursive: true });
   mkdirSync(stagingPlugin, { recursive: true });
 
-  // Files to include — plugin code only, no repo metadata (README.md, LICENSE, scripts, .github)
-  const includePaths = ['bible-by-midvash.php', 'readme.txt', 'uninstall.php', 'includes', 'assets', 'languages'];
-  if (target !== 'wp-org') {
-    includePaths.push('vendor');
-  }
+  // Files to include — plugin code only, no repo metadata (README.md, LICENSE, scripts, .github, translations)
+  const includePaths = ['midvash-bible-references.php', 'readme.txt', 'uninstall.php', 'includes', 'assets'];
   for (const p of includePaths) {
     const src = join(ROOT, p);
     if (!existsSync(src)) continue;
@@ -142,26 +95,14 @@ function main() {
   minifyAssets(stagingPlugin, version);
 
   // The plugin key is public in the shipped plugin but kept out of this
-  // public repo: CI passes it in BBMV_PLUGIN_KEY and it is filled in here.
-  injectPluginKey(join(stagingPlugin, 'bible-by-midvash.php'));
-
-  // For wp-org build: strip the auto-update block from the staged entry-point.
-  if (target === 'wp-org') {
-    const stagedPhp = join(stagingPlugin, 'bible-by-midvash.php');
-    const original = readFileSync(stagedPhp, 'utf8');
-    const stripped = stripWporgBlock(original);
-    if (stripped === original) {
-      console.warn(`[warn] --target=wp-org but no ${WPORG_STRIP_START} markers found — nothing was stripped`);
-    } else {
-      writeFileSync(stagedPhp, stripped);
-    }
-  }
+  // public repo: CI passes it in MVBR_PLUGIN_KEY and it is filled in here.
+  injectPluginKey(join(stagingPlugin, 'midvash-bible-references.php'));
 
   if (existsSync(outFile)) rmSync(outFile);
   execSync(`cd "${stagingRoot}" && zip -rq "${outFile}" "${SLUG}"`, { stdio: 'inherit' });
   rmSync(stagingRoot, { recursive: true, force: true });
 
-  console.log(`✓ ${outFile} (v${version}, target=${target})`);
+  console.log(`✓ ${outFile} (v${version})`);
 }
 
 main();

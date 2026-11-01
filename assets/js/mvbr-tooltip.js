@@ -1,5 +1,5 @@
 /**
- * Bible by Midvash - Tooltip Handler
+ * Midvash Bible References - Tooltip Handler
  * 
  * Handles tooltip display for Bible reference links
  * Fetches verse content via AJAX and displays in a styled tooltip
@@ -11,7 +11,7 @@
     'use strict';
 
     // Configuration from WordPress (passed via wp_localize_script)
-    const config = window.bbm_config || {
+    const config = window.mvbr_config || {
         ajax_url: '/wp-admin/admin-ajax.php',
         version: 'onbv',
         version_label: 'ONBV',
@@ -94,7 +94,7 @@
     function linkFromEvent(e) {
         let node = e.target;
         if (node && node.nodeType === 3) node = node.parentNode;
-        return node && typeof node.closest === 'function' ? node.closest('.bbm-link[data-midvash-ref]') : null;
+        return node && typeof node.closest === 'function' ? node.closest('.mvbr-link[data-midvash-ref]') : null;
     }
 
     /**
@@ -104,7 +104,7 @@
         if (tooltipElement) return tooltipElement;
 
         tooltipElement = document.createElement('div');
-        tooltipElement.className = 'bbm-tooltip bbm-tooltip--below';
+        tooltipElement.className = 'mvbr-tooltip mvbr-tooltip--below';
         tooltipElement.setAttribute('role', 'tooltip');
         tooltipElement.setAttribute('aria-hidden', 'true');
 
@@ -113,36 +113,36 @@
         // node so aggressive theme sanitizers (e.g. AMP-mode plugins) can't
         // strip the attribute.
         tooltipElement.innerHTML = `
-            <div class="bbm-tooltip__header">
-                <span class="bbm-tooltip__reference"></span>
-                <a class="bbm-tooltip__version-link">
-                    <span class="bbm-tooltip__version"></span>
+            <div class="mvbr-tooltip__header">
+                <span class="mvbr-tooltip__reference"></span>
+                <a class="mvbr-tooltip__version-link">
+                    <span class="mvbr-tooltip__version"></span>
                 </a>
             </div>
-            <div class="bbm-tooltip__content">
-                <p class="bbm-tooltip__text"></p>
+            <div class="mvbr-tooltip__content">
+                <p class="mvbr-tooltip__text"></p>
             </div>
-            <div class="bbm-tooltip__footer">
-                <a class="bbm-tooltip__read-more" target="_blank" rel="noopener noreferrer">
-                    <svg class="bbm-tooltip__read-more-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="mvbr-tooltip__footer">
+                <a class="mvbr-tooltip__read-more" target="_blank" rel="noopener noreferrer">
+                    <svg class="mvbr-tooltip__read-more-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    <span class="bbm-tooltip__read-more-text"></span>
+                    <span class="mvbr-tooltip__read-more-text"></span>
                 </a>
-                <span class="bbm-tooltip__copyright"></span>
+                <span class="mvbr-tooltip__copyright"></span>
             </div>
         `;
 
         setCopyright(tooltipElement, config.version_copyright);
 
         if (config.icon_url) {
-            const header = tooltipElement.querySelector('.bbm-tooltip__header');
+            const header = tooltipElement.querySelector('.mvbr-tooltip__header');
             const img    = document.createElement('img');
             img.src       = config.icon_url;
             img.alt       = 'Midvash';
-            img.className = 'bbm-tooltip__logo';
+            img.className = 'mvbr-tooltip__logo';
             header.insertBefore(img, header.firstChild);
         }
 
@@ -193,11 +193,11 @@
         if (spaceBelow < tooltipRect.height + 20 && spaceAbove > tooltipRect.height + 20) {
             // Position above the link
             top = linkRect.top + scrollTop - tooltipRect.height - 10;
-            tooltipElement.classList.remove('bbm-tooltip--below');
-            tooltipElement.classList.add('bbm-tooltip--above');
+            tooltipElement.classList.remove('mvbr-tooltip--below');
+            tooltipElement.classList.add('mvbr-tooltip--above');
         } else {
-            tooltipElement.classList.remove('bbm-tooltip--above');
-            tooltipElement.classList.add('bbm-tooltip--below');
+            tooltipElement.classList.remove('mvbr-tooltip--above');
+            tooltipElement.classList.add('mvbr-tooltip--below');
         }
 
         tooltipElement.style.top = top + 'px';
@@ -206,7 +206,7 @@
         // Point the arrow at the link even when the tooltip was pushed back
         // inside the viewport.
         const arrowLeft = Math.min(Math.max(linkRect.left + scrollLeft - left + 12, 12), tooltipRect.width - 24);
-        tooltipElement.style.setProperty('--bbm-arrow-left', arrowLeft + 'px');
+        tooltipElement.style.setProperty('--mvbr-arrow-left', arrowLeft + 'px');
     }
 
     /**
@@ -214,7 +214,7 @@
      * full multi-line notice on hover via the title attribute.
      */
     function setCopyright(tooltip, notice) {
-        const copyrightEl = tooltip.querySelector('.bbm-tooltip__copyright');
+        const copyrightEl = tooltip.querySelector('.mvbr-tooltip__copyright');
         if (!copyrightEl) {
             return;
         }
@@ -230,12 +230,12 @@
     function showLoading(reference) {
         const tooltip = createTooltip();
         
-        tooltip.classList.add('bbm-tooltip--loading');
-        tooltip.classList.remove('bbm-tooltip--error');
+        tooltip.classList.add('mvbr-tooltip--loading');
+        tooltip.classList.remove('mvbr-tooltip--error');
         
-        tooltip.querySelector('.bbm-tooltip__reference').textContent = reference;
-        const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
-        const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
+        tooltip.querySelector('.mvbr-tooltip__reference').textContent = reference;
+        const versionLink = tooltip.querySelector('.mvbr-tooltip__version-link');
+        const versionSpan = tooltip.querySelector('.mvbr-tooltip__version');
         if (config.show_version) {
             versionSpan.textContent = versionLabel(config.version);
             setVersionLink(versionLink, config.version);
@@ -243,8 +243,8 @@
         } else {
             versionLink.style.display = 'none';
         }
-        tooltip.querySelector('.bbm-tooltip__content').innerHTML = '<div class="bbm-tooltip__loader"></div>';
-        tooltip.querySelector('.bbm-tooltip__footer').style.display = 'none';
+        tooltip.querySelector('.mvbr-tooltip__content').innerHTML = '<div class="mvbr-tooltip__loader"></div>';
+        tooltip.querySelector('.mvbr-tooltip__footer').style.display = 'none';
     }
 
     /**
@@ -253,15 +253,15 @@
     function showContent(data, url) {
         const tooltip = createTooltip();
         
-        tooltip.classList.remove('bbm-tooltip--loading', 'bbm-tooltip--error');
+        tooltip.classList.remove('mvbr-tooltip--loading', 'mvbr-tooltip--error');
         
         // Set reference
         const reference = data.reference || data.book + ' ' + data.chapter + ':' + data.verse;
-        tooltip.querySelector('.bbm-tooltip__reference').textContent = reference;
+        tooltip.querySelector('.mvbr-tooltip__reference').textContent = reference;
         
         // Set version with link
-        const versionLink = tooltip.querySelector('.bbm-tooltip__version-link');
-        const versionSpan = tooltip.querySelector('.bbm-tooltip__version');
+        const versionLink = tooltip.querySelector('.mvbr-tooltip__version-link');
+        const versionSpan = tooltip.querySelector('.mvbr-tooltip__version');
         if (config.show_version && data.version) {
             versionSpan.textContent = versionLabel(data.version);
             setVersionLink(versionLink, data.version);
@@ -277,26 +277,26 @@
             // Multiple verses
             contentHtml = data.verses.map((verse, index) => {
                 const verseNum = data.verse + index;
-                return '<sup class="bbm-tooltip__verse-number">' + verseNum + '</sup>' + escapeHtml(verse);
+                return '<sup class="mvbr-tooltip__verse-number">' + verseNum + '</sup>' + escapeHtml(verse);
             }).join(' ');
         } else if (data.text) {
             // Single verse
             contentHtml = escapeHtml(data.text);
         }
         
-        tooltip.querySelector('.bbm-tooltip__content').innerHTML = 
-            '<p class="bbm-tooltip__text">' + contentHtml + '</p>';
+        tooltip.querySelector('.mvbr-tooltip__content').innerHTML = 
+            '<p class="mvbr-tooltip__text">' + contentHtml + '</p>';
         
         // Attribution sent by the API with the text wins over the catalogue's.
         setCopyright(tooltip, data.copyright || config.version_copyright);
 
         // Set read more link
-        const readMoreLink = tooltip.querySelector('.bbm-tooltip__read-more');
-        const readMoreText = tooltip.querySelector('.bbm-tooltip__read-more-text');
+        const readMoreLink = tooltip.querySelector('.mvbr-tooltip__read-more');
+        const readMoreText = tooltip.querySelector('.mvbr-tooltip__read-more-text');
         readMoreLink.href = url;
         readMoreText.textContent = config.read_more || 'Read more';
         readMoreLink.style.display = '';
-        tooltip.querySelector('.bbm-tooltip__footer').style.display = '';
+        tooltip.querySelector('.mvbr-tooltip__footer').style.display = '';
         
         // Update position after content change
         positionTooltip(activeLink);
@@ -308,17 +308,17 @@
     function showError(message) {
         const tooltip = createTooltip();
         
-        tooltip.classList.remove('bbm-tooltip--loading');
-        tooltip.classList.add('bbm-tooltip--error');
+        tooltip.classList.remove('mvbr-tooltip--loading');
+        tooltip.classList.add('mvbr-tooltip--error');
         
-        tooltip.querySelector('.bbm-tooltip__content').innerHTML = `
-            <svg class="bbm-tooltip__error-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        tooltip.querySelector('.mvbr-tooltip__content').innerHTML = `
+            <svg class="mvbr-tooltip__error-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
             </svg>
-            <p class="bbm-tooltip__error-message">${escapeHtml(message || config.fallback_message)}</p>
+            <p class="mvbr-tooltip__error-message">${escapeHtml(message || config.fallback_message)}</p>
         `;
         
-        tooltip.querySelector('.bbm-tooltip__footer').style.display = 'none';
+        tooltip.querySelector('.mvbr-tooltip__footer').style.display = 'none';
     }
 
     /**
@@ -332,7 +332,7 @@
     }
 
     function isTooltipVisible() {
-        return !!(tooltipElement && tooltipElement.classList.contains('bbm-tooltip--visible'));
+        return !!(tooltipElement && tooltipElement.classList.contains('mvbr-tooltip--visible'));
     }
 
     /**
@@ -342,7 +342,7 @@
     function stashTitle(link) {
         const title = link.getAttribute('title');
         if (title === null) return;
-        link.setAttribute('data-bbm-title', title);
+        link.setAttribute('data-mvbr-title', title);
         if (!link.hasAttribute('aria-label')) {
             link.setAttribute('aria-label', title);
         }
@@ -379,7 +379,7 @@
         positionTooltip(link);
         
         showTimeout = setTimeout(function() {
-            tooltipElement.classList.add('bbm-tooltip--visible');
+            tooltipElement.classList.add('mvbr-tooltip--visible');
             tooltipElement.setAttribute('aria-hidden', 'false');
         }, 100);
     }
@@ -397,7 +397,7 @@
                 return;
             }
             if (tooltipElement) {
-                tooltipElement.classList.remove('bbm-tooltip--visible');
+                tooltipElement.classList.remove('mvbr-tooltip--visible');
                 tooltipElement.setAttribute('aria-hidden', 'true');
             }
             activeLink = null;
@@ -409,7 +409,7 @@
      */
     function fetchVerse(reference, url, cacheKey) {
         const params = new URLSearchParams({
-            action: 'bbm_get_verse',
+            action: 'mvbr_get_verse',
             reference: reference,
             version: config.version
         });
@@ -441,7 +441,7 @@
             }
         })
         .catch(function(error) {
-            if (window.bbm_config && window.bbm_config.debug && typeof console !== 'undefined') {
+            if (window.mvbr_config && window.mvbr_config.debug && typeof console !== 'undefined') {
                 console.error('Midvash Tooltip Error:', error);
             }
             if (activeLink && activeLink.getAttribute('data-midvash-ref') === reference) {
@@ -459,7 +459,7 @@
      * existing single-verse fetch — no coordination needed.
      */
     function prefetchAll() {
-        const links = document.querySelectorAll('.bbm-link[data-midvash-ref]');
+        const links = document.querySelectorAll('.mvbr-link[data-midvash-ref]');
         if (!links.length) return;
 
         const refs = [];
@@ -473,7 +473,7 @@
         if (refs.length < 2) return; // A single ref isn't worth a batch round-trip.
 
         const body = new URLSearchParams({
-            action: 'bbm_get_verses',
+            action: 'mvbr_get_verses',
             refs: refs.slice(0, 60).join('|'),
             version: config.version
         });
@@ -544,7 +544,7 @@
             }
         }, true);
 
-        document.querySelectorAll('.bbm-link[data-midvash-ref]').forEach(stashTitle);
+        document.querySelectorAll('.mvbr-link[data-midvash-ref]').forEach(stashTitle);
 
         // Handle focus for accessibility
         document.addEventListener('focusin', function(e) {
@@ -563,7 +563,7 @@
 
         // Handle escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && tooltipElement && tooltipElement.classList.contains('bbm-tooltip--visible')) {
+            if (e.key === 'Escape' && tooltipElement && tooltipElement.classList.contains('mvbr-tooltip--visible')) {
                 hideTooltip();
             }
         });
@@ -573,7 +573,7 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
-                if (activeLink && tooltipElement && tooltipElement.classList.contains('bbm-tooltip--visible')) {
+                if (activeLink && tooltipElement && tooltipElement.classList.contains('mvbr-tooltip--visible')) {
                     positionTooltip(activeLink);
                 }
             }, 100);
@@ -584,7 +584,7 @@
         window.addEventListener('scroll', function() {
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(function() {
-                if (activeLink && tooltipElement && tooltipElement.classList.contains('bbm-tooltip--visible')) {
+                if (activeLink && tooltipElement && tooltipElement.classList.contains('mvbr-tooltip--visible')) {
                     positionTooltip(activeLink);
                 }
             }, 50);

@@ -553,7 +553,9 @@ class MVBR_API {
 		$locale  = MVBR_Books::normalize_locale( $locale );
 		$version = MVBR_Books::resolve_version( $version ? $version : MVBR_Books::get_default_version( $locale ) );
 
-		$cache_key = 'mvbr_votd_' . $locale . '_' . $version . '_' . gmdate( 'Y-m-d' );
+		// Hashed: $version comes from the shortcode with no length limit, and a
+		// transient key longer than 172 characters would not be stored.
+		$cache_key = 'mvbr_votd_' . md5( $locale . '|' . $version . '|' . gmdate( 'Y-m-d' ) );
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
 			return $cached;

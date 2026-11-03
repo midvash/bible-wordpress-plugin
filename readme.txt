@@ -3,7 +3,7 @@ Contributors: midvash
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -136,6 +136,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
+= 1.0.1 =
+* **Fixed:** the Verse of the Day cache key is now hashed, so a long `version` in the shortcode can no longer push it past the WordPress transient key limit and break the cache.
+
 = 1.0.0 =
 * **New name: Midvash Bible References** (slug `midvash-bible-references`), published by Midvash. The plugin files, the text domain and every internal name now use the `mvbr` prefix.
 * **Settings and widgets carry over.** On the first load, the settings saved by 0.x and the Verse of the Day widgets are moved to the new names and the old rows are deleted.
@@ -235,6 +238,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://midvash.com/wordpress-plugin.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Fixes the Verse of the Day cache when the shortcode has a very long version value.
 
 = 1.0.0 =
 New name: Midvash Bible References. Settings and widgets move over on their own. The shortcode is now [mvbr_votd]: replace [bbm_votd] in your posts.

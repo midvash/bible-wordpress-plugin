@@ -3,7 +3,7 @@
  * Plugin Name: Midvash Bible References
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Midvash
  * Author URI: https://midvash.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'MVBR_VERSION', '1.0.0' );
+define( 'MVBR_VERSION', '1.0.1' );
 define( 'MVBR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MVBR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'MVBR_API_BASE_URL', 'https://api.midvash.com' );

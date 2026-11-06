@@ -142,8 +142,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * **Fixed:** more ways of writing a reference become links: "Salmo 23", "Cantares 2:1", "I Coríntios 13", "II Coríntios 5:17", "2 Co 5:17", "Primeira João 4:8", "João 3,16". Other languages gain common spellings too.
 * **Fixed:** in single-chapter books a lone number is the verse: "Judas 3", "3 João 4".
 * **Fixed:** "João 3:16,18" now links both verses, each with its own tooltip.
+* **New:** a range into a later chapter ("João 3:16-4:2", up to five chapters) is one link, and its tooltip shows the whole passage.
 * **Fixed:** a name followed by a count is no longer a reference: "Marcos 12 anos".
-* **Fixed:** the link color and underline settings now win over the theme, and follow a custom CSS class.
+* **Fixed:** the link color and underline settings now win over the theme (Elementor's link color used to override them), and follow a custom CSS class.
 * **Fixed:** a shortcode, block or widget set to another language uses that language's default version.
 * **Fixed:** the widget's "show reference" and "link" boxes can now be turned off.
 * **i18n:** the block's editor texts can now be translated.

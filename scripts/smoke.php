@@ -82,6 +82,9 @@ try {
 	$out['block_chapter'] = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'Salmos 23' ) ) ), 0, 80 );
 	$chapter              = ( new MVBR_API() )->get_passages( array( 'Salmos 23' ) );
 	$out['chapter_verse'] = isset( $chapter['Salmos 23']['verse'] ) ? $chapter['Salmos 23']['verse'] : null;
+	$out['block_span']    = wp_strip_all_tags( $block->render( array( 'reference' => 'João 3:35-4:2' ) ) );
+	$span                 = ( new MVBR_API() )->get_passages( array( 'João 3:35-4:2' ) );
+	$out['span_reference'] = isset( $span['João 3:35-4:2']['reference'] ) ? $span['João 3:35-4:2']['reference'] : null;
 	$out['block_jude']    = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'Judas 3' ) ) ), 0, 80 );
 	// A language override brings its own version.
 	$out['votd_en'] = substr( wp_strip_all_tags( mvbr_votd_shortcode( array( 'locale' => 'en' ) ) ), 0, 80 );

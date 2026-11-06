@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Midvash Bible References\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 09:21-0300\n"
+"POT-Creation-Date: 2026-11-06 15:23-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Italian\n"
@@ -12,31 +12,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: midvash-bible-references.php:213
+#: midvash-bible-references.php:221
 msgid "Verse currently unavailable"
 msgstr "Versetto attualmente non disponibile"
 
-#: midvash-bible-references.php:214
+#: midvash-bible-references.php:222
 msgid "Read more"
 msgstr "Leggi di più"
 
-#: midvash-bible-references.php:285 midvash-bible-references.php:322
+#: midvash-bible-references.php:293 midvash-bible-references.php:330
 msgid "Too many requests"
 msgstr "Troppe richieste"
 
-#: midvash-bible-references.php:294 midvash-bible-references.php:332
+#: midvash-bible-references.php:302 midvash-bible-references.php:340
 msgid "Reference not provided"
 msgstr "Riferimento non fornito"
 
-#: midvash-bible-references.php:303
+#: midvash-bible-references.php:311
 msgid "Verse not found"
 msgstr "Versetto non trovato"
 
-#: midvash-bible-references.php:354
+#: midvash-bible-references.php:362
 msgid "Forbidden"
 msgstr "Vietato"
 
-#: midvash-bible-references.php:367
+#: midvash-bible-references.php:375
 msgid "Failed to fetch versions"
 msgstr "Impossibile recuperare le versioni"
 
@@ -337,7 +337,7 @@ msgstr "Mostra il riferimento (es. Giovanni 3:16)"
 msgid "Link verse to Midvash"
 msgstr "Collega versetto a Midvash"
 
-#: includes/class-mvbr-widget.php:192 includes/class-mvbr-block.php:110
+#: includes/class-mvbr-widget.php:193 includes/class-mvbr-block.php:111
 msgid "Verse currently unavailable."
 msgstr "Versetto attualmente non disponibile."
 
@@ -345,10 +345,62 @@ msgstr "Versetto attualmente non disponibile."
 msgid "Online Bible"
 msgstr "Bibbia online"
 
-#: includes/class-mvbr-parser.php:280
+#: includes/class-mvbr-parser.php:306
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Leggi %s su Midvash"
+
+#: assets/js/mvbr-block.js:23
+msgid "Plugin setting"
+msgstr "Impostazione del plugin"
+
+#: assets/js/mvbr-block.js:36
+msgid "Bible Verse"
+msgstr "Versetto biblico"
+
+#: assets/js/mvbr-block.js:37
+msgid "Display a specific Bible verse with styling and a link to Midvash."
+msgstr "Mostra un versetto biblico con stile e un link a Midvash."
+
+#: assets/js/mvbr-block.js:60
+msgid "Verse Settings"
+msgstr "Impostazioni del versetto"
+
+#: assets/js/mvbr-block.js:62
+msgid "Bible Reference"
+msgstr "Riferimento biblico"
+
+#: assets/js/mvbr-block.js:63
+msgid "e.g. John 3:16 · João 3:16 · 요한복음 3:16"
+msgstr "es.: Giovanni 3:16 · 1 Corinzi 13:4"
+
+#: assets/js/mvbr-block.js:69
+msgid "Version"
+msgstr "Versione"
+
+#: assets/js/mvbr-block.js:70
+msgid "Leave empty to use the plugin default."
+msgstr "Lascia vuoto per usare il valore predefinito del plugin."
+
+#: assets/js/mvbr-block.js:76
+msgid "Language override"
+msgstr "Cambia lingua"
+
+#: assets/js/mvbr-block.js:82
+msgid "Show reference (e.g. John 3:16)"
+msgstr "Mostra il riferimento (es.: Giovanni 3:16)"
+
+#: assets/js/mvbr-block.js:87
+msgid "Link reference to Midvash"
+msgstr "Collega il riferimento a Midvash"
+
+#: assets/js/mvbr-block.js:105
+msgid "Verse rendered on the front end via Midvash API."
+msgstr "Il versetto appare sul sito tramite l’API di Midvash."
+
+#: assets/js/mvbr-block.js:113
+msgid "Enter a Bible reference in the block settings →"
+msgstr "Inserisci un riferimento biblico nelle impostazioni del blocco →"
 
 #~ msgid "Bible by Midvash"
 #~ msgstr "Bibbia by Midvash"

@@ -192,6 +192,62 @@ check( 'only the first "Bíblia" is linked', array( 'https://midvash.com/pt-br' 
 check( 'English "Bible" goes to the root', array( 'https://midvash.com' ), mvbr_hrefs( mvbr_parse( '<p>The Bible says.</p>', 'en', array( 'link_biblia' => true ) ) ) );
 check( '"Bíblia" off by default', array(), mvbr_hrefs( mvbr_parse( '<p>A Bíblia diz.</p>' ) ) );
 
+// --- Numbered books ---------------------------------------------------------
+
+foreach ( array( '1 Jo 4:8', '1Jo 4:8', 'I João 4:8', 'Primeira João 4:8', '1ª João 4:8', '1 João 4:8', '1 Joao 4:8' ) as $mvbr_ref ) {
+	check( "$mvbr_ref is 1 John", array( 'https://midvash.com/pt-br/onbv/1-joao/4#v=8' ), mvbr_hrefs( mvbr_parse( "<p>$mvbr_ref</p>" ) ) );
+}
+check( '"1. João" is not the Gospel', array(), mvbr_hrefs( mvbr_parse( '<p>1. João 4:8</p>' ) ) );
+check( 'a verse number before a book is not a book number', 2, count( mvbr_hrefs( mvbr_parse( '<p>Mt 5:3 Lc 6:20</p>' ) ) ) );
+check( 'II and short numbered forms', array( 'https://midvash.com/pt-br/onbv/2-corintios/5#v=17', 'https://midvash.com/pt-br/onbv/2-corintios/5#v=17', 'https://midvash.com/pt-br/onbv/1-samuel/3#v=1' ), mvbr_hrefs( mvbr_parse( '<p>II Coríntios 5:17, 2 Co 5:17 e 1 Sm 3:1</p>' ) ) );
+check( 'I with chapter only', array( 'https://midvash.com/pt-br/onbv/1-corintios/13' ), mvbr_hrefs( mvbr_parse( '<p>I Coríntios 13</p>' ) ) );
+check( 'English Roman and ordinal', array( 'https://midvash.com/bsb/1-john/4#v=8', 'https://midvash.com/bsb/2-peter/1#v=3' ), mvbr_hrefs( mvbr_parse( '<p>I John 4:8 and Second Peter 1:3</p>', 'en' ) ) );
+check( 'Spanish Roman', array( 'https://midvash.com/es/rvr1909/1-juan/4#v=8' ), mvbr_hrefs( mvbr_parse( '<p>I Juan 4:8</p>', 'es' ) ) );
+
+// --- Other common spellings -------------------------------------------------
+
+check( 'Salmo and Cantares', array( 'https://midvash.com/pt-br/onbv/salmos/23', 'https://midvash.com/pt-br/onbv/canticos/2#v=1' ), mvbr_hrefs( mvbr_parse( '<p>Salmo 23 e Cantares 2:1</p>' ) ) );
+check( 'Ex with verse', array( 'https://midvash.com/pt-br/onbv/exodo/20#v=3' ), mvbr_hrefs( mvbr_parse( '<p>Ex 20:3</p>' ) ) );
+check( 'English Psalm', array( 'https://midvash.com/bsb/psalms/23' ), mvbr_hrefs( mvbr_parse( '<p>Psalm 23</p>', 'en' ) ) );
+check( '"Phil 3" needs a verse', array(), mvbr_hrefs( mvbr_parse( '<p>Phil 3 was here.</p>', 'en' ) ) );
+
+// --- Single-chapter books -----------------------------------------------------
+
+check( 'Judas 3 is the verse', array( 'https://midvash.com/pt-br/onbv/judas/1#v=3' ), mvbr_hrefs( mvbr_parse( '<p>Judas 3</p>' ) ) );
+check( '3 João 4 is the verse', array( 'https://midvash.com/pt-br/onbv/3-joao/1#v=4' ), mvbr_hrefs( mvbr_parse( '<p>3 João 4</p>' ) ) );
+check( 'Judas 1:3 still works', array( 'https://midvash.com/pt-br/onbv/judas/1#v=3' ), mvbr_hrefs( mvbr_parse( '<p>Judas 1:3</p>' ) ) );
+check( 'number past the last verse', array(), mvbr_hrefs( mvbr_parse( '<p>Judas 30</p>' ) ) );
+
+// --- Comma -------------------------------------------------------------------
+
+check( 'comma separates chapter and verse', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16' ), mvbr_hrefs( mvbr_parse( '<p>João 3,16</p>' ) ) );
+check( 'comma with a space is not a verse', array( 'https://midvash.com/pt-br/onbv/joao/3' ), mvbr_hrefs( mvbr_parse( '<p>João 3, 16 vezes</p>' ) ) );
+$mvbr_more = mvbr_parse( '<p>João 3:16,18-20 diz</p>' );
+check( 'more verses get their own links', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16', 'https://midvash.com/pt-br/onbv/joao/3#v=18-20' ), mvbr_hrefs( $mvbr_more ) );
+check( 'the extra link has the full reference', 1, substr_count( $mvbr_more, 'data-midvash-ref="João 3:18-20"' ) );
+check( 'the comma stays in the text', true, false !== strpos( $mvbr_more, '</a>,<a ' ) );
+check( 'next chapter range keeps the start', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16' ), mvbr_hrefs( mvbr_parse( '<p>João 3:16-4:2</p>' ) ) );
+
+// --- Counts are not chapters ----------------------------------------------------
+
+check( '"Marcos 12 anos" is an age', array(), mvbr_hrefs( mvbr_parse( '<p>Marcos 12 anos</p>' ) ) );
+check( '"João 3 vezes" is a count', array(), mvbr_hrefs( mvbr_parse( '<p>João 3 vezes</p>' ) ) );
+check( 'English count', array(), mvbr_hrefs( mvbr_parse( '<p>Mark 12 years old</p>', 'en' ) ) );
+check( 'a word that starts like a count word', array( 'https://midvash.com/pt-br/onbv/joao/3' ), mvbr_hrefs( mvbr_parse( '<p>João 3 anoitece</p>' ) ) );
+check( 'with a verse a count word does not matter', array( 'https://midvash.com/pt-br/onbv/efesios/5#v=25' ), mvbr_hrefs( mvbr_parse( '<p>Efésios 5:25 homens</p>' ) ) );
+
+// --- Version of an output -------------------------------------------------------
+
+$mvbr_opts = array( 'locale' => 'pt-br', 'versao' => 'almeida-livre' );
+check( 'asked version wins', 'kjv', MVBR_Books::version_for_output( 'kjv', 'en', $mvbr_opts ) );
+check( 'language override uses its default', 'bsb', MVBR_Books::version_for_output( '', 'en', $mvbr_opts ) );
+check( 'same language uses the setting', 'almeida-livre', MVBR_Books::version_for_output( '', 'pt-br', $mvbr_opts ) );
+
+// --- Parsing used by the API -----------------------------------------------------
+
+check( 'Jn is Jonah in Portuguese', 32, MVBR_Books::parse_reference( 'Jn 1:1', 'pt-br' )['book_id'] );
+check( 'parse accepts a comma', 16, MVBR_Books::parse_reference( 'João 3,16', 'pt-br' )['verse'] );
+
 // --- Assets ---------------------------------------------------------------
 
 $mvbr_enqueued = array();

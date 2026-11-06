@@ -94,6 +94,8 @@ Conteúdo orgânico, regular e relevante > volume artificial.
     --keyword=_x:1,2c --keyword=_n:1,2 --keyword=_nx:1,2,4c \
     -o translations/midvash-bible-references.pot \
     $(find includes midvash-bible-references.php -name '*.php')
+  xgettext --from-code=UTF-8 -L JavaScript --join-existing --keyword=__ \
+    -o translations/midvash-bible-references.pot assets/js/mvbr-block.js
   ```
 
 ## Estrutura do repo

@@ -77,6 +77,21 @@ try {
 	$out['votd'] = substr( wp_strip_all_tags( mvbr_votd_shortcode( array() ) ), 0, 80 );
 	$block = new MVBR_Block();
 	$out['block'] = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'João 3:16' ) ) ), 0, 80 );
+	// A whole chapter in the block, then the same chapter through the tooltip's
+	// batch path, which reads what the block left in the cache.
+	$out['block_chapter'] = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'Salmos 23' ) ) ), 0, 80 );
+	$chapter              = ( new MVBR_API() )->get_passages( array( 'Salmos 23' ) );
+	$out['chapter_verse'] = isset( $chapter['Salmos 23']['verse'] ) ? $chapter['Salmos 23']['verse'] : null;
+	$out['block_jude']    = substr( wp_strip_all_tags( $block->render( array( 'reference' => 'Judas 3' ) ) ), 0, 80 );
+	// A language override brings its own version.
+	$out['votd_en'] = substr( wp_strip_all_tags( mvbr_votd_shortcode( array( 'locale' => 'en' ) ) ), 0, 80 );
+	// The widget's boxes can be turned off.
+	ob_start();
+	( new MVBR_Widget() )->widget(
+		array( 'before_widget' => '', 'after_widget' => '', 'before_title' => '', 'after_title' => '' ),
+		array( 'show_reference' => false, 'link_verse' => false )
+	);
+	$out['widget_no_reference'] = false === strpos( ob_get_clean(), 'mvbr-votd__reference' );
 	// Settings and widgets saved under the 0.x `bbm` names move to `mvbr`.
 	$saved = get_option( 'mvbr_options' );
 	delete_option( 'mvbr_options' );

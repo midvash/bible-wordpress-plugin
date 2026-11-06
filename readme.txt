@@ -3,7 +3,7 @@ Contributors: midvash
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -136,6 +136,18 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
+= 1.0.2 =
+* **Fixed:** "1 Jo 4:8" and similar forms no longer open the Gospel of John. A lone 1, 2 or 3 before a book name is never dropped.
+* **Fixed:** the Bible Verse block now shows whole chapters, and tooltips no longer number their verses "NaN".
+* **Fixed:** more ways of writing a reference become links: "Salmo 23", "Cantares 2:1", "I Coríntios 13", "II Coríntios 5:17", "2 Co 5:17", "Primeira João 4:8", "João 3,16". Other languages gain common spellings too.
+* **Fixed:** in single-chapter books a lone number is the verse: "Judas 3", "3 João 4".
+* **Fixed:** "João 3:16,18" now links both verses, each with its own tooltip.
+* **Fixed:** a name followed by a count is no longer a reference: "Marcos 12 anos".
+* **Fixed:** the link color and underline settings now win over the theme, and follow a custom CSS class.
+* **Fixed:** a shortcode, block or widget set to another language uses that language's default version.
+* **Fixed:** the widget's "show reference" and "link" boxes can now be turned off.
+* **i18n:** the block's editor texts can now be translated.
+
 = 1.0.1 =
 * **Fixed:** the Verse of the Day cache key is now hashed, so a long `version` in the shortcode can no longer push it past the WordPress transient key limit and break the cache.
 
@@ -238,6 +250,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://midvash.com/wordpress-plugin.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Fixes references that opened the wrong book, whole chapters in the block and the "NaN" in tooltips, and links many more ways of writing a reference.
 
 = 1.0.1 =
 Fixes the Verse of the Day cache when the shortcode has a very long version value.

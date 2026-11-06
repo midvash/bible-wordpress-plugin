@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Midvash Bible References\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 09:21-0300\n"
+"POT-Creation-Date: 2026-11-06 15:23-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Russian\n"
@@ -13,31 +13,31 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: midvash-bible-references.php:213
+#: midvash-bible-references.php:221
 msgid "Verse currently unavailable"
 msgstr "Стих временно недоступен"
 
-#: midvash-bible-references.php:214
+#: midvash-bible-references.php:222
 msgid "Read more"
 msgstr "Читать далее"
 
-#: midvash-bible-references.php:285 midvash-bible-references.php:322
+#: midvash-bible-references.php:293 midvash-bible-references.php:330
 msgid "Too many requests"
 msgstr "Слишком много запросов"
 
-#: midvash-bible-references.php:294 midvash-bible-references.php:332
+#: midvash-bible-references.php:302 midvash-bible-references.php:340
 msgid "Reference not provided"
 msgstr "Ссылка не указана"
 
-#: midvash-bible-references.php:303
+#: midvash-bible-references.php:311
 msgid "Verse not found"
 msgstr "Стих не найден"
 
-#: midvash-bible-references.php:354
+#: midvash-bible-references.php:362
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: midvash-bible-references.php:367
+#: midvash-bible-references.php:375
 msgid "Failed to fetch versions"
 msgstr "Не удалось загрузить переводы"
 
@@ -336,7 +336,7 @@ msgstr "Показывать ссылку (например, Иоанн 3:16)"
 msgid "Link verse to Midvash"
 msgstr "Связать стих с Midvash"
 
-#: includes/class-mvbr-widget.php:192 includes/class-mvbr-block.php:110
+#: includes/class-mvbr-widget.php:193 includes/class-mvbr-block.php:111
 msgid "Verse currently unavailable."
 msgstr "Стих временно недоступен."
 
@@ -344,10 +344,62 @@ msgstr "Стих временно недоступен."
 msgid "Online Bible"
 msgstr "Библия онлайн"
 
-#: includes/class-mvbr-parser.php:280
+#: includes/class-mvbr-parser.php:306
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Читать %s на Midvash"
+
+#: assets/js/mvbr-block.js:23
+msgid "Plugin setting"
+msgstr "Настройка плагина"
+
+#: assets/js/mvbr-block.js:36
+msgid "Bible Verse"
+msgstr "Библейский стих"
+
+#: assets/js/mvbr-block.js:37
+msgid "Display a specific Bible verse with styling and a link to Midvash."
+msgstr "Показывает оформленный библейский стих со ссылкой на Midvash."
+
+#: assets/js/mvbr-block.js:60
+msgid "Verse Settings"
+msgstr "Настройки стиха"
+
+#: assets/js/mvbr-block.js:62
+msgid "Bible Reference"
+msgstr "Библейская ссылка"
+
+#: assets/js/mvbr-block.js:63
+msgid "e.g. John 3:16 · João 3:16 · 요한복음 3:16"
+msgstr "например: Иоанна 3:16 · 1 Коринфянам 13:4"
+
+#: assets/js/mvbr-block.js:69
+msgid "Version"
+msgstr "Перевод"
+
+#: assets/js/mvbr-block.js:70
+msgid "Leave empty to use the plugin default."
+msgstr "Оставьте пустым, чтобы использовать значение плагина по умолчанию."
+
+#: assets/js/mvbr-block.js:76
+msgid "Language override"
+msgstr "Сменить язык"
+
+#: assets/js/mvbr-block.js:82
+msgid "Show reference (e.g. John 3:16)"
+msgstr "Показывать ссылку (например: Иоанна 3:16)"
+
+#: assets/js/mvbr-block.js:87
+msgid "Link reference to Midvash"
+msgstr "Сделать ссылку на Midvash"
+
+#: assets/js/mvbr-block.js:105
+msgid "Verse rendered on the front end via Midvash API."
+msgstr "Стих выводится на сайте через API Midvash."
+
+#: assets/js/mvbr-block.js:113
+msgid "Enter a Bible reference in the block settings →"
+msgstr "Введите библейскую ссылку в настройках блока →"
 
 #~ msgid "Bible by Midvash"
 #~ msgstr "Библия by Midvash"

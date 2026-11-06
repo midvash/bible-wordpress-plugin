@@ -276,7 +276,7 @@
         if (data.verses && Array.isArray(data.verses)) {
             // Multiple verses
             contentHtml = data.verses.map((verse, index) => {
-                const verseNum = data.verse + index;
+                const verseNum = (data.verse || 1) + index;
                 return '<sup class="mvbr-tooltip__verse-number">' + verseNum + '</sup>' + escapeHtml(verse);
             }).join(' ');
         } else if (data.text) {

@@ -215,7 +215,8 @@ class MVBR_Parser {
 	 * @param array $matches Matches of MVBR_Books::get_reference_regex(): full match at 0, `abbr` set when the book was abbreviated, `v` the verse.
 	 */
 	public function replace_reference( $matches ) {
-		$original = $matches[0];
+		$more     = isset( $matches['more'] ) ? $matches['more'] : '';
+		$original = '' === $more ? $matches[0] : substr( $matches[0], 0, -strlen( $more ) );
 
 		// An abbreviation alone is too often a plain word ("Os 13", "Am 5"):
 		// only link it with chapter and verse.
@@ -232,7 +233,32 @@ class MVBR_Parser {
 			return $original;
 		}
 
-		$book_id = $parsed['book_id'];
+		$html = $this->reference_link( $parsed, $original );
+
+		// More verses of the same chapter get their own link: "João 3:16,18".
+		if ( '' !== $more ) {
+			$book = ! empty( $matches['name'] ) ? $matches['name'] : $matches['abbr'];
+			foreach ( array_filter( explode( ',', $more ) ) as $verses ) {
+				$reference = $book . ' ' . $parsed['chapter'] . ':' . $verses;
+				$extra     = MVBR_Books::parse_reference( $reference, $this->locale );
+				$html     .= ',' . ( $extra ? $this->reference_link( $extra, $reference, $verses ) : $verses );
+			}
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Builds the link and tooltip data for one parsed reference.
+	 *
+	 * @param array       $parsed    Result of MVBR_Books::parse_reference().
+	 * @param string      $reference Reference for the tooltip and the title.
+	 * @param string|null $text      Link text, when it differs from the reference.
+	 * @return string
+	 */
+	private function reference_link( $parsed, $reference, $text = null ) {
+		$original = $reference;
+		$book_id  = $parsed['book_id'];
 
 		// The tooltip assets only load on posts that have a reference.
 		wp_enqueue_style( 'mvbr-style' );
@@ -281,7 +307,7 @@ class MVBR_Parser {
 					$original
 				)
 			),
-			esc_html( $original )
+			esc_html( null === $text ? $original : $text )
 		);
 	}
 

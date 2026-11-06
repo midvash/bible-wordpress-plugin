@@ -283,7 +283,7 @@ class MVBR_Parser {
 		$url = MVBR_Books::site_url( $this->locale ) . '/' . $versao . '/' . $book_slug . '/' . $parsed['chapter'];
 
 		if ( $parsed['verse'] ) {
-			if ( $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
+			if ( empty( $parsed['chapter_end'] ) && $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
 				$url .= '#v=' . $parsed['verse'] . '-' . $parsed['verse_end'];
 			} else {
 				$url .= '#v=' . $parsed['verse'];

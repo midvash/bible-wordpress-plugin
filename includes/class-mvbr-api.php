@@ -97,6 +97,11 @@ class MVBR_API {
 		$book_slug = MVBR_Books::get_book_slug( $parsed['book_id'], 'en' );
 		$path      = '/' . strtolower( $version ) . '/' . $book_slug . '/' . $parsed['chapter'];
 
+		// Not an API route: only the cache key of a span fetched by get_span().
+		if ( ! empty( $parsed['chapter_end'] ) ) {
+			return $path . '/' . $parsed['verse'] . '-' . $parsed['chapter_end'] . ':' . $parsed['verse_end'];
+		}
+
 		if ( $parsed['verse'] ) {
 			if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
 				$path .= '/' . $parsed['verse'] . '-' . $parsed['verse_end'];
@@ -136,6 +141,90 @@ class MVBR_API {
 			$data['verse'] = 1;
 		}
 		return $data;
+	}
+
+	/**
+	 * Most chapters one span may cover. "Mateus 5:1-7:29" (the Sermon on the
+	 * Mount) is three.
+	 */
+	const MAX_SPAN_CHAPTERS = 5;
+
+	/**
+	 * Fetches a range into a later chapter ("João 3:16-4:2"), which the API has
+	 * no route for: each chapter whole, cut at both ends, in one text.
+	 *
+	 * @param array  $parsed  Result of MVBR_Books::parse_reference(), with `chapter_end`.
+	 * @param string $version Bible version, already resolved.
+	 * @return array|null Verse data or null on error.
+	 */
+	private function get_span( $parsed, $version ) {
+		if ( $parsed['chapter_end'] - $parsed['chapter'] + 1 > self::MAX_SPAN_CHAPTERS ) {
+			return null;
+		}
+
+		$path = $this->build_api_path( $parsed, $version );
+		if ( $this->is_cache_enabled() ) {
+			$cached = $this->get_from_cache( $path, $version );
+			if ( false !== $cached ) {
+				return $cached;
+			}
+		}
+
+		$book_slug = MVBR_Books::get_book_slug( $parsed['book_id'], 'en' );
+		$texts     = array();
+		$copyright = '';
+		for ( $chapter = $parsed['chapter']; $chapter <= $parsed['chapter_end']; $chapter++ ) {
+			$data = $this->make_request( '/' . strtolower( $version ) . '/' . $book_slug . '/' . $chapter );
+			if ( ! $data || empty( $data['verses'] ) || ! is_array( $data['verses'] ) ) {
+				return null;
+			}
+			$verses = $data['verses'];
+			if ( $chapter === $parsed['chapter_end'] ) {
+				$verses = array_slice( $verses, 0, $parsed['verse_end'] );
+			}
+			if ( $chapter === $parsed['chapter'] ) {
+				$verses = array_slice( $verses, $parsed['verse'] - 1 );
+			}
+			$texts[] = implode( ' ', $verses );
+			if ( '' === $copyright ) {
+				$copyright = ! empty( $data['copyright'] ) ? $data['copyright'] : ( ! empty( $data['meta']['copyright'] ) ? $data['meta']['copyright'] : '' );
+			}
+		}
+
+		$result = array(
+			'version'   => $version,
+			'chapter'   => $parsed['chapter'],
+			'verse'     => $parsed['verse'],
+			'text'      => implode( ' ', $texts ),
+			'reference' => $this->display_reference( $parsed ),
+		);
+		if ( '' !== $copyright ) {
+			$result['copyright'] = $copyright;
+		}
+
+		if ( $this->is_cache_enabled() ) {
+			$this->save_to_cache( $path, $version, $result );
+		}
+		return $result;
+	}
+
+	/**
+	 * Reference as shown to the reader, in the site's language.
+	 *
+	 * @param array $parsed Result of MVBR_Books::parse_reference().
+	 * @return string
+	 */
+	private function display_reference( $parsed ) {
+		$reference = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
+		if ( $parsed['verse'] ) {
+			$reference .= ':' . $parsed['verse'];
+			if ( ! empty( $parsed['chapter_end'] ) ) {
+				$reference .= '-' . $parsed['chapter_end'] . ':' . $parsed['verse_end'];
+			} elseif ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
+				$reference .= '-' . $parsed['verse_end'];
+			}
+		}
+		return $reference;
 	}
 
 	/**
@@ -187,6 +276,10 @@ class MVBR_API {
 			return null;
 		}
 
+		if ( ! empty( $parsed['chapter_end'] ) ) {
+			return $this->get_span( $parsed, $version );
+		}
+
 		// Build API path.
 		$path = $this->build_api_path( $parsed, $version );
 		if ( ! $path ) {
@@ -214,13 +307,7 @@ class MVBR_API {
 			}
 
 			// Add reference info to response.
-			$data['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
-			if ( $parsed['verse'] ) {
-				$data['reference'] .= ':' . $parsed['verse'];
-				if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
-					$data['reference'] .= '-' . $parsed['verse_end'];
-				}
-			}
+			$data['reference'] = $this->display_reference( $parsed );
 
 			// Save to cache.
 			if ( $this->is_cache_enabled() ) {
@@ -257,6 +344,11 @@ class MVBR_API {
 			}
 			$parsed = $this->parse( $reference );
 			if ( ! $parsed ) {
+				continue;
+			}
+			// A span across chapters has no single API route: get_verse() builds it.
+			if ( ! empty( $parsed['chapter_end'] ) ) {
+				$results[ $reference ] = $this->get_verse( $reference, $version );
 				continue;
 			}
 
@@ -308,13 +400,7 @@ class MVBR_API {
 				}
 
 				// Localized display reference, mirroring get_verse().
-				$item['reference'] = $parsed['book']['names'][ $this->locale ] . ' ' . $parsed['chapter'];
-				if ( $parsed['verse'] ) {
-					$item['reference'] .= ':' . $parsed['verse'];
-					if ( $parsed['verse_end'] && $parsed['verse_end'] !== $parsed['verse'] ) {
-						$item['reference'] .= '-' . $parsed['verse_end'];
-					}
-				}
+				$item['reference'] = $this->display_reference( $parsed );
 
 				$results[ $miss['input'] ] = $item;
 				if ( $this->is_cache_enabled() ) {

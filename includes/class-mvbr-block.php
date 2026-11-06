@@ -177,7 +177,7 @@ class MVBR_Block {
 
 		if ( $parsed['verse'] ) {
 			$url .= '#v=' . $parsed['verse'];
-			if ( $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
+			if ( empty( $parsed['chapter_end'] ) && $parsed['verse_end'] && $parsed['verse_end'] > $parsed['verse'] ) {
 				$url .= '-' . $parsed['verse_end'];
 			}
 		}

@@ -226,7 +226,16 @@ $mvbr_more = mvbr_parse( '<p>João 3:16,18-20 diz</p>' );
 check( 'more verses get their own links', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16', 'https://midvash.com/pt-br/onbv/joao/3#v=18-20' ), mvbr_hrefs( $mvbr_more ) );
 check( 'the extra link has the full reference', 1, substr_count( $mvbr_more, 'data-midvash-ref="João 3:18-20"' ) );
 check( 'the comma stays in the text', true, false !== strpos( $mvbr_more, '</a>,<a ' ) );
-check( 'next chapter range keeps the start', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16' ), mvbr_hrefs( mvbr_parse( '<p>João 3:16-4:2</p>' ) ) );
+$mvbr_span = mvbr_parse( '<p>João 3:16-4:2</p>' );
+check( 'range into the next chapter opens at its start', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16' ), mvbr_hrefs( $mvbr_span ) );
+check( 'the whole range is one link', 1, substr_count( $mvbr_span, 'data-midvash-ref="João 3:16-4:2"' ) );
+check( 'no verse range in the anchor of a span', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16' ), mvbr_hrefs( mvbr_parse( '<p>João 3:16-4:20</p>' ) ) );
+check( 'span with spaces', array( 'https://midvash.com/pt-br/onbv/mateus/5#v=1' ), mvbr_hrefs( mvbr_parse( '<p>Mateus 5:1 - 7:29</p>' ) ) );
+check( 'same-chapter range and one more verse', array( 'https://midvash.com/pt-br/onbv/joao/3#v=16-18', 'https://midvash.com/pt-br/onbv/joao/3#v=20' ), mvbr_hrefs( mvbr_parse( '<p>João 3:16-18,20</p>' ) ) );
+$mvbr_p = MVBR_Books::parse_reference( 'João 3:16-4:2', 'pt-br' );
+check( 'parse reads the span', array( 3, 16, 4, 2 ), array( $mvbr_p['chapter'], $mvbr_p['verse'], $mvbr_p['chapter_end'], $mvbr_p['verse_end'] ) );
+check( 'a span going backwards is not a reference', null, MVBR_Books::parse_reference( 'João 4:2-3:16', 'pt-br' ) );
+check( 'a span past the last chapter is not a reference', null, MVBR_Books::parse_reference( 'Judas 1:3-2:1', 'pt-br' ) );
 
 // --- Counts are not chapters ----------------------------------------------------
 

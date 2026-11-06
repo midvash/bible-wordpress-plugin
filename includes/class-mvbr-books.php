@@ -542,8 +542,9 @@ class MVBR_Books {
 	 * caller enforces through the `abbr` group: many are everyday words
 	 * ("Am", "Ex", "Is", "Mar", "Job").
 	 *
-	 * Groups: name|abbr, ch, v (optional), ve (optional, needs v), more (more
-	 * verses of the same chapter, ",18" in "João 3:16,18").
+	 * Groups: name|abbr, ch, v (optional), ve (optional, needs v), che and cve
+	 * (end of a range into a later chapter, "3:16-4:2"), more (more verses of
+	 * the same chapter, ",18" in "João 3:16,18").
 	 *
 	 * @param string $locale Locale code.
 	 * @return string PCRE pattern with the `u` flag.
@@ -607,7 +608,7 @@ class MVBR_Books {
 		$cache[ $locale ] = '/' . $before
 			. '(?:(?<name>' . implode( '|', $names ) . ')|(?<abbr>' . implode( '|', $abbrev ) . '))'
 			. $gap . '(?<ch>\\d{1,3})'
-			. '(?:[:\\.,](?<v>\\d{1,3})(?:\\s*[-–]\\s*(?<ve>\\d{1,3}))?(?<more>(?:,\\d{1,3}(?:[-–]\\d{1,3})?)+)?)?'
+			. '(?:[:\\.,](?<v>\\d{1,3})(?:\\s*[-–]\\s*(?:(?<che>\\d{1,3})[:\\.](?<cve>\\d{1,3})|(?<ve>\\d{1,3})))?(?<more>(?:,\\d{1,3}(?:[-–]\\d{1,3})?)+)?)?'
 			. $after . $count . '/u';
 
 		return $cache[ $locale ];
@@ -777,6 +778,7 @@ class MVBR_Books {
 	 *   "John 3.16"         → alternative separator
 	 *   "John 3,16"         → comma as separator, common in Portuguese and German
 	 *   "John 3:16-18"      → verse range
+	 *   "John 3:16-4:2"     → range into a later chapter (`chapter_end`)
 	 *   "Jude 3"            → verse, in a single-chapter book
 	 *
 	 * Returns null when the book name cannot be resolved against any locale
@@ -785,7 +787,7 @@ class MVBR_Books {
 	 *
 	 * @param string      $reference Raw reference text.
 	 * @param string|null $locale    Only accept book names of this locale, or null for all.
-	 * @return array|null {book_id, book, chapter, verse, verse_end}
+	 * @return array|null {book_id, book, chapter, verse, verse_end, chapter_end}
 	 */
 	public static function parse_reference( $reference, $locale = null ) {
 		$reference = trim( $reference );
@@ -794,14 +796,26 @@ class MVBR_Books {
 		}
 		// The book ends in a non-digit, so "Salmos 119" never splits into
 		// "Salmos 1" + "19"; the space is optional because Chinese has none.
-		if ( ! preg_match( '/^(.*?\D)\s*(\d{1,3})(?:[:\.,](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m ) ) {
+		if ( ! preg_match( '/^(.*?\D)\s*(\d{1,3})(?:[:\.,](\d{1,3}))?(?:\s*[-–]\s*(?:(\d{1,3})[:\.](\d{1,3})|(\d{1,3})))?$/iu', $reference, $m ) ) {
 			return null;
 		}
 
 		$book_input = self::lower( trim( $m[1] ) );
 		$chapter    = intval( $m[2] );
 		$verse      = ( isset( $m[3] ) && '' !== $m[3] ) ? intval( $m[3] ) : null;
-		$verse_end  = ( isset( $m[4] ) && '' !== $m[4] ) ? intval( $m[4] ) : null;
+		$verse_end  = ( isset( $m[6] ) && '' !== $m[6] ) ? intval( $m[6] ) : null;
+		// A range into a later chapter: "3:16-4:2".
+		$chapter_end = null;
+		if ( isset( $m[4] ) && '' !== $m[4] ) {
+			if ( null === $verse ) {
+				return null;
+			}
+			$chapter_end = intval( $m[4] );
+			$verse_end   = intval( $m[5] );
+			if ( $chapter_end === $chapter ) {
+				$chapter_end = null;
+			}
+		}
 
 		$lookup = self::get_lookup_table( $locale );
 		if ( isset( $lookup[ $book_input ] ) ) {
@@ -831,13 +845,17 @@ class MVBR_Books {
 		if ( $chapter < 1 || $chapter > $book['chapters'] ) {
 			return null;
 		}
+		if ( null !== $chapter_end && ( $chapter_end < $chapter || $chapter_end > $book['chapters'] || $verse_end < 1 ) ) {
+			return null;
+		}
 
 		return array(
-			'book_id'   => $book_id,
-			'book'      => $book,
-			'chapter'   => $chapter,
-			'verse'     => $verse,
-			'verse_end' => $verse_end,
+			'book_id'     => $book_id,
+			'book'        => $book,
+			'chapter'     => $chapter,
+			'verse'       => $verse,
+			'verse_end'   => $verse_end,
+			'chapter_end' => $chapter_end,
 		);
 	}
 

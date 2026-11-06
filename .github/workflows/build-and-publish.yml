@@ -70,3 +70,16 @@ jobs:
             --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Release publica de verdade. Rodar o workflow à mão é só um ensaio:
+      # monta o pacote, mostra o que mudaria e não envia nada.
+      - name: Install Subversion
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion
+
+      - name: Publish to wordpress.org (SVN)
+        run: |
+          scripts/deploy-wporg.sh "${{ steps.version.outputs.version }}" \
+            "dist/midvash-bible-references-${{ steps.version.outputs.version }}.zip"
+        env:
+          DRY_RUN: ${{ github.event_name != 'release' }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

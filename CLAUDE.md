@@ -27,6 +27,7 @@ Pipeline em [.github/workflows/release.yml](.github/workflows/release.yml), gati
 1. Lê `Version:` do header de [midvash-bible-references.php](midvash-bible-references.php)
 2. Roda [scripts/build-zip.ts](scripts/build-zip.ts) — inclui o PHP principal, `uninstall.php`, `includes/`, `assets/`, `readme.txt`. Exclui `translations/`, `vendor/`, `README.md`, `LICENSE`, `scripts/`, `.github/`, `CLAUDE.md`, qualquer coisa de metadata do repo
 3. Anexa `midvash-bible-references-<v>.zip` ao GitHub Release (o mesmo ZIP vai pro wordpress.org)
+4. Publica esse ZIP no SVN do wordpress.org ([scripts/deploy-wporg.sh](scripts/deploy-wporg.sh)), com a secret `SVN_PASSWORD`. Rodar o workflow à mão (`gh workflow run build-and-publish.yml`) é só um ensaio: mostra o que mudaria e não envia nada
 
 **Pra cortar um release**, 3 lugares precisam casar (verifique antes de abrir o PR):
 - [midvash-bible-references.php](midvash-bible-references.php) → `* Version: X.Y.Z`

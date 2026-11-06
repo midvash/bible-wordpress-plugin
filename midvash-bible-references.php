@@ -3,7 +3,7 @@
  * Plugin Name: Midvash Bible References
  * Plugin URI:  https://midvash.com/wordpress-plugin
  * Description: Automatically identifies Bible references in posts and creates links with tooltips via the Midvash service.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Midvash
  * Author URI: https://midvash.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'MVBR_VERSION', '1.0.1' );
+define( 'MVBR_VERSION', '1.0.2' );
 define( 'MVBR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MVBR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'MVBR_API_BASE_URL', 'https://api.midvash.com' );
@@ -166,7 +166,7 @@ function mvbr_register_assets() {
 
 	$use_custom_color = isset( $options['use_custom_color'] ) ? (bool) $options['use_custom_color'] : false;
 	if ( $use_custom_color ) {
-		$css_styles[] = 'color: ' . mvbr_css_color( isset( $options['link_color'] ) ? $options['link_color'] : '' ) . ';';
+		$css_styles[] = 'color: ' . mvbr_css_color( isset( $options['link_color'] ) ? $options['link_color'] : '' ) . ' !important;';
 	}
 
 	$underline_link = isset( $options['underline_link'] ) ? (bool) $options['underline_link'] : false;
@@ -176,9 +176,9 @@ function mvbr_register_assets() {
 			$underline_style = 'solid';
 		}
 
-		$css_styles[] = 'text-decoration-line: underline;';
-		$css_styles[] = 'text-decoration-color: ' . mvbr_css_color( isset( $options['underline_color'] ) ? $options['underline_color'] : '' ) . ';';
-		$css_styles[] = 'text-decoration-style: ' . $underline_style . ';';
+		$css_styles[] = 'text-decoration-line: underline !important;';
+		$css_styles[] = 'text-decoration-color: ' . mvbr_css_color( isset( $options['underline_color'] ) ? $options['underline_color'] : '' ) . ' !important;';
+		$css_styles[] = 'text-decoration-style: ' . $underline_style . ' !important;';
 	} else {
 		$css_styles[] = 'text-decoration: none;';
 	}
@@ -187,7 +187,12 @@ function mvbr_register_assets() {
 	// setting even when links keep the theme colour.
 	$accent = mvbr_css_color( isset( $options['link_color'] ) ? $options['link_color'] : '' );
 
-	wp_add_inline_style( 'mvbr-style', wp_strip_all_tags( '.mvbr-link { ' . implode( ' ', $css_styles ) . ' } .mvbr-tooltip { --mvbr-accent: ' . $accent . '; }' ) );
+	// These are choices the site owner made on purpose, so they win over the
+	// theme, whose link rules are often more specific ("article .content a").
+	// The CSS class is a setting too: the links may not be .mvbr-link.
+	$link_class = sanitize_html_class( isset( $options['css_class'] ) ? $options['css_class'] : 'mvbr-link', 'mvbr-link' );
+
+	wp_add_inline_style( 'mvbr-style', wp_strip_all_tags( 'a.' . $link_class . ' { ' . implode( ' ', $css_styles ) . ' } .mvbr-tooltip { --mvbr-accent: ' . $accent . '; }' ) );
 
 	wp_register_script( 'mvbr-tooltip', mvbr_asset_url( 'assets/js/mvbr-tooltip.js' ), array(), MVBR_VERSION, true );
 

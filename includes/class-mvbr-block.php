@@ -94,10 +94,11 @@ class MVBR_Block {
 		$locale   = ! empty( $atts['locale'] )
 			? MVBR_Books::normalize_locale( sanitize_text_field( $atts['locale'] ) )
 			: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-		$version  = MVBR_Books::resolve_version(
-			! empty( $atts['version'] )
-				? sanitize_text_field( $atts['version'] )
-				: ( isset( $options['versao'] ) ? $options['versao'] : MVBR_Books::get_default_version( $locale ) )
+		$locale   = MVBR_Books::normalize_locale( $locale );
+		$version  = MVBR_Books::version_for_output(
+			! empty( $atts['version'] ) ? sanitize_text_field( $atts['version'] ) : '',
+			$locale,
+			$options
 		);
 		$show_ref = isset( $atts['show_reference'] ) ? (bool) $atts['show_reference'] : true;
 		$link     = isset( $atts['link_verse'] ) ? (bool) $atts['link_verse'] : true;

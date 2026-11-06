@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Midvash Bible References\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 09:21-0300\n"
+"POT-Creation-Date: 2026-11-06 15:23-0300\n"
 "PO-Revision-Date: 2026-05-13 10:21-0300\n"
 "Last-Translator: Midvash Team\n"
 "Language-Team: Korean\n"
@@ -12,31 +12,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: midvash-bible-references.php:213
+#: midvash-bible-references.php:221
 msgid "Verse currently unavailable"
 msgstr "구절을 현재 사용할 수 없습니다"
 
-#: midvash-bible-references.php:214
+#: midvash-bible-references.php:222
 msgid "Read more"
 msgstr "더 읽기"
 
-#: midvash-bible-references.php:285 midvash-bible-references.php:322
+#: midvash-bible-references.php:293 midvash-bible-references.php:330
 msgid "Too many requests"
 msgstr "요청이 너무 많습니다"
 
-#: midvash-bible-references.php:294 midvash-bible-references.php:332
+#: midvash-bible-references.php:302 midvash-bible-references.php:340
 msgid "Reference not provided"
 msgstr "구절이 제공되지 않았습니다"
 
-#: midvash-bible-references.php:303
+#: midvash-bible-references.php:311
 msgid "Verse not found"
 msgstr "구절을 찾을 수 없습니다"
 
-#: midvash-bible-references.php:354
+#: midvash-bible-references.php:362
 msgid "Forbidden"
 msgstr "접근 거부"
 
-#: midvash-bible-references.php:367
+#: midvash-bible-references.php:375
 msgid "Failed to fetch versions"
 msgstr "버전을 가져오지 못했습니다"
 
@@ -334,7 +334,7 @@ msgstr "참조 표시(예: 요한복음 3:16)"
 msgid "Link verse to Midvash"
 msgstr "구절을 Midvash에 연결"
 
-#: includes/class-mvbr-widget.php:192 includes/class-mvbr-block.php:110
+#: includes/class-mvbr-widget.php:193 includes/class-mvbr-block.php:111
 msgid "Verse currently unavailable."
 msgstr "구절을 현재 사용할 수 없습니다."
 
@@ -342,10 +342,62 @@ msgstr "구절을 현재 사용할 수 없습니다."
 msgid "Online Bible"
 msgstr "온라인 성경"
 
-#: includes/class-mvbr-parser.php:280
+#: includes/class-mvbr-parser.php:306
 #, php-format
 msgid "Read %s on Midvash"
 msgstr "Midvash에서 %s 읽기"
+
+#: assets/js/mvbr-block.js:23
+msgid "Plugin setting"
+msgstr "플러그인 설정"
+
+#: assets/js/mvbr-block.js:36
+msgid "Bible Verse"
+msgstr "성경 구절"
+
+#: assets/js/mvbr-block.js:37
+msgid "Display a specific Bible verse with styling and a link to Midvash."
+msgstr "Midvash 링크와 함께 성경 구절을 보기 좋게 표시합니다."
+
+#: assets/js/mvbr-block.js:60
+msgid "Verse Settings"
+msgstr "구절 설정"
+
+#: assets/js/mvbr-block.js:62
+msgid "Bible Reference"
+msgstr "성경 참조"
+
+#: assets/js/mvbr-block.js:63
+msgid "e.g. John 3:16 · João 3:16 · 요한복음 3:16"
+msgstr "예: 요한복음 3:16 · 고린도전서 13:4"
+
+#: assets/js/mvbr-block.js:69
+msgid "Version"
+msgstr "역본"
+
+#: assets/js/mvbr-block.js:70
+msgid "Leave empty to use the plugin default."
+msgstr "플러그인 기본값을 사용하려면 비워 두세요."
+
+#: assets/js/mvbr-block.js:76
+msgid "Language override"
+msgstr "언어 변경"
+
+#: assets/js/mvbr-block.js:82
+msgid "Show reference (e.g. John 3:16)"
+msgstr "참조 표시 (예: 요한복음 3:16)"
+
+#: assets/js/mvbr-block.js:87
+msgid "Link reference to Midvash"
+msgstr "참조를 Midvash에 연결"
+
+#: assets/js/mvbr-block.js:105
+msgid "Verse rendered on the front end via Midvash API."
+msgstr "구절은 Midvash API를 통해 사이트에 표시됩니다."
+
+#: assets/js/mvbr-block.js:113
+msgid "Enter a Bible reference in the block settings →"
+msgstr "블록 설정에서 성경 참조를 입력하세요 →"
 
 #~ msgid "Bible by Midvash"
 #~ msgstr "성경 by Midvash"

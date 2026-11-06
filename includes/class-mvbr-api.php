@@ -109,6 +109,36 @@ class MVBR_API {
 	}
 
 	/**
+	 * Reads a reference in the site's language first, so that "Jn 1:1" on a
+	 * Portuguese site is Jonah, then in any language (a block may hold another).
+	 *
+	 * @param string $reference Bible reference.
+	 * @return array|null Result of MVBR_Books::parse_reference().
+	 */
+	private function parse( $reference ) {
+		$parsed = MVBR_Books::parse_reference( $reference, $this->locale );
+		return $parsed ? $parsed : MVBR_Books::parse_reference( $reference );
+	}
+
+	/**
+	 * A whole chapter comes from the API as a `verses` list, without `text` or
+	 * `verse`. Fills them in, so every caller reads the same shape. Also runs on
+	 * cached entries, which may have been stored before this existed.
+	 *
+	 * @param array $data Verse data.
+	 * @return array
+	 */
+	private function with_text( $data ) {
+		if ( empty( $data['text'] ) && ! empty( $data['verses'] ) && is_array( $data['verses'] ) ) {
+			$data['text'] = implode( ' ', $data['verses'] );
+		}
+		if ( ! empty( $data['verses'] ) && empty( $data['verse'] ) ) {
+			$data['verse'] = 1;
+		}
+		return $data;
+	}
+
+	/**
 	 * Validates reference before making request
 	 *
 	 * @param string $reference Reference to validate.
@@ -152,7 +182,7 @@ class MVBR_API {
 		}
 
 		// Parse reference (centralized in MVBR_Books).
-		$parsed = MVBR_Books::parse_reference( $reference );
+		$parsed = $this->parse( $reference );
 		if ( ! $parsed ) {
 			return null;
 		}
@@ -167,7 +197,7 @@ class MVBR_API {
 		if ( $this->is_cache_enabled() ) {
 			$cached = $this->get_from_cache( $path, $version );
 			if ( false !== $cached ) {
-				return $cached;
+				return $this->with_text( $cached );
 			}
 		}
 
@@ -175,6 +205,8 @@ class MVBR_API {
 		$data = $this->make_request( $path );
 
 		if ( $data ) {
+			$data = $this->with_text( $data );
+
 			// Attribution travels with the text: flat legacy routes send a
 			// top-level `copyright`, /v1 routes nest it under `meta`.
 			if ( empty( $data['copyright'] ) && ! empty( $data['meta']['copyright'] ) ) {
@@ -223,7 +255,7 @@ class MVBR_API {
 			if ( '' === $reference || true !== $this->validate_reference( $reference ) ) {
 				continue;
 			}
-			$parsed = MVBR_Books::parse_reference( $reference );
+			$parsed = $this->parse( $reference );
 			if ( ! $parsed ) {
 				continue;
 			}
@@ -232,7 +264,7 @@ class MVBR_API {
 			if ( $this->is_cache_enabled() ) {
 				$cached = $this->get_from_cache( $path, $version );
 				if ( false !== $cached ) {
-					$results[ $reference ] = $cached;
+					$results[ $reference ] = $this->with_text( $cached );
 					continue;
 				}
 			}

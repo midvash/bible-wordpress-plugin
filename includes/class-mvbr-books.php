@@ -43,6 +43,204 @@ class MVBR_Books {
 	);
 
 	/**
+	 * Ways of writing a book that are neither its `names` nor its `abbrev`.
+	 * Copied from `BOOK_NAME_ALIASES` in the Midvash site (@midvash/data), which
+	 * was surveyed from real content, plus a few common Portuguese and Spanish forms.
+	 */
+	const NAME_ALIASES = array(
+		'en'    => array(
+			'Ps'            => 19,
+			'Psalm'         => 19,
+			'Ex'            => 2,
+			'1 Kgs'         => 11,
+			'2 Kgs'         => 12,
+			'Jas'           => 59,
+			'Song of Songs' => 22,
+			'Matt'          => 40,
+			'Exod'          => 2,
+			'Deut'          => 5,
+			'Josh'          => 6,
+			'Judg'          => 7,
+			'Esth'          => 17,
+			'Pss'           => 19,
+			'Prov'          => 20,
+			'Prv'           => 20,
+			'Eccl'          => 21,
+			'Song'          => 22,
+			'Ezek'          => 26,
+			'Obad'          => 31,
+			'Zeph'          => 36,
+			'Zech'          => 38,
+			'Mt'            => 40,
+			'Mk'            => 41,
+			'Mrk'           => 41,
+			'Lk'            => 42,
+			'Jn'            => 43,
+			'Jhn'           => 43,
+			'Phil'          => 50,
+			'Phlm'          => 57,
+			'1 Jn'          => 62,
+			'2 Jn'          => 63,
+			'3 Jn'          => 64,
+		),
+		'pt-br' => array(
+			'Ex'                   => 2,
+			'Salmo'                => 19,
+			'Oséias'               => 28,
+			'Cantares'             => 22,
+			'Cântico dos Cânticos' => 22,
+			'Cantares de Salomão'  => 22,
+		),
+		'es'    => array(
+			'Gn'                     => 1,
+			'Ex'                     => 2,
+			'Nm'                     => 4,
+			'Lev'                    => 3,
+			'Heb'                    => 58,
+			'Rom'                    => 45,
+			'Rm'                     => 45,
+			'Mc'                     => 41,
+			'Jr'                     => 24,
+			'Salmo'                  => 19,
+			'Génesis'                => 1,
+			'Cantar de los Cantares' => 22,
+		),
+		'fr'    => array(
+			'He'     => 58,
+			'Ep'     => 49,
+			'Es'     => 23,
+			'Ez'     => 26,
+			'Isaïe'  => 23,
+			'Psaume' => 19,
+		),
+		'de'    => array(
+			'1 Mose' => 1,
+			'2 Mose' => 2,
+			'3 Mose' => 3,
+			'4 Mose' => 4,
+			'5 Mose' => 5,
+			'Psalm'  => 19,
+		),
+		'it'    => array(
+			'Salmo'  => 19,
+			'Num'    => 4,
+			'Lev'    => 3,
+			'Mal'    => 39,
+			'1 Ts'   => 52,
+			'2 Ts'   => 53,
+			'Obadia' => 31,
+		),
+		'ru'    => array(
+			'Матфея'        => 40,
+			'Марка'         => 41,
+			'Луки'          => 42,
+			'Иоанна'        => 43,
+			'Псалом'        => 19,
+			'Псалме'        => 19,
+			'Псалмах'       => 19,
+			'Псалмы'        => 19,
+			'Псалтири'      => 19,
+			'Бытии'         => 1,
+			'Исходе'        => 2,
+			'Левите'        => 3,
+			'Числах'        => 4,
+			'Второзаконии'  => 5,
+			'Навина'        => 6,
+			'Иисуса Навина' => 6,
+			'Судей'         => 7,
+			'Руфи'          => 8,
+			'Ездры'         => 15,
+			'Неемии'        => 16,
+			'Есфири'        => 17,
+			'Иова'          => 18,
+			'Притчах'       => 20,
+			'Екклесиаста'   => 21,
+			'Исаии'         => 23,
+			'Иеремии'       => 24,
+			'Иезекииля'     => 26,
+			'Даниила'       => 27,
+			'Осии'          => 28,
+			'Иоиля'         => 29,
+			'Амоса'         => 30,
+			'Авдия'         => 31,
+			'Ионы'          => 32,
+			'Михея'         => 33,
+			'Наума'         => 34,
+			'Аввакума'      => 35,
+			'Софонии'       => 36,
+			'Аггея'         => 37,
+			'Захарии'       => 38,
+			'Малахии'       => 39,
+			'Деяний'        => 44,
+			'Деяниях'       => 44,
+			'Иакова'        => 59,
+			'Иуды'          => 65,
+			'Откровении'    => 66,
+		),
+		'ko'    => array(
+			'요한일서' => 62,
+			'요한이서' => 63,
+			'요한삼서' => 64,
+		),
+		'zh'    => array(
+			'約翰福音' => 43,
+			'創世記'  => 1,
+			'约壹'   => 62,
+		),
+	);
+
+	/**
+	 * Locales that also write numbered books with Roman numerals ("II Coríntios").
+	 */
+	const ROMAN_NUMERAL_LOCALES = array( 'en', 'pt-br', 'es', 'fr', 'it' );
+
+	/**
+	 * Words that replace the number in numbered books ("Primeira João").
+	 */
+	const BOOK_ORDINALS = array(
+		'en'    => array(
+			1 => array( 'First', '1st' ),
+			2 => array( 'Second', '2nd' ),
+			3 => array( 'Third', '3rd' ),
+		),
+		'pt-br' => array(
+			1 => array( 'Primeira', 'Primeiro', '1ª', '1º' ),
+			2 => array( 'Segunda', 'Segundo', '2ª', '2º' ),
+			3 => array( 'Terceira', 'Terceiro', '3ª', '3º' ),
+		),
+		'es'    => array(
+			1 => array( 'Primera', 'Primero', '1ª', '1º' ),
+			2 => array( 'Segunda', 'Segundo', '2ª', '2º' ),
+			3 => array( 'Tercera', 'Tercero', '3ª', '3º' ),
+		),
+	);
+
+	/**
+	 * Verses in each single-chapter book, keyed by book id. In these books a
+	 * lone number is the verse: "Judas 3" is Jude 1:3.
+	 */
+	const SINGLE_CHAPTER_VERSES = array(
+		31 => 21,
+		57 => 25,
+		63 => 13,
+		64 => 15,
+		65 => 25,
+	);
+
+	/**
+	 * Words that show a number after a name is a count, not a chapter
+	 * ("Marcos 12 anos" is someone's age).
+	 */
+	const COUNT_WORDS = array(
+		'en'    => array( 'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days', 'hour', 'hours', 'minute', 'minutes', 'time', 'times', 'people', 'men', 'women', 'children', 'kids', 'friends', 'dollars' ),
+		'pt-br' => array( 'ano', 'anos', 'mês', 'mes', 'meses', 'semana', 'semanas', 'dia', 'dias', 'hora', 'horas', 'minuto', 'minutos', 'vez', 'vezes', 'pessoa', 'pessoas', 'homens', 'mulheres', 'filhos', 'filhas', 'amigos', 'moedas', 'reais' ),
+		'es'    => array( 'año', 'años', 'mes', 'meses', 'semana', 'semanas', 'día', 'dia', 'días', 'dias', 'hora', 'horas', 'minuto', 'minutos', 'vez', 'veces', 'persona', 'personas', 'hombres', 'mujeres', 'hijos', 'hijas', 'amigos', 'monedas' ),
+		'fr'    => array( 'an', 'ans', 'mois', 'semaine', 'semaines', 'jour', 'jours', 'heure', 'heures', 'minute', 'minutes', 'fois', 'personnes', 'hommes', 'femmes', 'enfants' ),
+		'de'    => array( 'Jahr', 'Jahre', 'Jahren', 'Monat', 'Monate', 'Woche', 'Wochen', 'Tag', 'Tage', 'Tagen', 'Stunde', 'Stunden', 'Minuten', 'Mal', 'Personen', 'Kinder' ),
+		'it'    => array( 'anno', 'anni', 'mese', 'mesi', 'settimana', 'settimane', 'giorno', 'giorni', 'ora', 'ore', 'minuti', 'volta', 'volte', 'persone', 'uomini', 'donne', 'figli' ),
+	);
+
+	/**
 	 * Transient holding the API's version catalogue (MVBR_API::get_catalog()).
 	 */
 	const CATALOG_CACHE_KEY = 'mvbr_versions_v3';
@@ -280,6 +478,28 @@ class MVBR_Books {
 	}
 
 	/**
+	 * Version for a verse, block or widget: the one asked for, else the default
+	 * of a language that overrides the plugin's, else the plugin setting. A
+	 * language override with the plugin's version would mix an English
+	 * reference with Portuguese text.
+	 *
+	 * @param string $version Version asked for, or empty.
+	 * @param string $locale  Language of this output, already normalized.
+	 * @param array  $options Plugin options.
+	 * @return string Version slug.
+	 */
+	public static function version_for_output( $version, $locale, $options ) {
+		if ( $version ) {
+			return self::resolve_version( $version );
+		}
+		$plugin_locale = self::normalize_locale( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
+		if ( $locale !== $plugin_locale || empty( $options['versao'] ) ) {
+			return self::resolve_version( self::get_default_version( $locale ) );
+		}
+		return self::resolve_version( $options['versao'] );
+	}
+
+	/**
 	 * Slugs in the cached version catalogue, as array keys.
 	 *
 	 * @return array<string, true>
@@ -322,7 +542,8 @@ class MVBR_Books {
 	 * caller enforces through the `abbr` group: many are everyday words
 	 * ("Am", "Ex", "Is", "Mar", "Job").
 	 *
-	 * Groups: name|abbr, ch, v (optional), ve (optional, needs v).
+	 * Groups: name|abbr, ch, v (optional), ve (optional, needs v), more (more
+	 * verses of the same chapter, ",18" in "João 3:16,18").
 	 *
 	 * @param string $locale Locale code.
 	 * @return string PCRE pattern with the `u` flag.
@@ -348,6 +569,15 @@ class MVBR_Books {
 				$abbrev[] = preg_quote( $book['abbrev'][ $locale ], '/' );
 			}
 		}
+		foreach ( array_keys( self::get_aliases( $locale ) ) as $alias ) {
+			if ( self::is_short_alias( $alias ) ) {
+				$abbrev[] = preg_quote( $alias, '/' );
+				continue;
+			}
+			foreach ( array_unique( array( $alias, self::strip_accents( $alias ) ) ) as $variant ) {
+				$names[] = self::first_letter_cased( $variant );
+			}
+		}
 
 		$by_length = function ( $a, $b ) {
 			return strlen( $b ) - strlen( $a );
@@ -359,18 +589,91 @@ class MVBR_Books {
 
 		// Chinese runs words together, so there is no space or letter boundary
 		// around the book; Korean attaches particles right after the number.
-		$cjk    = in_array( $locale, array( 'zh', 'ko' ), true );
-		$before = 'zh' === $locale ? '' : '(?<![\\p{L}\\p{N}])';
-		$gap    = 'zh' === $locale ? '\\s*' : '\\s+';
-		$after  = $cjk ? '(?!\\p{N}|[:\\.]\\d)' : '(?![\\p{L}\\p{N}]|[:\\.]\\d)';
+		$cjk = in_array( $locale, array( 'zh', 'ko' ), true );
+		// A lone 1, 2 or 3 right before the name means a numbered book we could
+		// not read ("1. João"): linking the name alone would open the wrong book.
+		// A verse number ("Mt 5:3 Lc 6:20") is not one, hence the inner check.
+		$numbered = '(?<![\\p{N}:\\.,])[123]';
+		$before   = 'zh' === $locale ? '' : '(?<![\\p{L}\\p{N}])(?<!' . $numbered . '\\s)(?<!' . $numbered . '\\.)(?<!' . $numbered . '\\.\\s)';
+		$gap      = 'zh' === $locale ? '\\s*' : '\\s+';
+		$after    = $cjk ? '(?!\\p{N}|[:\\.]\\d)' : '(?![\\p{L}\\p{N}]|[:\\.]\\d)';
+
+		// A bare chapter followed by a count word is not a reference.
+		$count = '';
+		if ( isset( self::COUNT_WORDS[ $locale ] ) ) {
+			$count = '(?(<v>)|(?!\\s+(?i:' . implode( '|', array_map( 'preg_quote', self::COUNT_WORDS[ $locale ] ) ) . ')(?![\\p{L}\\p{N}])))';
+		}
 
 		$cache[ $locale ] = '/' . $before
 			. '(?:(?<name>' . implode( '|', $names ) . ')|(?<abbr>' . implode( '|', $abbrev ) . '))'
 			. $gap . '(?<ch>\\d{1,3})'
-			. '(?:[:\\.](?<v>\\d{1,3})(?:\\s*[-–]\\s*(?<ve>\\d{1,3}))?)?'
-			. $after . '/u';
+			. '(?:[:\\.,](?<v>\\d{1,3})(?:\\s*[-–]\\s*(?<ve>\\d{1,3}))?(?<more>(?:,\\d{1,3}(?:[-–]\\d{1,3})?)+)?)?'
+			. $after . $count . '/u';
 
 		return $cache[ $locale ];
+	}
+
+	/**
+	 * Alternative spellings of the books in a locale, including numbered books
+	 * written with Roman numerals or ordinals and abbreviations with or without
+	 * the space after the number ("1Co", "1 Co").
+	 *
+	 * @param string $locale Locale code.
+	 * @return array<string, int> Spelling => book id.
+	 */
+	private static function get_aliases( $locale ) {
+		static $cache = array();
+
+		$locale = self::normalize_locale( $locale );
+		if ( isset( $cache[ $locale ] ) ) {
+			return $cache[ $locale ];
+		}
+
+		$aliases = isset( self::NAME_ALIASES[ $locale ] ) ? self::NAME_ALIASES[ $locale ] : array();
+
+		foreach ( self::get_books() as $book ) {
+			if ( isset( $book['names'][ $locale ] ) && preg_match( '/^([123]) (.+)$/u', $book['names'][ $locale ], $m ) ) {
+				$prefixes = isset( self::BOOK_ORDINALS[ $locale ][ (int) $m[1] ] ) ? self::BOOK_ORDINALS[ $locale ][ (int) $m[1] ] : array();
+				if ( in_array( $locale, self::ROMAN_NUMERAL_LOCALES, true ) ) {
+					$prefixes[] = str_repeat( 'I', (int) $m[1] );
+				}
+				foreach ( $prefixes as $prefix ) {
+					$aliases[ $prefix . ' ' . $m[2] ] = $book['id'];
+				}
+			}
+			if ( isset( $book['abbrev'][ $locale ] ) ) {
+				$aliases[ $book['abbrev'][ $locale ] ] = $book['id'];
+			}
+		}
+
+		foreach ( $aliases as $alias => $book_id ) {
+			if ( self::is_short_alias( $alias ) && preg_match( '/^([123])\\s*(\\D.*)$/u', $alias, $m ) ) {
+				$aliases[ $m[1] . $m[2] ]       = $book_id;
+				$aliases[ $m[1] . ' ' . $m[2] ] = $book_id;
+			}
+		}
+
+		// The plain abbreviations are already in the regex and the lookup table.
+		foreach ( self::get_books() as $book ) {
+			if ( isset( $book['abbrev'][ $locale ] ) ) {
+				unset( $aliases[ $book['abbrev'][ $locale ] ] );
+			}
+		}
+
+		$cache[ $locale ] = $aliases;
+		return $aliases;
+	}
+
+	/**
+	 * Whether a spelling is an abbreviation (four letters at most, not counting
+	 * the book number). Like the `abbrev` ones, these need chapter and verse,
+	 * since many are everyday words or names ("Ex", "Phil", "Josh").
+	 *
+	 * @param string $alias Spelling.
+	 * @return bool
+	 */
+	private static function is_short_alias( $alias ) {
+		return preg_match_all( '/\\p{L}/u', $alias ) <= 4;
 	}
 
 	/**
@@ -472,7 +775,9 @@ class MVBR_Books {
 	 *   "John 3"            → entire chapter
 	 *   "John 3:16"         → single verse
 	 *   "John 3.16"         → alternative separator
+	 *   "John 3,16"         → comma as separator, common in Portuguese and German
 	 *   "John 3:16-18"      → verse range
+	 *   "Jude 3"            → verse, in a single-chapter book
 	 *
 	 * Returns null when the book name cannot be resolved against any locale
 	 * (with and without accents), or when the chapter number exceeds the
@@ -489,7 +794,7 @@ class MVBR_Books {
 		}
 		// The book ends in a non-digit, so "Salmos 119" never splits into
 		// "Salmos 1" + "19"; the space is optional because Chinese has none.
-		if ( ! preg_match( '/^(.*?\D)\s*(\d{1,3})(?:[:\.](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m ) ) {
+		if ( ! preg_match( '/^(.*?\D)\s*(\d{1,3})(?:[:\.,](\d{1,3}))?(?:\s*[-–]\s*(\d{1,3}))?$/iu', $reference, $m ) ) {
 			return null;
 		}
 
@@ -513,6 +818,16 @@ class MVBR_Books {
 		if ( ! $book ) {
 			return null;
 		}
+
+		// In a single-chapter book a lone number is the verse: "Judas 3".
+		if ( null === $verse && $chapter > 1 && isset( self::SINGLE_CHAPTER_VERSES[ $book_id ] ) ) {
+			if ( $chapter > self::SINGLE_CHAPTER_VERSES[ $book_id ] ) {
+				return null;
+			}
+			$verse   = $chapter;
+			$chapter = 1;
+		}
+
 		if ( $chapter < 1 || $chapter > $book['chapters'] ) {
 			return null;
 		}
@@ -3072,13 +3387,25 @@ class MVBR_Books {
 		foreach ( $books as $book ) {
 			foreach ( $locales_to_check as $loc ) {
 				if ( isset( $book['names'][ $loc ] ) ) {
-					$lookup[ self::lower( $book['names'][ $loc ] ) ] = $book['id'];
+					$lookup[ self::lower( $book['names'][ $loc ] ) ]                        = $book['id'];
+					$lookup[ self::lower( self::strip_accents( $book['names'][ $loc ] ) ) ] = $book['id'];
 				}
 				if ( isset( $book['abbrev'][ $loc ] ) ) {
 					$lookup[ self::lower( $book['abbrev'][ $loc ] ) ] = $book['id'];
 				}
 				if ( isset( $book['slugs'][ $loc ] ) ) {
 					$lookup[ $book['slugs'][ $loc ] ] = $book['id'];
+				}
+			}
+		}
+
+		// Aliases last, so they never take a slot from an official name.
+		foreach ( $locales_to_check as $loc ) {
+			foreach ( self::get_aliases( $loc ) as $alias => $book_id ) {
+				foreach ( array( self::lower( $alias ), self::lower( self::strip_accents( $alias ) ) ) as $key_form ) {
+					if ( ! isset( $lookup[ $key_form ] ) ) {
+						$lookup[ $key_form ] = $book_id;
+					}
 				}
 			}
 		}

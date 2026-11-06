@@ -41,8 +41,8 @@ class MVBR_Widget extends WP_Widget {
 		$title          = ! empty( $instance['title'] ) ? $instance['title'] : '';
 		$locale         = ! empty( $instance['locale'] ) ? $instance['locale'] : '';
 		$version        = ! empty( $instance['version'] ) ? $instance['version'] : '';
-		$show_reference = ! empty( $instance['show_reference'] ) ? (bool) $instance['show_reference'] : true;
-		$link_verse     = ! empty( $instance['link_verse'] ) ? (bool) $instance['link_verse'] : true;
+		$show_reference = isset( $instance['show_reference'] ) ? (bool) $instance['show_reference'] : true;
+		$link_verse     = isset( $instance['link_verse'] ) ? (bool) $instance['link_verse'] : true;
 
 		echo wp_kses_post( $args['before_widget'] );
 
@@ -182,7 +182,8 @@ function mvbr_render_votd( $atts = array() ) {
 	$options = get_option( 'mvbr_options', array() );
 	$locale  = $atts['locale'] ? MVBR_Books::normalize_locale( $atts['locale'] )
 								: ( isset( $options['locale'] ) ? $options['locale'] : 'pt-br' );
-	$version = MVBR_Books::resolve_version( $atts['version'] ? $atts['version'] : ( isset( $options['versao'] ) ? $options['versao'] : MVBR_Books::get_default_version( $locale ) ) );
+	$locale  = MVBR_Books::normalize_locale( $locale );
+	$version = MVBR_Books::version_for_output( $atts['version'], $locale, $options );
 
 	$api  = new MVBR_API();
 	$data = $api->get_votd( $locale, $version );

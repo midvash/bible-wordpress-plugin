@@ -33,6 +33,7 @@
     ];
 
     registerBlockType('midvash-bible-references/verse', {
+        apiVersion:  3,
         title:       __('Bible Verse', 'midvash-bible-references') + ' — Midvash',
         description: __('Display a specific Bible verse with styling and a link to Midvash.', 'midvash-bible-references'),
         category:    'text',

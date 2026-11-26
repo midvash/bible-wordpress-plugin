@@ -33,9 +33,15 @@ class MVBR_Block {
 			return;
 		}
 
+		// The editor runs inside an iframe since WordPress 6.9 (API version 3),
+		// so the preview card's CSS has to come in as the block's editor style.
+		wp_register_style( 'mvbr-block-editor', mvbr_asset_url( 'assets/css/mvbr.css' ), array(), MVBR_VERSION );
+
 		register_block_type(
 			'midvash-bible-references/verse',
 			array(
+				'api_version'     => '3',
+				'editor_style'    => 'mvbr-block-editor',
 				'render_callback' => array( $this, 'render' ),
 				'attributes'      => array(
 					'reference'      => array(

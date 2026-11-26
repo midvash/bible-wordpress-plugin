@@ -2,8 +2,8 @@
 Contributors: midvash
 Tags: bible, biblia, bible verse, tooltip, gutenberg block
 Requires at least: 5.0
-Tested up to: 7.1
-Stable tag: 1.0.2
+Tested up to: 7.2
+Stable tag: 1.0.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -136,6 +136,10 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 
 == Changelog ==
 
+= 1.0.3 =
+* **Tested:** WordPress 7.2.
+* **Fixed:** the Bible Verse block uses block API version 3, so the editor no longer warns that it is deprecated and the block works inside the iframed editor, with its preview card styled.
+
 = 1.0.2 =
 * **Fixed:** "1 Jo 4:8" and similar forms no longer open the Gospel of John. A lone 1, 2 or 3 before a book name is never dropped.
 * **Fixed:** the Bible Verse block now shows whole chapters, and tooltips no longer number their verses "NaN".
@@ -251,6 +255,9 @@ This plugin does **not** collect, store or transmit any visitor data. No cookies
 * Distributed via https://midvash.com/wordpress-plugin.
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Ready for WordPress 7.2: the Bible Verse block moves to block API version 3 and works in the iframed editor.
 
 = 1.0.2 =
 Fixes references that opened the wrong book, whole chapters in the block and the "NaN" in tooltips, and links many more ways of writing a reference.
